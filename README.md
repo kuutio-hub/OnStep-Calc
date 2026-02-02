@@ -23,7 +23,7 @@ The goal of this application is to simplify the complex process of configuring O
 This project adheres strictly to the development framework outlined in `Prompt_0`. Key principles include:
 - **No JS Frameworks:** The application uses only vanilla JavaScript (ES6+ Modules).
 - **No Build Step:** The code is written to run directly in the browser without any need for transpilation or bundling.
-- **Single-File Structure:** All HTML, CSS, and JavaScript are contained within a single `index.html` file to ensure simplicity and portability. Data templates are fetched dynamically.
+- **Modular Structure:** The core application logic, styling, and structure are contained within `index.html` for simplicity. To allow for easier maintenance and translation, it dynamically fetches external data files such as language packs (`locales/*.json`) and configuration templates (`template-*.txt`).
 - **Responsiveness & Accessibility:** The design is optimized for desktop and tablet use and is built with accessibility (ARIA, semantic HTML) in mind.
 
 ## How to Run

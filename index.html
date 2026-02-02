@@ -39,7 +39,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh;
+            height: 100vh;
             padding: 2rem 1rem;
             position: relative;
             overflow: hidden;
@@ -52,7 +52,8 @@
             position: relative; z-index: 10; max-width: 900px; width: 100%;
             padding: 2.5rem; background-color: var(--container-bg); border-radius: var(--border-radius);
             border: 1px solid var(--border-color); box-shadow: 0 8px 32px 0 var(--shadow-color);
-            text-align: center; transition: all 0.3s ease; flex-grow: 1; display: flex; flex-direction: column;
+            text-align: center; transition: all 0.3s ease; flex: 1; display: flex; flex-direction: column;
+            max-height: calc(100vh - 4rem);
         }
         
         .app-header { position: absolute; top: 1rem; right: 1rem; display: flex; align-items: center; z-index: 20; }
@@ -64,7 +65,7 @@
         h3 { font-size: 1.5rem; margin-bottom: 1rem; }
         p { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; margin: 0 auto 2.5rem auto; }
         
-        .main-content { flex-grow: 1; display: flex; flex-direction: column; }
+        .main-content { flex: 1; display: flex; flex-direction: column; min-height: 0; }
         .version-selector-container { display: flex; gap: 2rem; justify-content: center; align-items: stretch; margin-bottom: 2rem; }
         .version-card { background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 2rem; flex: 1; max-width: 320px; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; text-align: center; }
         .version-card:hover { transform: translateY(-5px); border-color: var(--primary-accent); box-shadow: 0 10px 30px 0 var(--shadow-color); }
@@ -82,7 +83,7 @@
         .button:disabled { opacity: 0.5; cursor: not-allowed; border-color: var(--border-color); color: var(--text-muted); background: none; }
         
         /* --- Wizard Styles --- */
-        #config-wizard { text-align: left; display: flex; flex-direction: column; flex-grow: 1; }
+        #config-wizard { text-align: left; display: flex; flex-direction: column; flex: 1; min-height: 0; }
         .wizard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; position: relative; flex-shrink: 0; }
         .back-button { background: none; border: 1px solid var(--border-color); color: var(--text-muted); padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s ease; }
         .back-button:hover { color: var(--text-color); border-color: var(--primary-accent); }
@@ -90,7 +91,8 @@
         .form-group { margin-bottom: 1.5rem; display: flex; flex-direction: column; }
         .form-group-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
         .form-group label { font-size: 1rem; font-weight: bold; color: var(--text-color); margin-bottom: 0.5rem; display: flex; align-items: center; }
-        .info-icon { display: inline-block; width: 18px; height: 18px; border-radius: 50%; background-color: var(--border-color); color: var(--text-color); text-align: center; font-size: 12px; line-height: 18px; margin-left: 8px; cursor: pointer; transition: background-color 0.2s; }
+        .form-group label code { margin-left: 8px; font-size: 0.8em; opacity: 0.6; background: var(--border-color); padding: 0.1em 0.4em; border-radius: 4px; }
+        .info-icon { display: inline-block; width: 18px; height: 18px; border-radius: 50%; background-color: var(--border-color); color: var(--text-color); text-align: center; font-size: 12px; line-height: 18px; margin-left: 8px; cursor: pointer; transition: background-color 0.2s; flex-shrink: 0; }
         .info-icon:hover { background-color: var(--primary-accent); }
         .form-group select, .form-group input[type="text"], .form-group input[type="number"] { width: 100%; padding: 0.75rem 1rem; background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color); font-size: 1rem; transition: border-color 0.2s, box-shadow 0.2s; }
         .form-group select:focus, .form-group input:focus { outline: none; border-color: var(--primary-accent); box-shadow: 0 0 0 3px var(--shadow-color); }
@@ -99,15 +101,15 @@
         .calculator-grid label { font-size: 0.9rem; font-weight: normal; cursor: pointer; }
         .calculator-grid .form-group { margin-bottom: 0; }
         .wizard-nav { margin-top: auto; padding-top: 1.5rem; display: flex; justify-content: space-between; flex-shrink: 0; border-top: 1px solid var(--border-color); }
-        .step-container { flex-grow: 1; overflow-y: auto; padding: 1.5rem 1rem 1.5rem 0; margin-top: 1.5rem; border-top: 1px solid var(--border-color); }
+        .step-container { flex: 1; overflow-y: auto; padding: 1.5rem 1rem 1.5rem 0; margin-top: 1.5rem; border-top: 1px solid var(--border-color); min-height: 0; }
         #config-preview { width: 100%; height: 100%; background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-muted); font-family: 'Courier New', Courier, monospace; font-size: 0.8rem; padding: 1rem; resize: vertical; }
         .axis-section h3 { font-size: 1.2rem; color: var(--secondary-accent); border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-top: 2rem; }
         .axis-section:first-child h3 { margin-top: 0; }
         .microstep-display { background: var(--input-bg); padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid var(--border-color); font-style: italic; color: var(--text-muted); font-size: 0.9rem; }
 
         /* --- Wiki Section --- */
-        #wiki-section { text-align: left; display: flex; flex-direction: column; flex-grow: 1; }
-        #wiki-content { display: flex; gap: 2rem; margin-top: 1rem; flex-grow: 1; overflow: hidden; }
+        #wiki-section { text-align: left; display: flex; flex-direction: column; flex: 1; min-height: 0; }
+        #wiki-content { display: flex; gap: 2rem; margin-top: 1rem; flex: 1; overflow: hidden; min-height: 0; }
         #wiki-nav { flex: 0 0 200px; overflow-y: auto; }
         #wiki-nav ul { list-style: none; padding: 0; margin: 0; }
         #wiki-nav a { display: block; padding: 0.5rem 1rem; color: var(--text-muted); text-decoration: none; border-radius: 6px; transition: background-color 0.2s, color 0.2s; }
@@ -133,7 +135,7 @@
         .modal-body strong { color: var(--text-color); }
 
         /* --- Footer --- */
-        footer { width: 100%; max-width: 900px; padding: 1.5rem 2.5rem; margin-top: auto; text-align: center; font-size: 0.9rem; color: var(--text-muted); }
+        footer { width: 100%; max-width: 900px; padding-top: 1.5rem; text-align: center; font-size: 0.9rem; color: var(--text-muted); }
     </style>
 </head>
 <body>
@@ -223,6 +225,19 @@
             </div>
             <div class="modal-body">
                 <div class="form-group-grid">
+                     <div class="form-group">
+                        <label for="belt-type" data-lang-key="beltCalcType"></label>
+                        <select id="belt-type">
+                            <option value="2">GT2 (2mm pitch)</option>
+                            <option value="3">GT3 (3mm pitch)</option>
+                            <option value="3">HTD-3M (3mm pitch)</option>
+                            <option value="5">HTD-5M (5mm pitch)</option>
+                        </select>
+                    </div>
+                     <div class="form-group">
+                        <label for="belt-pitch" data-lang-key="beltCalcPitch"></label>
+                        <input type="number" id="belt-pitch" value="2" readonly style="background: #222;">
+                    </div>
                     <div class="form-group">
                         <label for="belt-p1" data-lang-key="beltCalcP1"></label>
                         <input type="number" id="belt-p1" value="16">
@@ -230,10 +245,6 @@
                      <div class="form-group">
                         <label for="belt-p2" data-lang-key="beltCalcP2"></label>
                         <input type="number" id="belt-p2" value="48">
-                    </div>
-                     <div class="form-group">
-                        <label for="belt-pitch" data-lang-key="beltCalcPitch"></label>
-                        <input type="number" id="belt-pitch" value="2">
                     </div>
                     <div class="form-group">
                         <label for="belt-distance" data-lang-key="beltCalcDist"></label>
@@ -252,7 +263,7 @@
         // ===================================================================================
         // CONSTANTS & CONFIGURATION
         // ===================================================================================
-        const APP_VERSION = "0.0.4.1-beta";
+        const APP_VERSION = "0.0.4.2-beta";
 
         const calculatorOptions = {
             motorSteps: [200, 400],
@@ -481,6 +492,11 @@
             const label = document.createElement('label');
             label.htmlFor = key;
             label.textContent = appState.i18n[def.labelKey] || key;
+            
+            const codeTag = document.createElement('code');
+            codeTag.textContent = `(${key})`;
+            label.appendChild(codeTag);
+
             const infoIcon = document.createElement('span');
             infoIcon.className = 'info-icon';
             infoIcon.textContent = '?';
@@ -511,7 +527,6 @@
         function createCalculatorDOM(axisKey) {
             const container = document.createElement('div');
             
-            // Radio buttons for mode selection
             const radioGroup = document.createElement('div');
             radioGroup.className = 'radio-group';
             radioGroup.innerHTML = `
@@ -520,7 +535,6 @@
             `;
             container.appendChild(radioGroup);
 
-            // Preset dropdown
             const presetGroup = document.createElement('div');
             presetGroup.id = `preset_group_${axisKey}`;
             const presetSelect = document.createElement('select');
@@ -535,35 +549,37 @@
             presetGroup.appendChild(presetSelect);
             container.appendChild(presetGroup);
 
-            // Custom calculation grid
             const grid = document.createElement('div');
             grid.className = 'calculator-grid hidden';
             grid.id = `custom_group_${axisKey}`;
             grid.dataset.axis = axisKey;
             
             const fields = { 
-                motorSteps: { labelKey: 'CALC_MOTOR_STEPS_LABEL', descKey: 'CALC_MOTOR_STEPS_DESC', defaultValue: 200 },
-                beltMotor: { labelKey: 'CALC_BELT_MOTOR_LABEL', descKey: 'CALC_BELT_MOTOR_DESC', defaultValue: 16 },
-                beltWorm: { labelKey: 'CALC_BELT_WORM_LABEL', descKey: 'CALC_BELT_WORM_DESC', defaultValue: 48 },
-                wormTeeth: { labelKey: 'CALC_WORM_TEETH_LABEL', descKey: 'CALC_WORM_TEETH_DESC', defaultValue: 144 }
+                motorSteps: { labelKey: 'CALC_MOTOR_STEPS_LABEL', key: 'motorSteps' },
+                beltMotor: { labelKey: 'CALC_BELT_MOTOR_LABEL', key: 'beltMotor' },
+                beltWorm: { labelKey: 'CALC_BELT_WORM_LABEL', key: 'beltWorm' },
+                wormTeeth: { labelKey: 'CALC_WORM_TEETH_LABEL', key: 'wormTeeth' }
             };
 
-            for (const fieldKey in fields) {
-                const field = fields[fieldKey];
+            for (const fieldId in fields) {
+                const field = fields[fieldId];
                 const formGroup = document.createElement('div');
                 formGroup.className = 'form-group';
 
                 const label = document.createElement('label');
                 label.textContent = appState.i18n[field.labelKey];
-                label.dataset.infoKey = fieldKey;
                 
+                const codeTag = document.createElement('code');
+                codeTag.textContent = `(${field.key})`;
+                label.appendChild(codeTag);
+
                 const select = document.createElement('select');
-                select.dataset.field = fieldKey;
+                select.dataset.field = fieldId;
                 
-                calculatorOptions[fieldKey].forEach(opt => {
+                calculatorOptions[fieldId].forEach(opt => {
                     const option = document.createElement('option');
                     option.value = opt; option.textContent = opt;
-                    if (opt === field.defaultValue) option.selected = true;
+                    if (String(opt) === String(calculatorOptions[fieldId][fieldId === 'beltWorm' ? 2 : 0])) option.selected = true; // Default to common values
                     select.appendChild(option);
                 });
                 
@@ -575,7 +591,8 @@
             microstepGroup.className = 'form-group';
             const microstepLabel = document.createElement('label');
             microstepLabel.textContent = appState.i18n.CALC_MICROSTEPS_LABEL;
-            microstepLabel.dataset.infoKey = 'microsteps';
+            const microstepCode = document.createElement('code'); microstepCode.textContent = `(microsteps)`; microstepLabel.appendChild(microstepCode);
+
             const microstepDisplay = document.createElement('div');
             microstepDisplay.className = 'microstep-display';
             microstepDisplay.dataset.field = "microsteps_display";
@@ -740,21 +757,9 @@
             URL.revokeObjectURL(url);
         }
 
-        function showInfoModal(key, isCalc = false) {
-            let def;
-            if (isCalc) {
-                const fields = { 
-                    motorSteps: { labelKey: 'CALC_MOTOR_STEPS_LABEL', descriptionKey: 'CALC_MOTOR_STEPS_DESC' },
-                    microsteps: { labelKey: 'CALC_MICROSTEPS_LABEL', descriptionKey: 'CALC_MICROSTEPS_DESC' },
-                    beltMotor: { labelKey: 'CALC_BELT_MOTOR_LABEL', descriptionKey: 'CALC_BELT_MOTOR_DESC' },
-                    beltWorm: { labelKey: 'CALC_BELT_WORM_LABEL', descriptionKey: 'CALC_BELT_WORM_DESC' },
-                    wormTeeth: { labelKey: 'CALC_WORM_TEETH_LABEL', descriptionKey: 'CALC_WORM_TEETH_DESC' }
-                };
-                def = fields[key];
-            } else {
-                 const stepSchema = schemas[appState.version]?.[appState.wizardStep];
-                 def = stepSchema?.[key];
-            }
+        function showInfoModal(key) {
+             const stepSchema = schemas[appState.version]?.[appState.wizardStep];
+             const def = stepSchema?.[key];
            
             if (def) {
                 dom.infoModalTitle.innerHTML = appState.i18n[def.labelKey] || key;
@@ -802,13 +807,38 @@
             const canvas = dom.constellationCanvas;
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'rgba(224, 229, 240, 0.7)';
+            ctx.strokeStyle = 'rgba(224, 229, 240, 0.1)';
+            ctx.lineWidth = 0.5;
+
             stars.forEach(star => {
                 star.x += star.vx; star.y += star.vy;
                 if (star.x < 0 || star.x > canvas.width) star.vx *= -1;
                 if (star.y < 0 || star.y > canvas.height) star.vy *= -1;
-                ctx.fillStyle = 'rgba(224, 229, 240, 0.7)';
                 ctx.beginPath(); ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2); ctx.fill();
             });
+
+            for (let i = 0; i < stars.length; i++) {
+                const star1 = stars[i];
+                let closest = [];
+                for (let j = 0; j < stars.length; j++) {
+                    if (i === j) continue;
+                    const star2 = stars[j];
+                    const dist = Math.sqrt(Math.pow(star1.x - star2.x, 2) + Math.pow(star1.y - star2.y, 2));
+                    if (dist < 150) {
+                        closest.push({ star: star2, dist: dist });
+                    }
+                }
+                closest.sort((a, b) => a.dist - b.dist);
+                const neighborsToConnect = Math.min(2, closest.length);
+                for (let k = 0; k < neighborsToConnect; k++) {
+                    const neighbor = closest[k].star;
+                    ctx.beginPath();
+                    ctx.moveTo(star1.x, star1.y);
+                    ctx.lineTo(neighbor.x, neighbor.y);
+                    ctx.stroke();
+                }
+            }
             requestAnimationFrame(animateBackground);
         }
         
@@ -829,13 +859,20 @@
             dom.wikiNav.addEventListener('click', e => { e.preventDefault(); if (e.target.tagName === 'A') renderWikiPage(e.target.hash.substring(1)); });
             dom.languageSelector.addEventListener('change', (e) => loadLanguage(e.target.value));
 
-            dom.beltCalcModal.addEventListener('input', calculateBeltLength);
+            const beltTypeSelector = document.getElementById('belt-type');
+            const beltPitchInput = document.getElementById('belt-pitch');
+            beltTypeSelector.addEventListener('change', (e) => {
+                beltPitchInput.value = e.target.value;
+                calculateBeltLength();
+            });
+            dom.beltCalcModal.addEventListener('input', e => {
+                if (e.target.id !== 'belt-type') calculateBeltLength();
+            });
         }
         
         function bindWizardEvents() {
             dom.configWizard.addEventListener('click', e => {
                  if (e.target.classList.contains('info-icon')) showInfoModal(e.target.dataset.key);
-                 else if (e.target.matches('.calculator-grid label[data-info-key]')) showInfoModal(e.target.dataset.infoKey, true);
             });
 
             dom.configWizard.addEventListener('change', e => {
@@ -873,12 +910,6 @@
         }
 
         async function init() {
-            // FEJLESZTÉSI MEGJEGYZÉS: A tesztkörnyezetben a böngésző nyelvfelismerése megbízhatatlan lehet.
-            // A fejlesztés idejére a nyelvet fixen magyarra állítjuk a felhasználó kérésére.
-            // Ezt a főverzió kiadása előtt vissza kell állítani az automatikus felismerésre.
-            const initialLang = 'hu';
-
-            /* Eredeti automatikus nyelvfelismerő logika (főverzióhoz visszaállítandó):
             const savedLang = localStorage.getItem('onstep_language');
             const browserLang = navigator.language.split('-')[0];
             
@@ -888,7 +919,6 @@
             } else if (['en', 'de', 'es', 'hu'].includes(browserLang)) {
                 initialLang = browserLang;
             }
-            */
             
             await loadLanguage(initialLang);
             bindEventListeners();

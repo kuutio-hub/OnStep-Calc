@@ -6,40 +6,39 @@ All notable changes to this project will be documented in this file.
 The format is based on on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.4.2-beta] - 2024-06-05
+
+### Added
+- **UI Clarity:** Added inline `<code>` tags next to each form label, displaying the corresponding `#define` variable name from the source code (e.g., `(PINMAP)`). This helps experienced users immediately recognize the parameters.
+- **Belt Calculator Enhancement:** The belt length calculator modal now includes a "Belt Type" selector (GT2, HTD-3M, etc.), which automatically sets the correct pitch value, improving accuracy and usability.
+
+### Changed
+- **Re-enabled Language Detection:** The temporary hardcoding of the Hungarian language has been removed. The application now properly uses its automatic language detection logic (checking `localStorage`, then browser language, then falling back to English).
+- **README.md Update:** The "Framework" section has been updated to more accurately reflect the project's structure, noting that while the core app is in `index.html`, it fetches modular data files like locales and templates.
+
+### Fixed
+- **Critical UI Bug - Wizard Scrolling:** The persistent scrolling issue on long wizard pages (like Driver Settings) has been definitively fixed by re-engineering the flexbox layout of the main content and wizard containers. The content area is now guaranteed to be scrollable on all screen sizes.
+- **Visuals - Background Animation:** The lines connecting the stars in the background animation have been restored and improved. The new logic creates smaller, more aesthetically pleasing "island-like" constellations instead of a uniform web.
+
 ## [0.0.4.1-beta] - 2024-06-04
 
 ### Fixed
-- **Development Environment:** Temporarily hardcoded the default language to Hungarian (`hu`) to bypass browser language detection issues within the specific test environment, ensuring all text labels load correctly during development. This is a temporary measure as requested.
+- **Development Environment:** Temporarily hardcoded the default language to Hungarian (`hu`) to bypass browser language detection issues within the specific test environment, ensuring all text labels load correctly during development. This was a temporary measure.
 
 ## [0.0.4.0-beta] - 2024-06-03
 
 ### Added
-- **External Language Files:** Reverted to using external JSON files for localization (`locales/en.json`, `locales/hu.json`, etc.) to facilitate community contributions. Added robust error handling to fall back to English if a language file is missing.
+- **External Language Files:** Reverted to using external JSON files for localization (`locales/*.json`) to facilitate community contributions. Added robust error handling to fall back to English if a language file is missing.
 - **Advanced Gearing Calculator:**
-    - Implemented a mode switch in the calculator: "Preset Ratio" for beginners (selecting from a list of common mounts) and "Custom Calculation" for advanced users.
-    - Added a new "Belt Length Calculator" utility in a modal to help users determine the correct belt size based on pulley teeth and axle distance.
-- **New Feature - Belt Length Calculator:** A new modal utility to calculate the required belt length and nearest tooth count based on pulley sizes, pitch, and distance.
+    - Implemented a mode switch in the calculator: "Preset Ratio" and "Custom Calculation".
+    - Added a "Belt Length Calculator" utility.
 
 ### Changed
-- **Config Generation Logic:** Generation is now triggered only upon entering the final "Summary" step, making the process more efficient and reliable. The preview is instantly available without a "Generate" button.
-- **UI/UX - Logical Flow:** The "Microsteps" setting in the Gearing Calculator is now a read-only display that reflects the value chosen in Step 3 ("Driver Settings"), eliminating redundancy and clarifying the source of truth.
+- **Config Generation Logic:** Generation is now triggered upon entering the final "Summary" step.
+- **UI/UX - Logical Flow:** The "Microsteps" setting in the Gearing Calculator is now a read-only display.
 
 ### Fixed
-- **UI Bug - Wizard Scrolling:** Re-engineered the CSS for the wizard to ensure the content area (`.step-container`) is always scrollable on any screen size, preventing navigation buttons from becoming inaccessible.
-- **File Structure:** Removed the forbidden and unused `index.tsx` file as per project rules.
+- **File Structure:** Removed the forbidden and unused `index.tsx` file.
 
-## [0.0.3.9-beta] - 2024-06-02
-
-### Added
-- **Internationalization (i18n):** The application now fully supports English, German, and Spanish, in addition to Hungarian. It auto-detects the browser's language on the first visit.
-- **Real-time Config Generation:** The `Config.h` preview on the final step is now generated and updated in real-time as the user changes any setting, eliminating the need for a "Generate" button.
-
-### Changed
-- **UI/UX - Calculator:** Replaced the number inputs in the `STEPS_PER_DEGREE` calculator with dropdowns (`<select>`) containing common, predefined values to reduce user error.
-- **UI/UX - Interactive Help:** Calculator labels (e.g., "Motor Steps") are now clickable and will open the info modal with a detailed explanation.
-
-### Fixed
-- **UI Bug - Wizard Scrolling:** Fixed a CSS issue where long wizard steps (like Driver Settings) would overflow on smaller screens without a scrollbar. The form content is now properly scrollable, keeping navigation buttons visible.
-
-## [0.1.0] - [0.0.3.8-beta]
+## [0.1.0] - [0.0.3.9-beta]
 - Initial development phases, feature additions, and bug fixes.
