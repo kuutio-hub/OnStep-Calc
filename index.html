@@ -252,7 +252,7 @@
         // ===================================================================================
         // CONSTANTS & CONFIGURATION
         // ===================================================================================
-        const APP_VERSION = "0.0.4.0-beta";
+        const APP_VERSION = "0.0.4.1-beta";
 
         const calculatorOptions = {
             motorSteps: [200, 400],
@@ -873,6 +873,12 @@
         }
 
         async function init() {
+            // FEJLESZTÉSI MEGJEGYZÉS: A tesztkörnyezetben a böngésző nyelvfelismerése megbízhatatlan lehet.
+            // A fejlesztés idejére a nyelvet fixen magyarra állítjuk a felhasználó kérésére.
+            // Ezt a főverzió kiadása előtt vissza kell állítani az automatikus felismerésre.
+            const initialLang = 'hu';
+
+            /* Eredeti automatikus nyelvfelismerő logika (főverzióhoz visszaállítandó):
             const savedLang = localStorage.getItem('onstep_language');
             const browserLang = navigator.language.split('-')[0];
             
@@ -882,6 +888,7 @@
             } else if (['en', 'de', 'es', 'hu'].includes(browserLang)) {
                 initialLang = browserLang;
             }
+            */
             
             await loadLanguage(initialLang);
             bindEventListeners();

@@ -6,6 +6,11 @@ All notable changes to this project will be documented in this file.
 The format is based on on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.4.1-beta] - 2024-06-04
+
+### Fixed
+- **Development Environment:** Temporarily hardcoded the default language to Hungarian (`hu`) to bypass browser language detection issues within the specific test environment, ensuring all text labels load correctly during development. This is a temporary measure as requested.
+
 ## [0.0.4.0-beta] - 2024-06-03
 
 ### Added
@@ -36,30 +41,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - **UI Bug - Wizard Scrolling:** Fixed a CSS issue where long wizard steps (like Driver Settings) would overflow on smaller screens without a scrollbar. The form content is now properly scrollable, keeping navigation buttons visible.
 
-## [0.0.3.8-beta] - 2024-06-01
-
-### Added
-- **Core Template Files:** Created `template-onstep.txt` and `template-onstepx.txt` which were missing from the project.
-
-### Fixed
-- **Config Generation Error:** The `HTTP error! status: 404` during config file generation is now resolved. The `fetch` call can now successfully load the required template files.
-
-## [0.0.3.7-beta] - 2024-05-31
-
-### Changed
-- **Code Refactoring:** Reorganized the JavaScript code within `index.html` into logical, commented sections to improve readability and maintainability.
-
-### Removed
-- **Forbidden File:** Deleted the unused and forbidden `index.tsx` file.
-
-## [0.0.3.6-beta] - 2024-05-30
-
-### Fixed
-- **Critical Error (404 Not Found):** Permanently fixed the language file loading error by embedding the localization data directly into the `index.html` script.
-
-### Removed
-- **External Language File:** Deleted `locales/hu.json` as its content is now embedded in `index.html`.
-- **Forbidden File:** Removed the unused `index.tsx` file.
-
-## [0.1.0] - [0.0.3.5-beta]
+## [0.1.0] - [0.0.3.8-beta]
 - Initial development phases, feature additions, and bug fixes.
