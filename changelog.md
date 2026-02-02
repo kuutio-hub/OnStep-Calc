@@ -6,6 +6,23 @@ All notable changes to this project will be documented in this file.
 The format is based on on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.4.0-beta] - 2024-06-03
+
+### Added
+- **External Language Files:** Reverted to using external JSON files for localization (`locales/en.json`, `locales/hu.json`, etc.) to facilitate community contributions. Added robust error handling to fall back to English if a language file is missing.
+- **Advanced Gearing Calculator:**
+    - Implemented a mode switch in the calculator: "Preset Ratio" for beginners (selecting from a list of common mounts) and "Custom Calculation" for advanced users.
+    - Added a new "Belt Length Calculator" utility in a modal to help users determine the correct belt size based on pulley teeth and axle distance.
+- **New Feature - Belt Length Calculator:** A new modal utility to calculate the required belt length and nearest tooth count based on pulley sizes, pitch, and distance.
+
+### Changed
+- **Config Generation Logic:** Generation is now triggered only upon entering the final "Summary" step, making the process more efficient and reliable. The preview is instantly available without a "Generate" button.
+- **UI/UX - Logical Flow:** The "Microsteps" setting in the Gearing Calculator is now a read-only display that reflects the value chosen in Step 3 ("Driver Settings"), eliminating redundancy and clarifying the source of truth.
+
+### Fixed
+- **UI Bug - Wizard Scrolling:** Re-engineered the CSS for the wizard to ensure the content area (`.step-container`) is always scrollable on any screen size, preventing navigation buttons from becoming inaccessible.
+- **File Structure:** Removed the forbidden and unused `index.tsx` file as per project rules.
+
 ## [0.0.3.9-beta] - 2024-06-02
 
 ### Added
@@ -30,82 +47,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.0.3.7-beta] - 2024-05-31
 
 ### Changed
-- **Code Refactoring:** Reorganized the JavaScript code within `index.html` into logical, commented sections (Configuration, State, UI Rendering, Event Handlers, etc.) to improve readability and maintainability while adhering to the single-file constraint.
+- **Code Refactoring:** Reorganized the JavaScript code within `index.html` into logical, commented sections to improve readability and maintainability.
 
 ### Removed
-- **Forbidden File:** Deleted the unused and forbidden `index.tsx` file to ensure full compliance with the project framework.
+- **Forbidden File:** Deleted the unused and forbidden `index.tsx` file.
 
 ## [0.0.3.6-beta] - 2024-05-30
 
 ### Fixed
-- **Critical Error (404 Not Found):** Permanently fixed the language file loading error by embedding the localization data directly into the main `index.html` script. This eliminates the `fetch` call and the possibility of a 404 error for language files.
+- **Critical Error (404 Not Found):** Permanently fixed the language file loading error by embedding the localization data directly into the `index.html` script.
 
 ### Removed
 - **External Language File:** Deleted `locales/hu.json` as its content is now embedded in `index.html`.
-- **Forbidden File:** Removed the unused and forbidden `index.tsx` file to maintain project compliance.
+- **Forbidden File:** Removed the unused `index.tsx` file.
 
-## [0.0.3.5-beta] - 2024-05-29
-
-### Added
-- **New Feature - Driver Configuration:** Added a new "Step 3: Driver Configuration" to the wizard. Users can now set the driver model, microstepping for tracking and GOTO, and reverse direction for both axes.
-- **Created Core Data Files:** Added the previously missing `locales/hu.json`, `template-onstep.txt`, and `template-onstepx.txt` files to the project.
-
-### Changed
-- **Wizard Flow:** The wizard is now a complete 4-step process: Basics -> Gearing -> Drivers -> Summary & Generation.
-- **UI:** The new driver settings step groups options by axis (RA/AZM and DEC/ALT) for better usability.
-
-### Fixed
-- **Critical Error (404 Not Found):** Creating the core data and template files completely resolves the `HTTP error! status: 404` on startup. The application now loads all texts and templates correctly.
-- **Project Structure:** Removed the forbidden and unused `index.tsx` file.
-
-## [0.0.3.4-beta] - 2024-05-28
-
-### Added
-- **Core Feature: Config Generation:** Implemented the final wizard step to generate and download the `Config.h` file.
-- **Config Preview:** The generated file content is now displayed in a preview text area before download.
-- **Download Functionality:** A "Download" button now allows users to save the generated `Config.h` file.
-
-### Changed
-- **Wizard Flow:** The wizard was updated to a 3-step process.
-- **Architecture:** The generation logic fetches the correct template file and uses regular expressions to inject user-configured values.
-
-## [0.0.3.3-beta] - 2024-05-27
-
-### Added
-- **Multi-Step Wizard:** Implemented the foundation for a multi-step configuration wizard.
-- **New Wizard Step 2:** Added the "Motor & Gearing" configuration step.
-- **STEPS_PER_DEGREE Calculator:** Added an interactive calculator for the `STEPS_PER_DEGREE` value.
-- **UI/UX - Main Page:** Redesigned the home screen with simplified version cards and a detailed comparison panel.
-
-### Changed
-- **UI/UX - Background:** Simplified the animated background to create distinct "constellation islands".
-
-### Fixed
-- **Navigation:** The "Back to Home" button on the Wiki page is now fully functional.
-- **Layout:** Correctly positioned the footer at the bottom of the page content.
-
-## [0.0.3.2-beta] - 2024-05-26
-
-### Added
-- **UI/UX - Dynamic Background:** Replaced the static background with a dynamic, animated parallax starfield.
-- **New Feature - Wiki/Knowledge Base:** Added a "Wiki / Súgó" button and a new dedicated section.
-
-## [0.3.1-beta] - 2024-05-25
-
-### Added
-- **Internationalization (i18n):** All UI strings are now loaded from an external `locales/hu.json` file.
-
-## [0.3.0] - 2024-05-24
-
-### Added
-- **Navigation & UI:** Added a "Back to Home" button, footer, and the first version of the SVG constellation background.
-
-## [0.2.0] - 2024-05-23
-
-### Added
-- **Dynamic Wizard:** Implemented the first step of the configuration wizard with data-driven controls and interactive help.
-
-## [0.1.0] - 2024-05-22
-
-### Added
-- **Project Overhaul:** Created the "OnStep Visual Configurator" with a new dark theme and version selection screen.
+## [0.1.0] - [0.0.3.5-beta]
+- Initial development phases, feature additions, and bug fixes.
