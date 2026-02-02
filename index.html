@@ -263,7 +263,695 @@
         // ===================================================================================
         // CONSTANTS & CONFIGURATION
         // ===================================================================================
-        const APP_VERSION = "0.0.4.2-beta";
+        const APP_VERSION = "0.0.4.3-beta";
+
+        const TEMPLATE_ONSTEP_CLASSIC = `
+// ---------------------------------------------------------------------------------------------------------------------------------
+// Configuration for OnStep
+
+/*
+ *          For more information on setting OnStep up see http://www.stellarjourney.com/index.php?r=site/equipment_onstep 
+ *                      and join the OnStep Groups.io at https://groups.io/g/onstep
+ * 
+ *           *** Read the compiler warnings and errors, they are there to help guard against invalid configurations ***
+*/
+
+// ---------------------------------------------------------------------------------------------------------------------------------
+// ADJUST THE FOLLOWING TO CONFIGURE YOUR CONTROLLER FEATURES ----------------------------------------------------------------------
+// <-Req'd = always must set, <-Often = usually must set, Option = optional, Adjust = adjust as req'd, Infreq = infrequently changed
+
+// PINMAP ------------------------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration-Controller#PINMAP
+//   *** See the matching Pins.xxx.h file for your setup (found by looking in src/pinmaps/Models.h) with detailed information ***
+//   *** to be sure it matches your wiring.            *** USE AT YOUR OWN RISK ***                                           ***
+
+//      Parameter Name              Value   Default  Notes                                                                      Hint
+#define PINMAP                        OFF //    OFF, Choose from: MksGenL2, MiniPCB2, MaxPCB2, MaxESP3, CNC3, STM32Blue,     <-Req'd
+                                          //         MaxSTM3, FYSETC_S6_2, etc.  Other boards and more info. in Constants.h
+
+// SERIAL PORT COMMAND CHANNELS --------------------------- see https://onstep.groups.io/g/main/wiki/Configuration-Controller#SERIAL
+#define SERIAL_A_BAUD_DEFAULT        9600 //   9600, n. Where n=9600,19200,57600,115200 (common baud rates.)                  Infreq
+#define SERIAL_B_BAUD_DEFAULT        9600 //   9600, n. See (src/HAL/) for your MCU Serial port # etc.                        Option
+#define SERIAL_B_ESP_FLASHING         OFF //    OFF, ON Upload ESP8266 WiFi firmware through SERIAL_B with :ESPFLASH# cmd.    Option
+#define SERIAL_C_BAUD_DEFAULT         OFF //    OFF, n, ON for ESP32 Bluetooth.                                               Option
+#define SERIAL_C_BLUETOOTH_NAME  "OnStep" // "On..", Bluetooth device name for ESP32.                                         Option
+
+// MOUNT TYPE ----------------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration-Controller#MOUNT_TYPE
+#define MOUNT_TYPE                    GEM //    GEM, GEM for German Equatorial, FORK for Equatorial Fork, or ALTAZM          <-Req'd
+                                          //         Dobsonian etc. mounts. GEM Eq mounts perform meridian flips.
+
+// USER FEEDBACK ----------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration-Controller#USER_FEEDBACK
+#define LED_STATUS                     ON //     ON, Blinks w/sidereal tracking otherwise steady on indicates activity.       Option
+#define LED_STATUS2                   OFF //    OFF, ON Blinks 1s interval w/PPS sync, steady for gotos, off if in standby.   Option
+#define LED_RETICLE                   OFF //    OFF, n. Where n=0..255 (0..100%) activates feature sets default brightness.   Option
+#define BUZZER                        OFF //    OFF, ON, n. Where n=100..6000 (Hz freq.) for piezo speaker. ON for buzzer.    Option
+#define BUZZER_STATE_DEFAULT          OFF //    OFF, ON Start with piezo buzzer/speaker enabled.                              Option
+
+// TIME AND LOCATION ----------------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration-Controller#TLS
+#define TIME_LOCATION_SOURCE          OFF //    OFF, DS3231 (I2c,) DS3234 (Spi,) TEENSY (T3.2 internal,) or GPS source.       Option
+                                          //         Provides Date/Time, and if available, PPS & Lat/Long also.
+
+// SENSORS ----------------------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration-Controller#SENSORS
+// * = also supports ON_PULLUP or ON_PULLDOWN to activate MCU internal resistors if present.
+#define WEATHER                       OFF //    OFF, BME280 (I2C 0x77,) BME280_0x76, BME280_SPI (see pinmap for CS.)          Option
+                                          //         BMP280 (I2C 0x77,) BMP280_0x76, BMP280_SPI (see pinmap for CS.)
+                                          //         BME280 or BMP280 for temperature, pressure.  BME280 for humidity also.
+                                          
+#define TELESCOPE_TEMPERATURE         OFF //    OFF, DS1820, n. Where n is the DS1820 s/n for focuser temperature.            Adjust
+
+#define HOME_SENSE                    OFF //    OFF, ON*. Automatically detect and use home switches. For GEM mode only.      Option
+#define HOME_SENSE_STATE_AXIS1       HIGH //   HIGH, State when clockwise of home position, as seen from front. Rev. w/LOW.   Adjust
+#define HOME_SENSE_STATE_AXIS2       HIGH //   HIGH, State when clockwise of home position, as seen from above. Rev. w/LOW.   Adjust
+                                          //         Signal state reverses when travel moves ccw past the home position.
+
+#define LIMIT_SENSE                   OFF //    OFF, ON* limit sense switch close to Gnd stops gotos and/or tracking.         Option
+#define LIMIT_SENSE_STATE             LOW //    LOW, For NO (normally open) switches, HIGH for NC (normally closed.)          Adjust
+
+#define PEC_SENSE                     OFF //    OFF, ON*, n, sense digital OR n=0 to 1023 (0 to 3.3V or 5V) analog threshold. Option
+#define PEC_SENSE_STATE              HIGH //   HIGH, Senses the PEC signal rising edge or use LOW for falling edge.           Adjust
+                                          //         Ignored in ALTAZM mode.
+
+#define PPS_SENSE                     OFF //    OFF, ON* enables PPS (pulse per second,) senses signal rising edge.           Option
+                                          //         Better tracking accuracy especially for Mega2560's w/ceramic resonator.
+
+// ST4 INTERFACE --------------------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration-Controller#ST4
+// *** It is up to you to verify the interface meets the electrical specifications of any connected device, use at your own risk ***
+#define ST4_INTERFACE                 OFF //    OFF, ON, ON_PULLUP enables interface. <= 1X guides unless hand control mode.  Option
+                                          //         During goto btn press: aborts slew or continue meridian flip pause home
+#define ST4_HAND_CONTROL              OFF //    OFF, ON for hand controller special features and SHC support.                 Option
+                                          //         Hold [E]+[W] btns >2s: Guide rate   [E]-  [W]+  [N] trk on/off [S] sync
+                                          //         Hold [N]+[S] btns >2s: Usr cat item [E]-  [W]+  [N] goto [S] snd on/off
+#define ST4_HAND_CONTROL_FOCUSER      OFF //    OFF, ON alternate to above: Focuser move [E]f1 [W]f2 [N]-     [S]+            Option
+
+// GUIDING BEHAVIOUR ------------------------------------------ see https://onstep.groups.io/g/main/wiki/Configuration-Mount#GUIDING
+#define GUIDE_TIME_LIMIT                0 //      0, No guide time limit. Or n. Where n=1..120 second time limit guard.       Adjust
+#define GUIDE_DISABLE_BACKLASH        OFF //    OFF, Disable backlash takeup during guiding at <= 1X                          Option
+
+// TRACKING BEHAVIOUR ---------------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration-Mount#TRACKING
+#define TRACK_AUTOSTART               OFF //    OFF, ON Start with tracking enabled.                                          Option
+#define TRACK_REFRACTION_RATE_DEFAULT OFF //    OFF, ON Start w/atmospheric refract. compensation (RA axis/Eq mounts only.)   Option
+#define TRACK_BACKLASH_RATE            25 //     25, n. Where n=2..50 (x sidereal rate) during backlash takeup.               Option
+                                          //         Too fast motors stall/gears slam or too slow and sluggish in backlash.
+
+// SLEWING BEHAVIOUR ------------------------------------------ see https://onstep.groups.io/g/main/wiki/Configuration-Mount#SLEWING
+#define SLEW_RATE_BASE_DESIRED        1.0 //    1.0, n. Desired slew rate in deg/sec. Adjustable at run-time from            <-Req'd
+                                          //         1/2 to 2x this rate, and as MCU performace considerations require.
+#define SLEW_RATE_MEMORY              OFF //    OFF, ON Remembers rates set across power cycles.                              Option
+#define SLEW_ACCELERATION_DIST        5.0 //    5.0, n, (degrees.) Approx. distance for acceleration (and deceleration.)      Adjust
+#define SLEW_RAPID_STOP_DIST          2.5 //    2.0, n, (degrees.) Approx. distance required to stop when a slew              Adjust
+                                          //         is aborted or a limit is exceeded.
+
+// PIER SIDE BEHAVIOUR -------------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration---Mount#SYNCING
+#define MFLIP_SKIP_HOME               OFF //    OFF, ON Goto directly to the destination without visiting home position.      Option
+#define MFLIP_PAUSE_HOME_MEMORY       OFF //    OFF, ON Remember meridian flip pause at home setting across power cycles.     Option
+#define MFLIP_AUTOMATIC_MEMORY        OFF //    OFF, ON Remember automatic meridian flip setting across power cycles.         Option
+
+#define PIER_SIDE_SYNC_CHANGE_SIDES   OFF //    OFF, ON Allows sync to change pier side, for GEM mounts.                      Option
+#define PIER_SIDE_PREFERRED_DEFAULT  BEST //   BEST, Stays on current side if possible. EAST or WEST switch if possible.      Option
+
+// PARKING BEHAVIOUR ------------------------------------------ see https://onstep.groups.io/g/main/wiki/Configuration-Mount#PARKING
+#define STRICT_PARKING                OFF //    OFF, ON Un-parking is only allowed if successfully parked.                    Option
+
+// MOTION CONTROL ---------------------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration-Mount#MOTION
+#define STEP_WAVE_FORM             SQUARE // SQUARE, PULSE Step signal wave form faster rates. SQUARE best signal integrity.  Adjust
+
+// Stepper driver models (also see ~/OnStep/src/sd_drivers/Models.h for additional infrequently used models and more info.): 
+// A4988, DRV8825, LV8729, S109, SSS TMC2209*, TMC2130* **, and TMC5160* ***
+// * = add _QUIET (stealthChop tracking) for example "TMC2130_QUIET"
+// ** = SSS TMC2130 if you choose to set stepper driver current (in mA) set Vref pot. 2.5V instead of by motor current as usual.
+// *** = SSS TMC5160 you must set stepper driver current (in mA) w/ #define AXISn_TMC_IRUN (IHOLD, etc.)
+
+// Settings for driver Microsteps, IRUN, Reverse, Limit Min, and Limit Max are stored in NV (EEPROM.) These runtime settings
+// can be changed (or reverted to the defaults below) from the SmartWebServer's Config webpage.  If runtime axis settings are 
+// enabled changes to these settings below may be ignored as runtime settings from NV (EEPROM) are used instead.
+
+// AXIS1 RA/AZM
+// see https://onstep.groups.io/g/main/wiki/Configuration-Mount#AXIS1
+#define AXIS1_STEPS_PER_DEGREE    12800.0 //  12800, n. Number of steps per degree:                                          <-Req'd
+                                          //         n = (stepper_steps * micro_steps * overall_gear_reduction)/360.0
+#define AXIS1_STEPS_PER_WORMROT         0 //      0, n. Number steps per worm rotation (PEC Eq mode only, 0 disables PEC.)   <-Req'd
+                                          //         n = (AXIS1_STEPS_PER_DEGREE*360)/reduction_final_stage
+
+#define AXIS1_DRIVER_MODEL            OFF //    OFF, (See above.) Stepper driver model.                                      <-Often
+#define AXIS1_DRIVER_MICROSTEPS       OFF //    OFF, n. Microstep mode when tracking.                                        <-Often
+#define AXIS1_DRIVER_MICROSTEPS_GOTO  OFF //    OFF, n. Microstep mode used during gotos.                                     Option
+#define AXIS1_DRIVER_IHOLD            OFF //    OFF, n, (mA.) Current during standstill. OFF uses IRUN/2.0                    Option
+#define AXIS1_DRIVER_IRUN             OFF //    OFF, n, (mA.) Current during tracking, appropriate for stepper/driver/etc.    Option
+#define AXIS1_DRIVER_IGOTO            OFF //    OFF, n, (mA.) Current during slews. OFF uses same as IRUN.                    Option
+#define AXIS1_DRIVER_REVERSE          OFF //    OFF, ON Reverses movement direction, or reverse wiring instead to correct.   <-Often
+#define AXIS1_DRIVER_STATUS           OFF //    OFF, TMC_SPI, HIGH, or LOW.  Polling for driver status info/fault detection.  Option
+
+#define AXIS1_LIMIT_MIN              -180 //   -180, n. Where n= -90..-270 (degrees.) Minimum "Hour Angle" for Eq modes.      Adjust
+                                          //         n. Where n=-180..-360 (degrees.) Minimum Azimuth for AltAzm mode.
+#define AXIS1_LIMIT_MAX               180 //    180, n. Where n=  90.. 270 (degrees.) Maximum "Hour Angle" for Eq modes.      Adjust
+                                          //         n. Where n= 180.. 360 (degrees.) Maximum Azimuth for AltAzm mode.
+
+// AXIS2 DEC/ALT
+// see https://onstep.groups.io/g/main/wiki/Configuration-Mount#AXIS2
+#define AXIS2_STEPS_PER_DEGREE    12800.0 //  12800, n. Number of steps per degree:                                          <-Req'd
+                                          //         n = (stepper_steps * micro_steps * overall_gear_reduction)/360.0
+
+#define AXIS2_DRIVER_MODEL            OFF //    OFF, (See above.) Stepper driver model.                                      <-Often
+#define AXIS2_DRIVER_MICROSTEPS       OFF //    OFF, n. Microstep mode when tracking.                                        <-Often
+#define AXIS2_DRIVER_MICROSTEPS_GOTO  OFF //    OFF, n. Microstep mode used during gotos.                                     Option
+#define AXIS2_DRIVER_IHOLD            OFF //    OFF, n, (mA.) Current during standstill. OFF uses IRUN/2.0                    Option
+#define AXIS2_DRIVER_IRUN             OFF //    OFF, n, (mA.) Current during tracking, appropriate for stepper/driver/etc.    Option
+#define AXIS2_DRIVER_IGOTO            OFF //    OFF, n, (mA.) Current during slews. OFF uses same as IRUN.                    Option
+#define AXIS2_DRIVER_POWER_DOWN       OFF //    OFF, ON Powers off 10sec after movement stops or 10min after last<=1x guide.  Option
+#define AXIS2_DRIVER_REVERSE          OFF //    OFF, ON Reverses movement direction, or reverse wiring instead to correct.   <-Often
+#define AXIS2_DRIVER_STATUS           OFF //    OFF, TMC_SPI, HIGH, or LOW.  Polling for driver status info/fault detection.  Option
+#define AXIS2_TANGENT_ARM             OFF //    OFF, ON +limit range below. Set cntr w/[Reset Home] Return cntr w/[Find Home] Infreq
+
+#define AXIS2_LIMIT_MIN               -90 //    -90, n. Where n=-90..0 (degrees.) Minimum allowed declination.                Infreq
+#define AXIS2_LIMIT_MAX                90 //     90, n. Where n=0..90 (degrees.) Maximum allowed declination.                 Infreq
+
+// AXIS3 ROTATOR
+// see https://onstep.groups.io/g/main/wiki/Configuration-Rotator-and-Focusers#AXIS3
+#define ROTATOR                       OFF //    OFF, ON to enable the rotator (or de-rotator for ALTAZM mounts.)              Option
+#define AXIS3_STEPS_PER_DEGREE       64.0 //   64.0, n. Number of steps per degree for rotator/de-rotator.                    Adjust
+                                          //         Alt/Az de-rotation: n = (num_circumference_pixels * 2)/360, minimum
+#define AXIS3_SLEW_RATE_DESIRED       1.0 //    1.0, n, (degrees/second) Maximum speed depends on processor.                  Adjust
+
+#define AXIS3_DRIVER_MODEL            OFF //    OFF, TMC2130, TMC5160. Leave OFF for all drivers models except these.         Option
+#define AXIS3_DRIVER_MICROSTEPS       OFF //    OFF, n. Microstep mode when tracking.                   For TMC2130, TMC5160. Option
+#define AXIS3_DRIVER_IHOLD            OFF //    OFF, n, (mA.) Current standstill. OFF uses IRUN/2.0.                  "       Option
+#define AXIS3_DRIVER_IRUN             OFF //    OFF, n, (mA.) Current tracking, appropriate for stepper/driver/etc.   "       Option
+#define AXIS3_DRIVER_POWER_DOWN       OFF //    OFF, ON Powers off the motor at stand-still.                                  Option
+#define AXIS3_DRIVER_REVERSE          OFF //    OFF, ON Reverses movement direction, or reverse wiring instead to correct.    Option
+
+#define AXIS3_LIMIT_MIN              -180 //   -180, n. Where n=-360..0 (degrees.) Minimum allowed rotator angle.             Infreq
+#define AXIS3_LIMIT_MAX               180 //    180, n. Where n=0..360 (degrees.) Maximum allowed rotator angle.              Infreq
+
+// AXIS4 FOCUSER 1
+// see https://onstep.groups.io/g/main/wiki/Configuration-Rotator-and-Focusers#AXIS4
+#define FOCUSER1                      OFF //    OFF, ON to enable this focuser.                                               Option
+#define AXIS4_STEPS_PER_MICRON        0.5 //    0.5, n. Steps per micrometer. Figure this out by testing or other means.      Adjust
+#define AXIS4_SLEW_RATE_DESIRED       500 //    500, n, Where n=200..5000 (um/s.) Max microns/second. In DC mode, max pwr %   Adjust
+
+#define AXIS4_DRIVER_MODEL            OFF //    OFF, TMC2130, TMC5160. Leave OFF for all drivers models except these.         Option
+#define AXIS4_DRIVER_MICROSTEPS       OFF //    OFF, n. Microstep mode when tracking.                   For TMC2130, TMC5160. Option
+#define AXIS4_DRIVER_IHOLD            OFF //    OFF, n, (mA.) Current standstill. OFF uses IRUN/2.0.                  "       Option
+#define AXIS4_DRIVER_IRUN             OFF //    OFF, n, (mA.) Current tracking, appropriate for stepper/driver/etc.   "       Option
+#define AXIS4_DRIVER_POWER_DOWN       OFF //    OFF, ON Powers off the motor at stand-still.                                  Option
+#define AXIS4_DRIVER_REVERSE          OFF //    OFF, ON Reverses movement direction, or reverse wiring instead to correct.    Option
+#define AXIS4_DRIVER_DC_MODE          OFF //    OFF, ON for pwm dc motor control on stepper driver outputs.                   Option
+
+#define AXIS4_LIMIT_MIN_RATE           50 //     50, n. Where n=1..1000 (um/s.) Minimum microns/second. In DC mode, min pwr.  Adjust
+#define AXIS4_LIMIT_MIN                 0 //      0, n. Where n=0..500 (millimeters.) Minimum allowed position.               Adjust
+#define AXIS4_LIMIT_MAX                50 //     50, n. Where n=0..500 (millimeters.) Maximum allowed position.               Adjust
+
+// AXIS5 FOCUSER 2
+// see https://onstep.groups.io/g/main/wiki/Configuration-Rotator-and-Focusers#AXIS5
+#define FOCUSER2                      OFF //    OFF, ON to enable this focuser.                                               Option
+#define AXIS5_STEPS_PER_MICRON        0.5 //    0.5, n. Steps per micrometer. Figure this out by testing or other means.      Adjust
+#define AXIS5_SLEW_RATE_DESIRED       500 //    500, n, Where n=200..5000 (um/s.) Max microns/second. In DC mode, max pwr %   Adjust
+
+#define AXIS5_DRIVER_MODEL            OFF //    OFF, TMC2130, TMC5160. Leave OFF for all drivers models except these.         Option
+#define AXIS5_DRIVER_MICROSTEPS       OFF //    OFF, n. Microstep mode when tracking.                   For TMC2130, TMC5160. Option
+#define AXIS5_DRIVER_IHOLD            OFF //    OFF, n, (mA.) Current standstill. OFF uses IRUN/2.0.                  "       Option
+#define AXIS5_DRIVER_IRUN             OFF //    OFF, n, (mA.) Current tracking, appropriate for stepper/driver/etc.   "       Option
+#define AXIS5_DRIVER_POWER_DOWN       OFF //    OFF, ON Powers off the motor at stand-still.                                  Option
+#define AXIS5_DRIVER_REVERSE          OFF //    OFF, ON Reverses movement direction, or reverse wiring instead to correct.    Option
+#define AXIS5_DRIVER_DC_MODE          OFF //    OFF, ON for pwm dc motor control on stepper driver outputs.                   Option
+
+#define AXIS5_LIMIT_MIN_RATE           50 //     50, n. Where n=1..1000 (um/s.) Minimum microns/second. In DC mode, min pwr.  Adjust
+#define AXIS5_LIMIT_MIN                 0 //      0, n. Where n=0..500 (millimeters.) Minimum allowed position.               Adjust
+#define AXIS5_LIMIT_MAX                50 //     50, n. Where n=0..500 (millimeters.) Maximum allowed position.               Adjust
+
+// AUXILIARY FEATURE CONTROL ------------------------------ see https://onstep.groups.io/g/main/wiki/6-ConfigurationMaster#AUXILIARY
+// For additional infrequently used _PURPOSE options see Constants.h "various auxillary features"
+#define FEATURE_LIST_DS               OFF //    OFF, temporarily set ON to list ds18b20 and ds2413 device serial numbers.     Adjust
+#define FEATURE1_NAME          "FEATURE1" // "FE..", Name of feature being controlled.                                        Adjust
+#define FEATURE1_PURPOSE              OFF //    OFF, SWITCH, ANALOG_OUT, DEW_HEATER, etc.                                     Option
+#define FEATURE1_TEMP                 OFF //    OFF, DS1820, n. Where n is the ds18b20 s/n for DEW_HEATER temperature.        Adjust
+#define FEATURE1_PIN                  OFF //    OFF, AUX, DS2413, n. Where n is ds2413 s/n (gpio0) or n=0 to 255 (pin#.)      Adjust
+#define FEATURE1_DEFAULT_VALUE        OFF //    OFF, ON, n. Where n=0..255 for ANALOG_OUT purpose.                            Adjust
+#define FEATURE2_NAME          "FEATURE2" // "FE..", Name of feature being controlled.                                        Adjust
+#define FEATURE2_PURPOSE              OFF //    OFF, SWITCH, ANALOG_OUT, DEW_HEATER, etc.                                     Option
+#define FEATURE2_TEMP                 OFF //    OFF, DS1820, n. Where n is the ds18b20 s/n for DEW_HEATER temperature.        Adjust
+#define FEATURE2_PIN                  OFF //    OFF, AUX, CHAIN (ds2413 gpio1,) n. Where n=0 to 255 (pin#.)                   Adjust
+#define FEATURE2_DEFAULT_VALUE        OFF //    OFF, ON, n. Where n=0..255 for ANALOG_OUT purpose.                            Adjust
+#define FEATURE3_NAME          "FEATURE3" // "FE..", Name of feature being controlled.                                        Adjust
+#define FEATURE3_PURPOSE              OFF //    OFF, SWITCH, ANALOG_OUT, DEW_HEATER, etc.                                     Option
+#define FEATURE3_TEMP                 OFF //    OFF, DS1820, n. Where n is the ds18b20 s/n for DEW_HEATER temperature.        Adjust
+#define FEATURE3_PIN                  OFF //    OFF, AUX, DS2413, n. Where n is ds2413 s/n (gpio0) or n=0 to 255 (pin#.)      Adjust
+#define FEATURE3_DEFAULT_VALUE        OFF //    OFF, ON, n. Where n=0..255 for ANALOG_OUT purpose.                            Adjust
+#define FEATURE4_NAME          "FEATURE4" // "FE..", Name of feature being controlled.                                        Adjust
+#define FEATURE4_PURPOSE              OFF //    OFF, SWITCH, ANALOG_OUT, DEW_HEATER, etc.                                     Option
+#define FEATURE4_TEMP                 OFF //    OFF, DS1820, n. Where n is the ds18b20 s/n for DEW_HEATER temperature.        Adjust
+#define FEATURE4_PIN                  OFF //    OFF, AUX, CHAIN (ds2413 gpio1,) n. Where n=0 to 255 (pin#.)                   Adjust
+#define FEATURE4_DEFAULT_VALUE        OFF //    OFF, ON, n. Where n=0..255 for ANALOG_OUT purpose.                            Adjust
+#define FEATURE5_NAME          "FEATURE5" // "FE..", Name of feature being controlled.                                        Adjust
+#define FEATURE5_PURPOSE              OFF //    OFF, SWITCH, ANALOG_OUT, DEW_HEATER, etc.                                     Option
+#define FEATURE5_TEMP                 OFF //    OFF, DS1820, n. Where n is the ds18b20 s/n for DEW_HEATER temperature.        Adjust
+#define FEATURE5_PIN                  OFF //    OFF, AUX, DS2413, n. Where n is ds2413 s/n (gpio0) or n=0 to 255 (pin#.)      Adjust
+#define FEATURE5_DEFAULT_VALUE        OFF //    OFF, ON, n. Where n=0..255 for ANALOG_OUT purpose.                            Adjust
+#define FEATURE6_NAME          "FEATURE6" // "FE..", Name of feature being controlled.                                        Adjust
+#define FEATURE6_PURPOSE              OFF //    OFF, SWITCH, ANALOG_OUT, DEW_HEATER, etc.                                     Option
+#define FEATURE6_TEMP                 OFF //    OFF, DS1820, n. Where n is the ds18b20 s/n for DEW_HEATER temperature.        Adjust
+#define FEATURE6_PIN                  OFF //    OFF, AUX, CHAIN (ds2413 gpio1,) n. Where n=0 to 255 (pin#.)                   Adjust
+#define FEATURE6_DEFAULT_VALUE        OFF //    OFF, ON, n. Where n=0..255 for ANALOG_OUT purpose.                            Adjust
+#define FEATURE7_NAME          "FEATURE7" // "FE..", Name of feature being controlled.                                        Adjust
+#define FEATURE7_PURPOSE              OFF //    OFF, SWITCH, ANALOG_OUT, DEW_HEATER, etc.                                     Option
+#define FEATURE7_TEMP                 OFF //    OFF, DS1820, n. Where n is the ds18b20 s/n for DEW_HEATER temperature.        Adjust
+#define FEATURE7_PIN                  OFF //    OFF, AUX, DS2413, n. Where n is ds2413 s/n (gpio0) or n=0 to 255 (pin#.)      Adjust
+#define FEATURE7_DEFAULT_VALUE        OFF //    OFF, ON, n. Where n=0..255 for ANALOG_OUT purpose.                            Adjust
+#define FEATURE8_NAME          "FEATURE8" // "FE..", Name of feature being controlled.                                        Adjust
+#define FEATURE8_PURPOSE              OFF //    OFF, SWITCH, ANALOG_OUT, DEW_HEATER, etc.                                     Option
+#define FEATURE8_TEMP                 OFF //    OFF, DS1820, n. Where n is the ds18b20 s/n for DEW_HEATER temperature.        Adjust
+#define FEATURE8_PIN                  OFF //    OFF, AUX, CHAIN (ds2413 gpio1,) n. Where n=0 to 255 (pin#.)                   Adjust
+#define FEATURE8_DEFAULT_VALUE        OFF //    OFF, ON, n. Where n=0..255 for ANALOG_OUT purpose.                            Adjust
+
+// THAT'S IT FOR USER CONFIGURATION!
+
+// -------------------------------------------------------------------------------------------------------------------------
+#define FileVersionConfig 4
+`;
+
+        const TEMPLATE_ONSTEPX = `
+/* ---------------------------------------------------------------------------------------------------------------------------------
+ * Configuration for OnStepX
+ *
+ *          For more information on setting OnStep up see http://www.stellarjourney.com/index.php?r=site/equipment_onstep 
+ *                      and join the OnStep Groups.io at https://groups.io/g/onstep
+ * 
+ *           *** Read the compiler warnings and errors, they are there to help guard against invalid configurations ***
+ *
+ * ---------------------------------------------------------------------------------------------------------------------------------
+ * ADJUST THE FOLLOWING TO CONFIGURE YOUR CONTROLLER FEATURES ----------------------------------------------------------------------
+ * <-Req'd = always must set, <-Often = usually must set, Option = optional, Adjust = adjust as req'd, Infreq = infrequently changed
+*/
+//      Parameter Name              Value   Default  Notes                                                                      Hint
+
+// =================================================================================================================================
+// CONTROLLER ======================================================================================================================
+
+#define THERMISTOR1_TNOM               25 //         Nominal temperature (Celsius)
+#define THERMISTOR1_RNOM            10000 //         Nominal resistance (Ohms) at nominal temperature
+#define THERMISTOR1_BETA             3950 //         Beta coefficient
+#define THERMISTOR1_RSERIES          4700 //         Series resistor value (Ohms)
+//#define THERMISTOR_RPARALLEL      10000 //         Parallel resistor value (Ohms, requires adding the 10k resistors to TB/TE!)
+                                          //         Option to extend the temperature measurement range down to -20C or so
+
+#define LIMIT_SENSE_PIN                34 //         Override default and move limit sense to the FYSETC E4's X-MIN connector
+#define SERIAL_TMC_RX                  35 //         Override default TMC2209 RX pin move to Y-MIN (enable _DRIVER_STATUS to use)
+
+#define DISPLAY_WEATHER                ON //         Website, display weather
+#define DISPLAY_INTERNAL_TEMPERATURE   ON //         Website, display internal MCU temperature
+
+// PINMAP ------------------------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration_Controller#PINMAP
+#define PINMAP                  FYSETC_E4 //    OFF, Choose from: MiniPCB, MiniPCB2, MaxPCB2, MaxESP3, CNC3, STM32Blue,      <-Req'd
+                                          //         MaxSTM3, FYSETC_S6_2, etc.  Other boards and more info. in ~/src/Constants.h
+
+// SERIAL PORT COMMAND CHANNELS --------------------- see https://onstep.groups.io/g/main/wiki/Configuration_Controller#SERIAL_PORTS
+#define SERIAL_A_BAUD_DEFAULT        9600 //   9600, n. Where n=9600,19200,57600,115200,230400,460800 (common baud rates.)    Infreq
+#define SERIAL_B_BAUD_DEFAULT         OFF //   9600, n. Baud rate as above. See (src/pinmaps/) for Serial port assignments.   Infreq
+#define SERIAL_B_ESP_FLASHING         OFF //    OFF, ON Upload ESP8266 WiFi firmware through SERIAL_B with :ESPFLASH# cmd.    Option
+#define SERIAL_C_BAUD_DEFAULT         OFF //    OFF, n. Baud rate as above. See (src/pinmaps/) for Serial port assignments.   Infreq
+#define SERIAL_D_BAUD_DEFAULT         OFF //    OFF, n. Baud rate as above. See (src/pinmaps/) for Serial port assignments.   Infreq
+#define SERIAL_E_BAUD_DEFAULT         OFF //    OFF, n. Baud rate as above. See (src/pinmaps/) for Serial port assignments.   Infreq
+#define SERIAL_RADIO    WIFI_ACCESS_POINT //    OFF, Use BLUETOOTH or WIFI_ACCESS_POINT or WIFI_STATION (ESP32 only.)         Option
+
+// STATUS --------------------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration_Controller#STATUS_LED
+#define STATUS_LED                     ON //    OFF, Steady illumination if no error, blinks w/error code otherwise.          Option
+
+// RETICLE CONTROL ------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration_Controller#RETICLE_CONTROL
+#define RETICLE_LED_DEFAULT           OFF //    OFF, n. Where n=0..255 (0..100%) activates feature sets default brightness.   Option
+#define RETICLE_LED_MEMORY            OFF //    OFF, ON Remember reticle brightness across power cycles.                      Option
+#define RETICLE_LED_INVERT            OFF //    OFF, ON Inverts control for cases where 0V is max brightness.                 Option
+
+// WEATHER SENSOR --------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration_Controller#WEATHER_SENSOR
+#define WEATHER               BME280_0x76 //    OFF, BME280 (I2C 0x77,) BME280_0x76, BME280_SPI (see pinmap for CS.)          Option
+                                          //         BMP280 (I2C 0x77,) BMP280_0x76, BMP280_SPI (see pinmap for CS.)
+                                          //         BME280 or BMP280 for temperature, pressure.  BME280 for humidity also.
+
+// SIGNALING ------------------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration_Controller#SIGNALING
+#define STEP_WAVE_FORM              PULSE // SQUARE, PULSE Step signal wave form faster rates. SQUARE best signal integrity.  Adjust
+                                          //         Applies to all axes.
+
+// NON-VOLATILE MEMORY ---------------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration_Controller#NV
+#define NV_DRIVER              NV_DEFAULT // NV_DEF, Use platforms default non-volatile device to remember runtime settings.  Option
+
+// =================================================================================================================================
+// MOUNT ===========================================================================================================================
+
+// Driver models (Step/Dir and Servo) many have specific requirements so be sure to follow the link below to help learn about these.
+// Typically: A4988, DRV8825, LV8729, S109, TMC2130, TMC5160, TMC2209, etc.
+
+// AXIS1 RA/AZM -------------------------------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration_Axes
+#define AXIS1_DRIVER_MODEL        TMC2209 //    OFF, Enter motor driver model (above) in both axes to activate the mount.    <-Often
+
+// If runtime axis settings are enabled changes in the section below will be ignored (disable in SWS or by wiping NV/EEPROM):
+// \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ 
+#define AXIS1_STEPS_PER_DEGREE      12800 //  12800, n. Number of steps per degree:                                          <-Req'd
+                                          //         n = (stepper_steps * micro_steps * overall_gear_reduction)/360.0
+#define AXIS1_REVERSE                 OFF //    OFF, ON Reverses movement direction, or reverse wiring instead to correct.   <-Often
+#define AXIS1_LIMIT_MIN              -180 //   -180, n. Where n= -90..-360 (degrees.) Minimum "Hour Angle" or Azimuth.        Adjust
+#define AXIS1_LIMIT_MAX               180 //    180, n. Where n=  90.. 360 (degrees.) Maximum "Hour Angle" or Azimuth.        Adjust
+
+#define AXIS1_DRIVER_MICROSTEPS        32 //    OFF, n. Microstep mode when tracking.                                        <-Req'd
+#define AXIS1_DRIVER_MICROSTEPS_GOTO    4 //    OFF, n. Microstep mode used during slews. OFF uses _DRIVER_MICROSTEPS.        Option
+
+// for TMC2130, TMC5160, TMC2209, TMC2226 STEP/DIR driver models:
+#define AXIS1_DRIVER_IHOLD            OFF //    OFF, n, (mA.) Current during standstill. OFF uses IRUN/2.0                    Option
+#define AXIS1_DRIVER_IRUN             500 //    OFF, n, (mA.) Current during tracking, appropriate for stepper/driver/etc.    Option
+#define AXIS1_DRIVER_IGOTO            OFF //    OFF, n, (mA.) Current during slews. OFF uses IRUN.                            Option
+// /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /
+
+#define AXIS1_DRIVER_STATUS           OFF //    OFF, ON, HIGH, or LOW.  For driver status info/fault detection.               Option
+
+#define AXIS1_DRIVER_DECAY            OFF //    OFF, Tracking decay mode default override. TMC default is STEALTHCHOP.        Infreq
+#define AXIS1_DRIVER_DECAY_GOTO       OFF //    OFF, Decay mode goto default override. TMC default is SPREADCYCLE.            Infreq
+
+#define AXIS1_POWER_DOWN              OFF //    OFF, ON Powers off 30sec after movement stops or 10min after last<=1x guide.  Infreq
+
+#define AXIS1_SENSE_HOME              OFF //    OFF, HIGH or LOW enables & state clockwise home position, as seen from front. Option
+#define AXIS1_SENSE_LIMIT_MIN LIMIT_SENSE // ...NSE, HIGH or LOW state on limit sense switch stops movement.                  Option
+#define AXIS1_SENSE_LIMIT_MAX LIMIT_SENSE // ...NSE, HIGH or LOW state on limit sense switch stops movement.                  Option
+                                          //         Digital, optionally add: |HYST(n) Where n=0..1023 stability time in ms.
+                                          //         Analog capable sense inputs also allow adding:
+                                          //         |THLD(n) Where n=1..1023 (ADU) for Analog threshold.
+                                          //         |HYST(n) Where n=0..1023 (ADU) for +/- Hystersis range.
+
+// AXIS2 DEC/ALT ------------------------------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration_Axes
+#define AXIS2_DRIVER_MODEL        TMC2209 //    OFF, Enter motor driver model (above) in both axes to activate the mount.    <-Often
+
+// If runtime axis settings are enabled changes in the section below will be ignored (disable in SWS or by wiping NV/EEPROM):
+// \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/
+#define AXIS2_STEPS_PER_DEGREE      12800 //  12800, n. Number of steps per degree:                                          <-Req'd
+                                          //         n = (stepper_steps * micro_steps * overall_gear_reduction)/360.0
+#define AXIS2_REVERSE                 OFF //    OFF, ON Reverses movement direction, or reverse wiring instead to correct.   <-Often
+#define AXIS2_LIMIT_MIN               -90 //    -90, n. Where n=-90..0 (degrees.) Minimum allowed Declination or Altitude.    Infreq
+#define AXIS2_LIMIT_MAX                90 //     90, n. Where n=0..90 (degrees.) Maximum allowed Declination or Altitude.     Infreq
+
+#define AXIS2_DRIVER_MICROSTEPS        32 //    OFF, n. Microstep mode when tracking.                                        <-Req'd
+#define AXIS2_DRIVER_MICROSTEPS_GOTO    4 //    OFF, n. Microstep mode used during slews. OFF uses _DRIVER_MICROSTEPS.        Option
+
+// for TMC2130, TMC5160, TMC2209, TMC2226 STEP/DIR driver models:
+#define AXIS2_DRIVER_IHOLD            OFF //    OFF, n, (mA.) Current during standstill. OFF uses IRUN/2.0                    Option
+#define AXIS2_DRIVER_IRUN             500 //    OFF, n, (mA.) Current during tracking, appropriate for stepper/driver/etc.    Option
+#define AXIS2_DRIVER_IGOTO            OFF //    OFF, n, (mA.) Current during slews. OFF uses IRUN.                            Option
+// /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /
+
+#define AXIS2_DRIVER_STATUS           OFF //    OFF, ON, HIGH, or LOW.  Polling for driver status info/fault detection.       Option
+
+#define AXIS2_DRIVER_DECAY            OFF //    OFF, Tracking decay mode default override. TMC default is STEALTHCHOP.        Infreq
+#define AXIS2_DRIVER_DECAY_GOTO       OFF //    OFF, Decay mode goto default override. TMC default is SPREADCYCLE.            Infreq
+
+#define AXIS2_POWER_DOWN              OFF //    OFF, ON Powers off 30sec after movement stops or 10min after last<=1x guide.  Option
+
+#define AXIS2_SENSE_HOME              OFF //    OFF, HIGH or LOW enables & state clockwise home position, as seen from above. Option
+#define AXIS2_SENSE_LIMIT_MIN LIMIT_SENSE // ...NSE, HIGH or LOW state on limit sense switch stops movement.                  Option
+#define AXIS2_SENSE_LIMIT_MAX LIMIT_SENSE // ...NSE, HIGH or LOW state on limit sense switch stops movement.                  Option
+
+// MOUNT -------------------------------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration_Mount#MOUNT
+#define MOUNT_TYPE                    GEM //    GEM, GEM         German Equatorial Mount, etc. that need meridian flips.     <-Req'd
+                                          //         GEM_TA      GEM w/tangent arm Declination
+                                          //         GEM_TAC     GEM w/tangent arm Declination and geometry correction
+                                          //         FORK        Fork Mount
+                                          //         FORK_TA     FORK w/tangent arm Declination
+                                          //         FORK_TAC    FORK w/tangent arm Declination and geometry correction
+                                          //         ALTAZM      Altitude/Azimuth Mount, Dobsonians, etc.
+                                          //         ALTAZM_UNL  ALTAZM w/unlimited Azimuth motion
+
+#define MOUNT_COORDS          TOPOCENTRIC // ...RIC, Applies refraction to coordinates to/from OnStep, except exactly         Infreq
+                                          //              at the poles. Use TOPO_STRICT to apply refraction even in that case.
+                                          //              Use OBSERVED_PLACE for no refraction.
+
+#define MOUNT_COORDS_MEMORY           OFF //    OFF, ON Remembers approximate mount coordinates across power cycles.          Option
+                                          //         Requires FRAM NV memory and the mount must not move while powered down.
+
+#define MOUNT_ENABLE_IN_STANDBY       OFF //    OFF, ON Enables mount motor drivers while in standby.                         Infreq
+
+// TIME AND LOCATION ---------------------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration_Mount#TLS
+#define TIME_LOCATION_SOURCE       DS3231 //    OFF, DS3231 (I2C,) SD3031 (I2C,) TEENSY (T3.2 etc,) GPS, or NTP source.       Option
+                                          //         Provides Date/Time, and if available, PPS & Lat/Long also.
+#define TIME_LOCATION_PPS_SENSE       OFF //    OFF, HIGH senses PPS (pulse per second,) signal rising edge, or use LOW for   Option
+                                          //         falling edge, or use BOTH for rising and falling edges.
+
+// STATUS ------------------------------------------------------ see https://onstep.groups.io/g/main/wiki/Configuration_Mount#STATUS
+#define STATUS_MOUNT_LED              OFF //    OFF, ON Flashes proportional to rate of movement or solid on for slews.       Option
+#define STATUS_BUZZER                2000 //    OFF, ON, n. Where n=100..6000 (Hz freq.) for speaker. ON for piezo buzzer.    Option
+#define STATUS_BUZZER_DEFAULT         OFF //    OFF, ON starts w/buzzer sound enabled.                                        Option
+#define STATUS_BUZZER_MEMORY           ON //    OFF, ON to remember buzzer sound setting across power cycles.                 Option
+
+// ST4 INTERFACE -------------------------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration_Mount#ST4
+// *** It is up to you to verify the interface meets the electrical specifications of any connected device, use at your own risk ***
+#define ST4_INTERFACE                 OFF //    OFF, ON enables interface. <= 1X guides unless hand control mode.             Option
+                                          //         During goto btn press: aborts slew or continue meridian flip pause home
+#define ST4_HAND_CONTROL               ON //     ON, ON for hand controller special features and SHC support.                 Option
+                                          //         Hold [E]+[W] btns >2s: Guide rate   [E]-  [W]+  [N] trk on/off [S] sync
+                                          //         Hold [N]+[S] btns >2s: Usr cat item [E]-  [W]+  [N] goto [S] snd on/off
+#define ST4_HAND_CONTROL_FOCUSER       ON //     ON, ON alternate to above: Focuser move [E]f1 [W]f2 [N]-     [S]+            Option
+
+// GUIDING BEHAVIOUR ------------------------------------------ see https://onstep.groups.io/g/main/wiki/Configuration_Mount#GUIDING
+#define GUIDE_TIME_LIMIT               20 //     10, n. Time limit n=0..120 seconds. Use 0 to disable.                        Adjust
+#define GUIDE_DISABLE_BACKLASH        OFF //    OFF, Disable backlash takeup during guiding at <= 1X.                         Option
+
+// LIMITS ------------------------------------------------------ see https://onstep.groups.io/g/main/wiki/Configuration_Mount#LIMITS
+#define LIMIT_SENSE                   LOW //    OFF, HIGH or LOW state on limit sense switch stops movement.                  Option
+#define LIMIT_STRICT                  OFF //    OFF, disables limits until unpark goto or sync. ON enables limits at startup. Option
+                                          //         note that ON also disables all motion until date/time are set.
+
+// PARKING ---------------------------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration_Mount#PARKING
+#define PARK_SENSE                    OFF //    OFF, HIGH or LOW state indicates mount is in the park orientation.            Option
+#define PARK_SIGNAL                   OFF //    OFF, HIGH or LOW state park input signal triggers parking.                    Option
+#define PARK_STATUS                   OFF //    OFF, signals with a HIGH or LOW state when successfully parked.               Option 
+#define PARK_STRICT                   OFF //    OFF, ON Un-parking is only allowed if successfully parked.                    Option
+
+// PEC ------------------------------------------------------------ see https://onstep.groups.io/g/main/wiki/Configuration_Mount#PEC
+#define PEC_STEPS_PER_WORM_ROTATION 12800 //      0, n. Steps per worm rotation (0 disables else 720 sec buffer allocated.)  <-Req'd
+                                          //         n = (AXIS1_STEPS_PER_DEGREE*360)/reduction_final_stage
+
+#define PEC_SENSE                     OFF //    OFF, HIGH. Senses the PEC signal rising edge or use LOW for falling edge.     Option
+                                          //         Ignored in ALTAZM mode.
+#define PEC_BUFFER_SIZE_LIMIT         720 //    720, Seconds of PEC buffer allowed.                                           Infreq
+
+// TRACKING BEHAVIOUR ---------------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration_Mount#TRACKING
+#define TRACK_BACKLASH_RATE            20 //     20, n. Where n=2..50 (x sidereal rate) during backlash takeup.               Option
+                                          //         Too fast motors stall/gears slam or too slow and sluggish in backlash.
+#define TRACK_AUTOSTART               OFF //    OFF, ON Start with tracking enabled.                                          Option
+#define TRACK_COMPENSATION_DEFAULT    OFF //    OFF, No compensation or REFRACTION, REFRACTION_DUAL, MODEL, MODEL_DUAL.       Option
+#define TRACK_COMPENSATION_MEMORY     OFF //    OFF, ON Remembers refraction/pointing model compensated tracking settings.    Option
+
+// SLEWING BEHAVIOUR ------------------------------------------ see https://onstep.groups.io/g/main/wiki/Configuration_Mount#SLEWING
+#define SLEW_RATE_BASE_DESIRED        2.5 //    1.0, n. Desired slew rate in deg/sec. Adjustable at run-time from            <-Req'd
+                                          //         1/2 to 2x this rate, and as performace considerations require.
+#define SLEW_RATE_MEMORY               ON //    OFF, ON Remembers rates set across power cycles.                              Option
+#define SLEW_ACCELERATION_DIST        5.0 //    5.0, n, (degrees.) Approx. distance for acceleration (and deceleration.)      Adjust
+#define SLEW_RAPID_STOP_DIST          2.0 //    2.0, n, (degrees.) Approx. distance required to stop when a slew              Adjust
+                                          //         is aborted or a limit is exceeded.
+#define GOTO_FEATURE                   ON //     ON, Use OFF to disable mount Goto features.                                  Infreq
+#define GOTO_OFFSET                  0.25 //   0.25, Offset in deg's for goto target unidirectional approach, 0.0 disables    Adjust
+#define GOTO_OFFSET_ALIGN             OFF //    OFF, ON skips final phase of goto for align stars so user tends to approach   Option
+                                          //         from the correct direction when centering.
+
+// PIER SIDE BEHAVIOUR --------------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration_Mount#PIERSIDE
+#define MFLIP_SKIP_HOME               OFF //    OFF, ON Goto directly to the destination without visiting home position.      Option
+#define MFLIP_AUTOMATIC_DEFAULT       OFF //    OFF, ON Start with automatic meridian flips enabled.                          Option
+#define MFLIP_AUTOMATIC_MEMORY        OFF //    OFF, ON Remember automatic meridian flip setting across power cycles.         Option
+#define MFLIP_PAUSE_HOME_DEFAULT      OFF //    OFF, ON Start with meridian flip pause at home enabed.                        Infreq
+#define MFLIP_PAUSE_HOME_MEMORY       OFF //    OFF, ON Remember meridian flip pause at home setting across power cycles.     Infreq
+
+#define PIER_SIDE_SYNC_CHANGE_SIDES   OFF //    OFF, ON Allows sync to change pier side, for GEM mounts.                      Option
+#define PIER_SIDE_PREFERRED_DEFAULT  EAST //   BEST, BEST Stays on current side if possible. EAST or WEST switch if possible. Option
+#define PIER_SIDE_PREFERRED_MEMORY    OFF //    OFF, ON Remember preferred pier side setting across power cycles.             Option
+
+// ALIGN -------------------------------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration_Mount#ALIGN
+#define ALIGN_AUTO_HOME               OFF //    OFF, ON uses home switches to find home first when starting an align.         Option
+#define ALIGN_MODEL_MEMORY            OFF //    OFF, ON Restores any pointing model saved in NV at startup.                   Option
+#define ALIGN_MAX_STARS              AUTO //   AUTO, Uses HAL specified default (either 6 or 9 stars.)                        Infreq
+                                          //         Or use n. Where n=1 (for Sync only) or 3 to 9 (for Goto Assist.)
+
+// =================================================================================================================================
+// ROTATOR =========================================================================================================================
+
+// Driver models (Step/Dir and Servo) many have specific requirements so be sure to follow the link below to help learn about these.
+// Typically: A4988, DRV8825, LV8729, S109, TMC2130S, etc.
+
+// AXIS3 ROTATOR ---------------------------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration_Rotator
+#define AXIS3_DRIVER_MODEL            OFF //    OFF, Enter motor driver model (above) to activate the rotator.                Option
+#define AXIS3_SLEW_RATE_BASE_DESIRED  1.0 //    1.0, n. Desired slew rate in deg/sec. Adjustable at run-time from            <-Req'd
+                                          //         1/2 to 2x this rate, and as performance considerations require.
+
+// If runtime axis settings are enabled changes in the section below will be ignored (disable in SWS or by wiping NV/EEPROM):
+// \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/
+#define AXIS3_STEPS_PER_DEGREE       64.0 //   64.0, n. Number of steps per degree for rotator/de-rotator.                    Adjust
+                                          //         Alt/Az de-rotation: n = (num_circumference_pixels * 2)/360, minimum
+#define AXIS3_REVERSE                 OFF //    OFF, ON Reverses movement direction, or reverse wiring instead to correct.    Option
+#define AXIS3_LIMIT_MIN                 0 //      0, n. Where n=-360..0 (degrees.) Minimum allowed rotator angle.             Infreq
+#define AXIS3_LIMIT_MAX               360 //    360, n. Where n=0..360 (degrees.) Maximum allowed rotator angle.              Infreq
+
+#define AXIS3_DRIVER_MICROSTEPS       OFF //    OFF, n. Microstep mode when tracking.                                         Option
+#define AXIS3_DRIVER_MICROSTEPS_GOTO  OFF //    OFF, n. Microstep mode used during slews. OFF uses _DRIVER_MICROSTEPS.        Option
+
+// for TMC2130, TMC5160, TMC2209, TMC2226 STEP/DIR driver models:
+#define AXIS3_DRIVER_IHOLD            OFF //    OFF, n, (mA.) Current during standstill. OFF uses IRUN/2.0                    Option
+#define AXIS3_DRIVER_IRUN             OFF //    OFF, n, (mA.) Current during tracking, appropriate for stepper/driver/etc.    Option
+#define AXIS3_DRIVER_IGOTO            OFF //    OFF, n, (mA.) Current during slews. OFF uses IRUN.                            Option
+// /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /
+
+#define AXIS3_DRIVER_STATUS           OFF //    OFF, ON, HIGH, or LOW.  For driver status info/fault detection.               Option
+
+#define AXIS3_DRIVER_DECAY            OFF //    OFF, Tracking decay mode default override. TMC default is STEALTHCHOP.        Infreq
+#define AXIS3_DRIVER_DECAY_GOTO       OFF //    OFF, Decay mode goto default override. TMC default is SPREADCYCLE.            Infreq
+
+#define AXIS3_POWER_DOWN              OFF //    OFF, ON Powers off 30 seconds after movement stops.                           Option
+
+#define AXIS3_SENSE_HOME              OFF //    OFF, HIGH or LOW enables & state clockwise home position, as seen from above. Option
+#define AXIS3_SENSE_LIMIT_MIN         OFF //    OFF, HIGH or LOW state on limit sense switch stops movement.                  Option
+#define AXIS3_SENSE_LIMIT_MAX         OFF //    OFF, HIGH or LOW state on limit sense switch stops movement.                  Option
+
+// =================================================================================================================================
+// FOCUSERS ========================================================================================================================
+
+// Driver models (Step/Dir and Servo) many have specific requirements so be sure to follow the link below to help learn about these.
+// Typically: A4988, DRV8825, LV8729, S109, TMC2130S, etc.
+
+// AXIS4 FOCUSER 1 -------------------------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration_Focuser
+#define AXIS4_DRIVER_MODEL        TMC2209 //    OFF, Enter motor driver model (above) to activate the focuser.                Option
+#define AXIS4_SLEW_RATE_BASE_DESIRED 1000 //    500, n, Where n=200..5000 (um/s.) Adjustable at run-time from                <-Req'd
+                                          //         1/2 to 2x this rate, and as performance considerations require.
+#define AXIS4_SLEW_RATE_MINIMUM        50 //     20, n. Where n=5..200 (um/s.) Minimum microns/second.                        Adjust
+
+// If runtime axis settings are enabled changes in the section below will be ignored (disable in SWS or by wiping NV/EEPROM):
+// \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/
+#define AXIS4_STEPS_PER_MICRON       0.25 //    0.5, n. Steps per micrometer. Figure this out by testing or other means.      Adjust
+#define AXIS4_REVERSE                 OFF //    OFF, ON Reverses movement direction, or reverse wiring instead to correct.    Option
+#define AXIS4_LIMIT_MIN                 0 //      0, n. Where n=0..500 (millimeters.) Minimum allowed position.               Adjust
+#define AXIS4_LIMIT_MAX                50 //     50, n. Where n=0..500 (millimeters.) Maximum allowed position.               Adjust
+
+#define AXIS4_DRIVER_MICROSTEPS         8 //    OFF, n. Microstep mode when tracking.                                         Option
+#define AXIS4_DRIVER_MICROSTEPS_GOTO  OFF //    OFF, n. Microstep mode used during slews. OFF uses _DRIVER_MICROSTEPS.        Option
+
+// for TMC2130, TMC5160, TMC2209, TMC2226 STEP/DIR driver models:
+#define AXIS4_DRIVER_IHOLD            200 //    OFF, n, (mA.) Current during standstill. OFF uses IRUN/2.0                    Option
+#define AXIS4_DRIVER_IRUN             200 //    OFF, n, (mA.) Current during tracking, appropriate for stepper/driver/etc.    Option
+#define AXIS4_DRIVER_IGOTO            OFF //    OFF, n, (mA.) Current during slews. OFF uses IRUN.                            Option
+// /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /
+
+#define AXIS4_DRIVER_STATUS           OFF //    OFF, ON, HIGH, or LOW.  For driver status info/fault detection.               Option
+
+#define AXIS4_DRIVER_DECAY      STEALTHCHOP //  OFF, Tracking decay mode default override. TMC default is STEALTHCHOP.        Infreq
+#define AXIS4_DRIVER_DECAY_GOTO STEALTHCHOP //  OFF, Decay mode goto default override. TMC default is SPREADCYCLE.            Infreq
+
+#define AXIS4_POWER_DOWN              OFF //    OFF, ON Powers off 30 seconds after movement stops.                           Option
+
+#define AXIS4_SENSE_HOME              OFF //    OFF, HIGH or LOW enables & state clockwise home position, as seen from above. Option
+#define AXIS4_SENSE_LIMIT_MIN         OFF //    OFF, HIGH or LOW state on limit sense switch stops movement.                  Option
+#define AXIS4_SENSE_LIMIT_MAX         OFF //    OFF, HIGH or LOW state on limit sense switch stops movement.                  Option
+
+// AXIS5 FOCUSER 2 -------------------------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration_Focuser
+#define AXIS5_DRIVER_MODEL        TMC2209 //    OFF, Enter motor driver model (above) to activate the focuser.                Option
+#define AXIS5_SLEW_RATE_BASE_DESIRED 1000 //    500, n, Where n=200..5000 (um/s.) Adjustable at run-time from                <-Req'd
+                                          //         1/2 to 2x this rate, and as performance considerations require.
+#define AXIS5_SLEW_RATE_MINIMUM        50 //     20, n. Where n=5..200 (um/s.) Minimum microns/second.                        Adjust
+
+// If runtime axis settings are enabled changes in the section below will be ignored (disable in SWS or by wiping NV/EEPROM):
+// \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/
+#define AXIS5_STEPS_PER_MICRON       0.25 //    0.5, n. Steps per micrometer. Figure this out by testing or other means.      Adjust
+#define AXIS5_REVERSE                 OFF //    OFF, ON Reverses movement direction, or reverse wiring instead to correct.    Option
+#define AXIS5_LIMIT_MIN                 0 //      0, n. Where n=0..500 (millimeters.) Minimum allowed position.               Adjust
+#define AXIS5_LIMIT_MAX                50 //     50, n. Where n=0..500 (millimeters.) Maximum allowed position.               Adjust
+
+#define AXIS5_DRIVER_MICROSTEPS         8 //    OFF, n. Microstep mode when tracking.                                         Option
+#define AXIS5_DRIVER_MICROSTEPS_GOTO  OFF //    OFF, n. Microstep mode used during slews. OFF uses _DRIVER_MICROSTEPS.        Option
+
+// for TMC2130, TMC5160, TMC2209, TMC2226 STEP/DIR driver models:
+#define AXIS5_DRIVER_IHOLD            200 //    OFF, n, (mA.) Current during standstill. OFF uses IRUN/2.0                    Option
+#define AXIS5_DRIVER_IRUN             200 //    OFF, n, (mA.) Current during tracking, appropriate for stepper/driver/etc.    Option
+#define AXIS5_DRIVER_IGOTO            OFF //    OFF, n, (mA.) Current during slews. OFF uses IRUN.                            Option
+// /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /
+
+#define AXIS5_DRIVER_STATUS           OFF //    OFF, ON, HIGH, or LOW.  For driver status info/fault detection.               Option
+
+#define AXIS5_DRIVER_DECAY      STEALTHCHOP //  OFF, Tracking decay mode default override. TMC default is STEALTHCHOP.        Infreq
+#define AXIS5_DRIVER_DECAY_GOTO STEALTHCHOP //  OFF, Decay mode goto default override. TMC default is SPREADCYCLE.            Infreq
+
+#define AXIS5_POWER_DOWN              OFF //    OFF, ON Powers off 30 seconds after movement stops.                           Option
+
+#define AXIS5_SENSE_HOME              OFF //    OFF, HIGH or LOW enables & state clockwise home position, as seen from above. Option
+#define AXIS5_SENSE_LIMIT_MIN         OFF //    OFF, HIGH or LOW state on limit sense switch stops movement.                  Option
+#define AXIS5_SENSE_LIMIT_MAX         OFF //    OFF, HIGH or LOW state on limit sense switch stops movement.                  Option
+
+// Up to 6 focusers can be present (AXIS4 to AXIS9) simply copy the above text for focuser 1 and rename to AXIS5_ for focuser 2, etc
+
+// FOCUSER TEMPERATURE ---------------------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration_Focuser
+#define FOCUSER_TEMPERATURE    THERMISTOR //    OFF, THERMISTOR or n. Where n is the ds18b20 s/n for focuser temp. (TE)       Adjust
+
+// =================================================================================================================================
+// AUXILIARY FEATURES ==============================================================================================================
+
+// FEATURES ------------------------------------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration_Aux
+// Note: Temporarily set DEBUG mode to VERBOSE and use "FEATURE1_TEMP DS1820" to list the DS18B20 device serial numbers.
+
+#define FEATURE1_PURPOSE       DEW_HEATER //    OFF, SWITCH, MOMENTARY_SWITCH, ANALOG_OUT, DEW_HEATER, INTERVALOMETER.        Option
+#define FEATURE1_NAME        "Dew Heat 1" // "FE..", Name of feature being controlled.                                        Adjust
+#define FEATURE1_TEMP                 OFF //    OFF, THERMISTOR or n. Where n is the ds18b20 s/n. For DEW_HEATER temperature. Adjust
+#define FEATURE1_PIN                    2 //    OFF, AUX for auxiliary pin, n. Where n is the pin#. (E0)                      Adjust
+#define FEATURE1_VALUE_DEFAULT        OFF //    OFF, ON, n. Where n=0..255 for ANALOG_OUT purpose.                            Adjust
+#define FEATURE1_VALUE_MEMORY         OFF //    OFF, ON remembers SWITCH, ANALOG_OUT, DEW_HEATER state across power cycles.   Adjust
+#define FEATURE1_ON_STATE            HIGH //   HIGH, LOW to invert so "ON" is 0V and "OFF" is Vcc (3.3V usually.)             Adjust
+
+#define FEATURE2_PURPOSE       DEW_HEATER //    OFF, SWITCH, MOMENTARY_SWITCH, ANALOG_OUT, DEW_HEATER, INTERVALOMETER.        Option
+#define FEATURE2_NAME        "Dew Heat 2" // "FE..", Name of feature being controlled.                                        Adjust
+#define FEATURE2_TEMP          THERMISTOR //    OFF, THERMISTOR or n. Where n is the ds18b20 s/n. For DEW_HEATER temperature. Adjust
+#define FEATURE2_PIN                    4 //    OFF, AUX for auxiliary pin, n. Where n is the pin#. (BED/TB)                  Adjust
+#define FEATURE2_VALUE_DEFAULT        OFF //    OFF, ON, n. Where n=0..255 for ANALOG_OUT purpose.                            Adjust
+#define FEATURE2_VALUE_MEMORY         OFF //    OFF, ON remembers SWITCH, ANALOG_OUT, DEW_HEATER state across power cycles.   Adjust
+#define FEATURE2_ON_STATE            HIGH //   HIGH, LOW to invert so "ON" is 0V and "OFF" is Vcc (3.3V usually.)             Adjust
+
+#define FEATURE3_PURPOSE              OFF //    OFF, SWITCH, MOMENTARY_SWITCH, ANALOG_OUT, DEW_HEATER, INTERVALOMETER.        Option
+#define FEATURE3_NAME          "FEATURE3" // "FE..", Name of feature being controlled.                                        Adjust
+#define FEATURE3_TEMP                 OFF //    OFF, THERMISTOR or n. Where n is the ds18b20 s/n. For DEW_HEATER temperature. Adjust
+#define FEATURE3_PIN                  OFF //    OFF, AUX for auxiliary pin, n. Where n is the pin#.                           Adjust
+#define FEATURE3_VALUE_DEFAULT        OFF //    OFF, ON, n. Where n=0..255 for ANALOG_OUT purpose.                            Adjust
+#define FEATURE3_VALUE_MEMORY         OFF //    OFF, ON remembers SWITCH, ANALOG_OUT, DEW_HEATER state across power cycles.   Adjust
+#define FEATURE3_ON_STATE            HIGH //   HIGH, LOW to invert so "ON" is 0V and "OFF" is Vcc (3.3V usually.)             Adjust
+
+#define FEATURE4_PURPOSE              OFF //    OFF, SWITCH, MOMENTARY_SWITCH, ANALOG_OUT, DEW_HEATER, INTERVALOMETER.        Option
+#define FEATURE4_NAME          "FEATURE4" // "FE..", Name of feature being controlled.                                        Adjust
+#define FEATURE4_TEMP                 OFF //    OFF, THERMISTOR or n. Where n is the ds18b20 s/n. For DEW_HEATER temperature. Adjust
+#define FEATURE4_PIN                  OFF //    OFF, AUX for auxiliary pin, n. Where n is the pin#.                           Adjust
+#define FEATURE4_VALUE_DEFAULT        OFF //    OFF, ON, n. Where n=0..255 for ANALOG_OUT purpose.                            Adjust
+#define FEATURE4_VALUE_MEMORY         OFF //    OFF, ON remembers SWITCH, ANALOG_OUT, DEW_HEATER state across power cycles.   Adjust
+#define FEATURE4_ON_STATE            HIGH //   HIGH, LOW to invert so "ON" is 0V and "OFF" is Vcc (3.3V usually.)             Adjust
+
+#define FEATURE5_PURPOSE              OFF //    OFF, SWITCH, MOMENTARY_SWITCH, ANALOG_OUT, DEW_HEATER, INTERVALOMETER.        Option
+#define FEATURE5_NAME          "FEATURE5" // "FE..", Name of feature being controlled.                                        Adjust
+#define FEATURE5_TEMP                 OFF //    OFF, THERMISTOR or n. Where n is the ds18b20 s/n. For DEW_HEATER temperature. Adjust
+#define FEATURE5_PIN                  OFF //    OFF, AUX for auxiliary pin, n. Where n is the pin#.                           Adjust
+#define FEATURE5_VALUE_DEFAULT        OFF //    OFF, ON, n. Where n=0..255 for ANALOG_OUT purpose.                            Adjust
+#define FEATURE5_VALUE_MEMORY         OFF //    OFF, ON remembers SWITCH, ANALOG_OUT, DEW_HEATER state across power cycles.   Adjust
+#define FEATURE5_ON_STATE            HIGH //   HIGH, LOW to invert so "ON" is 0V and "OFF" is Vcc (3.3V usually.)             Adjust
+
+#define FEATURE6_PURPOSE              OFF //    OFF, SWITCH, MOMENTARY_SWITCH, ANALOG_OUT, DEW_HEATER, INTERVALOMETER.        Option
+#define FEATURE6_NAME          "FEATURE6" // "FE..", Name of feature being controlled.                                        Adjust
+#define FEATURE6_TEMP                 OFF //    OFF, THERMISTOR or n. Where n is the ds18b20 s/n. For DEW_HEATER temperature. Adjust
+#define FEATURE6_PIN                  OFF //    OFF, AUX for auxiliary pin, n. Where n is the pin#.                           Adjust
+#define FEATURE6_VALUE_DEFAULT        OFF //    OFF, ON, n. Where n=0..255 for ANALOG_OUT purpose.                            Adjust
+#define FEATURE6_VALUE_MEMORY         OFF //    OFF, ON remembers SWITCH, ANALOG_OUT, DEW_HEATER state across power cycles.   Adjust
+#define FEATURE6_ON_STATE            HIGH //   HIGH, LOW to invert so "ON" is 0V and "OFF" is Vcc (3.3V usually.)             Adjust
+
+#define FEATURE7_PURPOSE              OFF //    OFF, SWITCH, MOMENTARY_SWITCH, ANALOG_OUT, DEW_HEATER, INTERVALOMETER.        Option
+#define FEATURE7_NAME          "FEATURE7" // "FE..", Name of feature being controlled.                                        Adjust
+#define FEATURE7_TEMP                 OFF //    OFF, THERMISTOR or n. Where n is the ds18b20 s/n. For DEW_HEATER temperature. Adjust
+#define FEATURE7_PIN                  OFF //    OFF, AUX for auxiliary pin, n. Where n is the pin#.                           Adjust
+#define FEATURE7_VALUE_DEFAULT        OFF //    OFF, ON, n. Where n=0..255 for ANALOG_OUT purpose.                            Adjust
+#define FEATURE7_VALUE_MEMORY         OFF //    OFF, ON remembers SWITCH, ANALOG_OUT, DEW_HEATER state across power cycles.   Adjust
+#define FEATURE7_ON_STATE            HIGH //   HIGH, LOW to invert so "ON" is 0V and "OFF" is Vcc (3.3V usually.)             Adjust
+
+#define FEATURE8_PURPOSE              OFF //    OFF, SWITCH, MOMENTARY_SWITCH, ANALOG_OUT, DEW_HEATER, INTERVALOMETER.        Option
+#define FEATURE8_NAME          "FEATURE8" // "FE..", Name of feature being controlled.                                        Adjust
+#define FEATURE8_TEMP                 OFF //    OFF, THERMISTOR or n. Where n is the ds18b20 s/n. For DEW_HEATER temperature. Adjust
+#define FEATURE8_PIN                  OFF //    OFF, AUX for auxiliary pin, n. Where n is the pin#.                           Adjust
+#define FEATURE8_VALUE_DEFAULT        OFF //    OFF, ON, n. Where n=0..255 for ANALOG_OUT purpose.                            Adjust
+#define FEATURE8_VALUE_MEMORY         OFF //    OFF, ON remembers SWITCH, ANALOG_OUT, DEW_HEATER state across power cycles.   Adjust
+#define FEATURE8_ON_STATE            HIGH //   HIGH, LOW to invert so "ON" is 0V and "OFF" is Vcc (3.3V usually.)             Adjust
+
+// ---------------------------------------------------------------------------------------------------------------------------------
+#define FileVersionConfig 6
+#include "Extended.config.h"
+`;
 
         const calculatorOptions = {
             motorSteps: [200, 400],
@@ -331,7 +1019,7 @@
         // ===================================================================================
         // APPLICATION STATE
         // ===================================================================================
-        const appState = { version: null, language: 'en', config: {}, i18n: {}, wizardStep: 0 };
+        const appState = { version: null, language: 'en', config: {}, i18n: {}, wizardStep: 0, constellations: [] };
         let stars = [];
 
         // ===================================================================================
@@ -708,40 +1396,33 @@
             appState.config[axisKey] = output.value;
         }
 
-        async function generateConfigFile() {
+        function generateConfigFile() {
             const previewArea = document.getElementById('config-preview');
             const downloadBtn = document.getElementById('download-btn');
             if (!previewArea || !downloadBtn) return;
+            
             downloadBtn.disabled = true;
 
-            try {
-                const templateName = appState.version === 'classic' ? 'template-onstep.txt' : 'template-onstepx.txt';
-                const response = await fetch(`${templateName}?v=${APP_VERSION}`);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                let content = await response.text();
+            let content = appState.version === 'classic' ? TEMPLATE_ONSTEP_CLASSIC : TEMPLATE_ONSTEPX;
 
-                // Initialize config with all defaults first
-                schemas[appState.version].forEach(step => {
-                    for(const key in step) {
-                        if (key !== '_summary' && appState.config[key] === undefined) {
-                            appState.config[key] = step[key].defaultValue;
-                        }
-                    }
-                });
-                
-                for (const key in appState.config) {
-                    const value = appState.config[key];
-                    const regex = new RegExp(`(#define\\s+${key}\\s+)(.*?)(\\s*\\/\\/|$)`);
-                    if (content.match(regex)) {
-                         content = content.replace(regex, `$1${value}$3`);
+            // Initialize config with all defaults first
+            schemas[appState.version].forEach(step => {
+                for(const key in step) {
+                    if (key !== '_summary' && appState.config[key] === undefined) {
+                        appState.config[key] = step[key].defaultValue;
                     }
                 }
-                previewArea.value = content;
-                downloadBtn.disabled = false;
-            } catch (error) {
-                console.error("Error generating config file:", error);
-                previewArea.textContent = "Error during generation. Please try again.";
+            });
+            
+            for (const key in appState.config) {
+                const value = appState.config[key];
+                const regex = new RegExp(`(#define\\s+${key}\\s+)(.*?)(\\s*\\/\\/|$)`);
+                if (content.match(regex)) {
+                     content = content.replace(regex, `$1${value}$3`);
+                }
             }
+            previewArea.value = content.trim();
+            downloadBtn.disabled = false;
         }
         
         function downloadConfigFile() {
@@ -787,11 +1468,17 @@
         // ===================================================================================
         // BACKGROUND ANIMATION
         // ===================================================================================
+        function distance(p1, p2) {
+            return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
+        }
+
         function initBackground() {
             const canvas = dom.constellationCanvas;
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
             stars = [];
+            appState.constellations = [];
+
             for (let i = 0; i < 250; i++) {
                 stars.push({
                     x: Math.random() * canvas.width,
@@ -801,6 +1488,19 @@
                     vy: (Math.random() - 0.5) * 0.1,
                 });
             }
+
+            let availableStars = [...stars];
+            while(availableStars.length > 0) {
+                const seedStar = availableStars.shift();
+                const constellation = [seedStar];
+                const size = Math.floor(Math.random() * (15 - 5 + 1)) + 5;
+                
+                availableStars.sort((a,b) => distance(a, seedStar) - distance(b, seedStar));
+
+                const neighbors = availableStars.splice(0, size - 1);
+                constellation.push(...neighbors);
+                appState.constellations.push(constellation);
+            }
         }
 
         function animateBackground() {
@@ -808,9 +1508,7 @@
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = 'rgba(224, 229, 240, 0.7)';
-            ctx.strokeStyle = 'rgba(224, 229, 240, 0.1)';
-            ctx.lineWidth = 0.5;
-
+            
             stars.forEach(star => {
                 star.x += star.vx; star.y += star.vy;
                 if (star.x < 0 || star.x > canvas.width) star.vx *= -1;
@@ -818,27 +1516,22 @@
                 ctx.beginPath(); ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2); ctx.fill();
             });
 
-            for (let i = 0; i < stars.length; i++) {
-                const star1 = stars[i];
-                let closest = [];
-                for (let j = 0; j < stars.length; j++) {
-                    if (i === j) continue;
-                    const star2 = stars[j];
-                    const dist = Math.sqrt(Math.pow(star1.x - star2.x, 2) + Math.pow(star1.y - star2.y, 2));
-                    if (dist < 150) {
-                        closest.push({ star: star2, dist: dist });
+            ctx.strokeStyle = 'rgba(224, 229, 240, 0.1)';
+            ctx.lineWidth = 0.5;
+            appState.constellations.forEach(constellation => {
+                for (let i = 0; i < constellation.length; i++) {
+                    for (let j = i + 1; j < constellation.length; j++) {
+                        const dist = distance(constellation[i], constellation[j]);
+                        if (dist < 150) {
+                             ctx.beginPath();
+                             ctx.moveTo(constellation[i].x, constellation[i].y);
+                             ctx.lineTo(constellation[j].x, constellation[j].y);
+                             ctx.stroke();
+                        }
                     }
                 }
-                closest.sort((a, b) => a.dist - b.dist);
-                const neighborsToConnect = Math.min(2, closest.length);
-                for (let k = 0; k < neighborsToConnect; k++) {
-                    const neighbor = closest[k].star;
-                    ctx.beginPath();
-                    ctx.moveTo(star1.x, star1.y);
-                    ctx.lineTo(neighbor.x, neighbor.y);
-                    ctx.stroke();
-                }
-            }
+            });
+
             requestAnimationFrame(animateBackground);
         }
         
@@ -931,4 +1624,107 @@
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
-</html>
+</html>--- START OF FILE README.md ---
+
+
+# OnStep Visual Configurator
+
+This project is a web application to visually and interactively generate configuration files (`Config.h`) for the OnStep open-source telescope controller firmware.
+
+## Description
+
+The goal of this application is to simplify the complex process of configuring OnStep for new and experienced users alike. Instead of manually editing a C++ header file, users are guided through a wizard-like interface to select their hardware and preferences. The application then generates a ready-to-use `Config.h` file.
+
+## Features
+
+- **Wizard-Style Interface:** Guides users step-by-step through the configuration process.
+- **Support for OnStep Versions:** Allows selection between the classic OnStep (for 8-bit MCUs) and the advanced OnStepX (for 32-bit MCUs).
+- **Dynamic UI:** The form intelligently shows or hides options based on user selections, reducing clutter and confusion.
+- **Integrated Calculator:** Complex parameters like `STEPS_PER_DEGREE` are calculated automatically from user-friendly hardware inputs (motor steps, gear ratios, pulleys, etc.).
+- **Template-Based Generation:** Uses official configuration files as templates to ensure maximum compatibility and includes all original comments.
+- **Dark Theme:** Features a modern, astronomy-themed dark UI for comfortable use.
+
+## Framework
+
+This project adheres strictly to the development framework outlined in `Prompt_0`. Key principles include:
+- **No JS Frameworks:** The application uses only vanilla JavaScript (ES6+ Modules).
+- **No Build Step:** The code is written to run directly in the browser without any need for transpilation or bundling.
+- **Self-Contained Structure:** The core application logic, styling, and configuration templates are contained within `index.html` for maximum portability and to eliminate external file-loading errors. The only external files are language packs (`locales/*.json`), which are fetched dynamically.
+- **Responsiveness & Accessibility:** The design is optimized for desktop and tablet use and is built with accessibility (ARIA, semantic HTML) in mind.
+
+## How to Run
+
+Simply open the `index.html` file in any modern web browser (Chrome, Firefox, Edge). For full functionality (including language selection), it's recommended to serve the file from a simple local web server, although it's designed to be as robust as possible when opened directly from the filesystem.--- START OF FILE changelog.md ---
+
+
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.0.4.3-beta] - 2024-06-06
+
+### Fixed
+- **CRITICAL - Config Generation:** The file generation process now works reliably in all environments. The `template-*.txt` files have been embedded directly into the JavaScript to eliminate all `fetch()`-related failures, making the application truly self-contained and portable. The external template files have been removed.
+
+### Added
+- **Visuals - Constellation Animation:** The background animation logic has been completely rewritten. It now groups stars into small "constellations" of 5-15 stars, creating a more aesthetically pleasing "island" effect as requested, instead of a uniform web.
+
+### Changed
+- **Documentation:** The `README.md` and `LOGIC.md` files have been updated to reflect the new self-contained architecture where templates are embedded in the code.
+
+## [0.0.4.2-beta] - 2024-06-05
+
+### Added
+- **UI Clarity:** Added inline `<code>` tags next to each form label, displaying the corresponding `#define` variable name from the source code (e.g., `(PINMAP)`).
+- **Belt Calculator Enhancement:** The belt length calculator modal now includes a "Belt Type" selector (GT2, HTD-3M, etc.).
+
+### Changed
+- **Re-enabled Language Detection:** The temporary hardcoding of the Hungarian language was removed.
+- **README.md Update:** The "Framework" section was updated to reflect the modular data file structure.
+
+### Fixed
+- **Critical UI Bug - Wizard Scrolling:** The persistent scrolling issue on long wizard pages was definitively fixed.
+- **Visuals - Background Animation:** Restored and improved the lines connecting stars.
+
+## [0.1.0] - [0.0.4.1-beta]
+- Initial development phases, feature additions, and bug fixes.--- START OF FILE LOGIC.md ---
+
+
+# Application Logic
+
+This document outlines the core logic, state management, and data flow of the OnStep Visual Configurator.
+
+## Overview
+
+The application is a single-page wizard designed to generate `Config.h` files for the OnStep telescope controller. It guides the user through a series of questions about their hardware and preferences, validates their input, and uses this information to populate a template configuration file. The core design principle is to be data-driven, separating the application logic from the configuration data itself.
+
+## Architecture
+
+The application is built upon three main data pillars:
+
+1.  **Configuration Schemas (`schemas` object):** A JavaScript object embedded in the main script that defines the structure of the configuration for each OnStep version. Each entry describes a single `#define` setting, including its type (e.g., `select`, `calculator`), label key, description key, default values, and options. The UI is dynamically generated from this schema.
+
+2.  **Language Files (`locales/*.json`):** To support multilingual capabilities, all user-facing strings (labels, descriptions, button texts) are stored in external, language-specific JSON files. The application fetches the appropriate file and uses keys (e.g., `MOUNT_TYPE_LABEL`) to look up the correct string. This allows for easy addition of new languages.
+
+3.  **Embedded Templates (`TEMPLATE_*` constants):** The raw, working `Config.h` files for each OnStep version are stored as large string constants directly within the main JavaScript. The generation process does not create a file from scratch; instead, it reads the appropriate template string and uses regular expressions to find and replace the `#define` values with the user's choices. This self-contained approach ensures that all original formatting and comments are preserved and guarantees that the generation process works in any environment, even without a web server.
+
+## State Management
+
+A central `appState` JavaScript object holds the entire application state, including:
+- `version`: The selected OnStep version ('classic' or 'onstepx').
+- `language`: The current UI language (e.g., 'hu').
+- `config`: An object that stores the user's selections, keyed by the `#define` name (e.g., `{ MOUNT_TYPE: 'GEM', PINMAP: 'FYSETC_E4' }`).
+
+When a user changes a value in the UI, the `appState.config` object is updated. All settings are designed to have valid defaults from the start, ensuring a working configuration can always be generated.
+
+## Data Flow
+
+1.  **Initialization:** The app starts, shows the version selection screen, and fetches the appropriate language file.
+2.  **Version Selection:** The user chooses 'OnStep Classic' or 'OnStepX'.
+3.  **Wizard Initialization:** The application loads the corresponding schema and dynamically renders the first step of the wizard. Default values are populated into the `appState`.
+4.  **User Interaction:** The user fills out the wizard step-by-step. Each input updates the `appState.config` object.
+5.  **Generation:** When the user reaches the final step, the application selects the appropriate embedded template string. It iterates through the `appState.config` object and injects each value into the template.
+6.  **Output:** The final, populated string is presented to the user in a textarea for review, copying, or downloading as a `Config.h` file.
