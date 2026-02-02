@@ -1,0 +1,998 @@
+
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OnStep Konfigurátor</title>
+    <meta name="description" content="Vizuális konfigurátor OnStep csillagászati távcsővezérlőhöz.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #0c0f1a;
+            --container-bg: rgba(26, 29, 46, 0.95);
+            --primary-accent: #00aaff;
+            --secondary-accent: #ffaa00;
+            --text-color: #e0e5f0;
+            --text-muted: #8a99b5;
+            --border-color: #343a5e;
+            --input-bg: #10121e;
+            --shadow-color: rgba(0, 170, 255, 0.2);
+            --success-color: #28a745;
+            --error-color: #dc3545;
+            --border-radius: 12px;
+            --font-main: 'Roboto', sans-serif;
+            --font-title: 'Orbitron', sans-serif;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-main);
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #constellation-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+        .hidden { display: none !important; }
+
+        main {
+            position: relative; z-index: 10; max-width: 900px; width: 100%;
+            padding: 2.5rem; background-color: var(--container-bg); border-radius: var(--border-radius);
+            border: 1px solid var(--border-color); box-shadow: 0 8px 32px 0 var(--shadow-color);
+            text-align: center; transition: all 0.3s ease; flex-grow: 1; display: flex; flex-direction: column;
+        }
+        
+        .app-header { position: absolute; top: 1rem; right: 1rem; display: flex; align-items: center; z-index: 20; }
+        #language-selector { background-color: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-muted); border-radius: 6px; padding: 0.25rem 0.5rem; font-size: 0.8rem; }
+
+        h1, h2, h3 { font-family: var(--font-title); color: var(--primary-accent); letter-spacing: 1.5px; text-shadow: 0 0 5px var(--shadow-color); }
+        h1 { font-size: 2.5rem; margin: 0 0 1rem 0; }
+        h2 { font-size: 1.8rem; margin-bottom: 2rem; text-align: center; }
+        h3 { font-size: 1.5rem; margin-bottom: 1rem; }
+        p { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; margin: 0 auto 2.5rem auto; }
+        
+        .main-content { flex-grow: 1; }
+        .version-selector-container { display: flex; gap: 2rem; justify-content: center; align-items: stretch; margin-bottom: 2rem; }
+        .version-card { background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 2rem; flex: 1; max-width: 320px; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; text-align: center; }
+        .version-card:hover { transform: translateY(-5px); border-color: var(--primary-accent); box-shadow: 0 10px 30px 0 var(--shadow-color); }
+        .version-card h3 { margin: 0 0 0.5rem 0; }
+        .version-card p { font-size: 0.9rem; margin-bottom: 0; color: var(--text-muted); text-align: center; max-width: 100%; }
+
+        .comparison-section { display: flex; gap: 2rem; text-align: left; margin-bottom: 2rem; background-color: var(--input-bg); padding: 1.5rem; border-radius: var(--border-radius); }
+        .comparison-column { flex: 1; }
+        .comparison-column ul { padding-left: 1.2rem; margin: 0; font-size: 0.9rem; color: var(--text-muted); }
+        .comparison-column li { margin-bottom: 0.5rem; }
+
+        .button { background: none; border: 1px solid var(--border-color); color: var(--text-muted); padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; font-size: 1rem; transition: all 0.2s ease; font-family: var(--font-title); }
+        .button:hover { color: var(--text-color); border-color: var(--primary-accent); background-color: var(--shadow-color); }
+        .button.primary { border-color: var(--primary-accent); color: var(--primary-accent); }
+        .button:disabled { opacity: 0.5; cursor: not-allowed; border-color: var(--border-color); color: var(--text-muted); background: none; }
+        
+        /* --- Wizard Styles --- */
+        #config-wizard { text-align: left; display: flex; flex-direction: column; height: 100%; }
+        .wizard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; position: relative; flex-shrink: 0; }
+        .back-button { background: none; border: 1px solid var(--border-color); color: var(--text-muted); padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s ease; }
+        .back-button:hover { color: var(--text-color); border-color: var(--primary-accent); }
+        .wizard-header h2 { position: absolute; left: 50%; transform: translateX(-50%); margin: 0; }
+        .form-group { margin-bottom: 1.5rem; display: flex; flex-direction: column; }
+        .form-group-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+        .form-group label { font-size: 1rem; font-weight: bold; color: var(--text-color); margin-bottom: 0.5rem; display: flex; align-items: center; }
+        .info-icon { display: inline-block; width: 18px; height: 18px; border-radius: 50%; background-color: var(--border-color); color: var(--text-color); text-align: center; font-size: 12px; line-height: 18px; margin-left: 8px; cursor: pointer; transition: background-color 0.2s; }
+        .info-icon:hover { background-color: var(--primary-accent); }
+        .form-group select, .form-group input[type="text"], .form-group input[type="number"] { width: 100%; padding: 0.75rem 1rem; background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color); font-size: 1rem; transition: border-color 0.2s, box-shadow 0.2s; }
+        .form-group select:focus, .form-group input:focus { outline: none; border-color: var(--primary-accent); box-shadow: 0 0 0 3px var(--shadow-color); }
+        .calculator-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem; align-items: center; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px; margin-top: 0.5rem; }
+        .calculator-grid label { font-size: 0.9rem; font-weight: normal; cursor: pointer; }
+        .calculator-grid .form-group { margin-bottom: 0; }
+        .wizard-nav { margin-top: 2rem; display: flex; justify-content: space-between; flex-shrink: 0; }
+        .step-container { border-top: 1px solid var(--border-color); padding-top: 1.5rem; margin-top: 1.5rem; flex-grow: 1; overflow-y: auto; padding-right: 1rem; }
+        #config-preview { width: 100%; height: 100%; background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-muted); font-family: 'Courier New', Courier, monospace; font-size: 0.8rem; padding: 1rem; resize: vertical; }
+        .axis-section h3 { font-size: 1.2rem; color: var(--secondary-accent); border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-top: 2rem; }
+        .axis-section:first-child h3 { margin-top: 0; }
+
+        /* --- Wiki Section --- */
+        #wiki-section { text-align: left; }
+        #wiki-content { display: flex; gap: 2rem; margin-top: 1rem; }
+        #wiki-nav { flex: 0 0 200px; }
+        #wiki-nav ul { list-style: none; padding: 0; margin: 0; }
+        #wiki-nav a { display: block; padding: 0.5rem 1rem; color: var(--text-muted); text-decoration: none; border-radius: 6px; transition: background-color 0.2s, color 0.2s; }
+        #wiki-nav a:hover { background-color: var(--input-bg); color: var(--text-color); }
+        #wiki-nav a.active { background-color: var(--primary-accent); color: var(--bg-color); font-weight: bold; }
+        #wiki-article { flex-grow: 1; max-height: 60vh; overflow-y: auto; padding-right: 1rem; }
+        #wiki-article h2 { text-align: left; }
+        #wiki-article p, #wiki-article ul, #wiki-article li { font-size: 1rem; color: var(--text-muted); max-width: 100%; }
+        #wiki-article a { color: var(--primary-accent); }
+        #wiki-article code { background-color: var(--input-bg); padding: 0.1rem 0.3rem; border-radius: 4px; font-family: 'Courier New', Courier, monospace; color: var(--secondary-accent); }
+
+        /* --- Modal Styles --- */
+        .modal { position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(12, 15, 26, 0.8); display: flex; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
+        .modal.visible { opacity: 1; pointer-events: auto; }
+        .modal-content { background-color: var(--container-bg); margin: auto; padding: 2rem; border: 1px solid var(--border-color); border-radius: var(--border-radius); max-width: 700px; width: 90%; box-shadow: 0 8px 32px 0 var(--shadow-color); transform: scale(0.95); transition: transform 0.3s ease; }
+        .modal.visible .modal-content { transform: scale(1); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1rem; }
+        .modal-header h3 { margin: 0; }
+        .modal-close { color: var(--text-muted); font-size: 28px; font-weight: bold; cursor: pointer; }
+        .modal-close:hover { color: var(--text-color); }
+        .modal-body p { font-size: 1rem; text-align: left; margin-bottom: 0; max-width: 100%; color: var(--text-muted); }
+        .modal-body code { background-color: var(--input-bg); padding: 0.1rem 0.3rem; border-radius: 4px; font-family: 'Courier New', Courier, monospace; color: var(--secondary-accent); }
+        .modal-body strong { color: var(--text-color); }
+
+        /* --- Footer --- */
+        footer { width: 100%; max-width: 900px; padding: 1.5rem 2.5rem; margin-top: auto; text-align: center; font-size: 0.9rem; color: var(--text-muted); }
+    </style>
+</head>
+<body>
+    <canvas id="constellation-canvas"></canvas>
+    
+    <main>
+        <header class="app-header">
+             <select id="language-selector" aria-label="Nyelvválasztás">
+                <option value="hu">Magyar</option>
+                <option value="en">English</option>
+                <option value="de">Deutsch</option>
+                <option value="es">Español</option>
+            </select>
+        </header>
+
+        <div class="main-content">
+            <section id="version-selector">
+                <h1 data-lang-key="appTitle">OnStep Konfigurátor</h1>
+                <p data-lang-key="appDescription"></p>
+                <div class="version-selector-container">
+                    <article class="version-card" data-version="classic" role="button" tabindex="0">
+                        <h3 data-lang-key="classicTitle"></h3>
+                        <p data-lang-key="classicTagline"></p>
+                    </article>
+                    <article class="version-card" data-version="onstepx" role="button" tabindex="0">
+                        <h3 data-lang-key="onstepxTitle"></h3>
+                        <p data-lang-key="onstepxTagline"></p>
+                    </article>
+                </div>
+
+                <div class="comparison-section">
+                    <div class="comparison-column">
+                        <h3 data-lang-key="classicTitle"></h3>
+                        <ul data-lang-key="classicFeatures"></ul>
+                    </div>
+                    <div class="comparison-column">
+                        <h3 data-lang-key="onstepxTitle"></h3>
+                        <ul data-lang-key="onstepxFeatures"></ul>
+                    </div>
+                </div>
+
+                <button id="wiki-button" class="button" data-lang-key="wikiButton"></button>
+            </section>
+
+            <section id="config-wizard" class="hidden">
+                <!-- Varázsló tartalma ide generálódik -->
+            </section>
+
+            <section id="wiki-section" class="hidden">
+                 <div class="wizard-header">
+                    <button class="back-button" id="wiki-back-button" data-lang-key="backToHomeButton"></button>
+                    <h2 data-lang-key="wikiTitle"></h2>
+                 </div>
+                 <div id="wiki-content" style="display: flex; gap: 2rem; margin-top: 1rem;">
+                    <nav id="wiki-nav">
+                        <ul>
+                            <li><a href="#prerequisites" data-lang-key="wikiNavPrerequisites" class="wiki-nav-link"></a></li>
+                            <li><a href="#hardware" data-lang-key="wikiNavHardware" class="wiki-nav-link"></a></li>
+                            <li><a href="#gearing" data-lang-key="wikiNavGearing" class="wiki-nav-link"></a></li>
+                        </ul>
+                    </nav>
+                    <article id="wiki-article"></article>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer id="app-footer"></footer>
+
+    <div id="info-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title"></h3>
+                <span class="modal-close" role="button" aria-label="Bezárás">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p id="modal-text"></p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // ===================================================================================
+        // CONSTANTS & CONFIGURATION
+        // ===================================================================================
+        const APP_VERSION = "0.0.3.9-beta";
+
+        const localizationData = {
+            // ... HUNGARIAN ...
+            hu: {
+                "appTitle": "OnStep Konfigurátor",
+                "appDescription": "Üdvözlünk! Ez az eszköz segít létrehozni a személyre szabott konfigurációs fájlt az OnStep távcsővezérlődhöz. Kérlek, válassz firmware verziót a kezdéshez.",
+                "classicTitle": "OnStep Classic",
+                "onstepxTitle": "OnStepX",
+                "classicTagline": "A stabil választás 8-bites vezérlőkhöz.",
+                "onstepxTagline": "A modern, funkciókban gazdag firmware 32-bites vezérlőkhöz.",
+                "classicFeatures": "<li><b>Célhardver:</b> 8-bites mikrokontrollerek (pl. Arduino Mega 2560).</li><li><b>Teljesítmény:</b> Megbízható, de korlátozottabb számítási kapacitás.</li><li><b>Funkciók:</b> Az alapvető csillagászati követéshez és GOTO-hoz szükséges összes funkciót tartalmazza.</li><li><b>Ideális:</b> Egyszerűbb, régebbi hardverekhez, vagy ha a maximális stabilitás a cél.</li>",
+                "onstepxFeatures": "<li><b>Célhardver:</b> 32-bites mikrokontrollerek (pl. ESP32, STM32).</li><li><b>Teljesítmény:</b> Jelentősen gyorsabb és több memóriával rendelkezik.</li><li><b>Funkciók:</b> Fejlett pointing modellek, WiFi, Bluetooth, webes felület és sok más extra képesség.</li><li><b>Ideális:</b> Modern hardverekhez, ha a legújabb funkciókat és a legnagyobb pontosságot szeretnéd elérni.</li>",
+                "wikiButton": "Wiki / Súgó",
+                "backToHomeButton": "‹ Vissza a főmenübe",
+                "wizardTitleStep1": "Alapbeállítások",
+                "wizardTitleStep2": "Motor és Áttétel",
+                "wizardTitleStep3": "Meghajtó Beállítások",
+                "wizardTitleStep4": "Összegzés és Generálás",
+                "wizardPrev": "Vissza",
+                "wizardNext": "Tovább",
+                "wizardSummary": "Összegzés",
+                "summaryText": "A beállításaid alapján a generált <code>Config.h</code> fájl előnézete alább látható. Ha minden rendben, a 'Letöltés' gombbal mentheted a fájlt.",
+                "summaryWaiting": "A konfiguráció generálása...",
+                "downloadButton": "Letöltés (Config.h)",
+                "wikiTitle": "Tudásbázis",
+                "wikiNavPrerequisites": "Előfeltételek",
+                "wikiNavHardware": "Hardver választás",
+                "wikiNavGearing": "Áttételek",
+                "PINMAP_LABEL": "Vezérlőpanel (PINMAP)",
+                "PINMAP_DESC": "<strong>Mi ez?</strong><br>A PINMAP határozza meg, hogy a mikrokontroller melyik lába melyik funkcióért felelős (pl. melyik láb vezérli a RA léptetőmotor 'step' jelét).<br><br><strong>Miért fontos?</strong><br>Minden OnStep vezérlőpanel (pl. FYSETC E4, MaxPCB3) más és más lábkiosztással rendelkezik. A helyes PINMAP kiválasztása elengedhetetlen, különben a vezérlő nem fogja tudni mozgatni a motorokat. Ez a beállítás választja ki a megfelelő <code>Pins.xxx.h</code> fájlt a fordításkor. Ellenőrizd a választott panel dokumentációját a helyes értékért!",
+                "MOUNT_TYPE_LABEL": "Mechanika Típusa (MOUNT_TYPE)",
+                "MOUNT_TYPE_DESC": "Add meg a távcső mechanikájának fizikai felépítését. Ez alapvetően befolyásolja, hogyan számolja a vezérlő az égi objektumok követését.<br><br><strong>Német Ekvatoriális (GEM) Típusok:</strong><br>- <code>GEM</code>: Standard német ekvatoriális mechanika. A legtöbb ekvatoriális mechanika ebbe a kategóriába tartozik. Az OnStep automatikusan kezeli a meridiánon való átfordulást (meridian flip).<br>- <code>GEM_TA</code>, <code>GEM_TAC</code>: Tangenskaros deklinációs meghajtással rendelkező GEM mechanikákhoz.<br><br><strong>Villás (FORK) Típusok:</strong><br>- <code>FORK</code>: Standard villás ekvatoriális mechanika. Jellemzően Schmidt-Cassegrain vagy Maksutov-Cassegrain távcsöveknél használatos.<br><br><strong>Alt-Azimut (ALTAZM) Típusok:</strong><br>- <code>ALTAZM</code>: Dobson-távcsövekhez és más alt-azimut állványokhoz. A vezérlő mindkét tengelyt (azimut és magasság) folyamatosan mozgatja a követéshez.",
+                "AXIS1_SPD_LABEL": "RA/AZM Tengely Lépés/Fok (STEPS_PER_DEGREE)",
+                "AXIS2_SPD_LABEL": "DEC/ALT Tengely Lépés/Fok (STEPS_PER_DEGREE)",
+                "AXIS_SPD_DESC": "<strong>Ez a legfontosabb beállítás!</strong><br>Azt adja meg, hogy a vezérlőnek hány mikrolépést kell kiadnia a motor meghajtónak ahhoz, hogy a tengely pontosan egy fokot elforduljon.<br><br><strong>Használd a kalkulátort!</strong><br>Add meg a mechanikád pontos adatait és a kalkulátor automatikusan kitölti a helyes értéket. A képlet: <code>(Motor Lépés * Mikrolépés * Teljes Áttétel) / 360</code>",
+                "AXIS_DM_LABEL": "Meghajtó Modell",
+                "AXIS_DM_DESC": "Válaszd ki a léptetőmotor meghajtó IC típusát. A helyes modell kiválasztása kritikus, mert ez határozza meg a mikrolépések beállításának módját és a speciális funkciók (pl. csendes mód) elérhetőségét.<br><br><strong>Gyakori Típusok:</strong><br>- <code>A4988</code> / <code>DRV8825</code>: Alap, megbízható, de hangosabb meghajtók.<br>- <code>TMC2209</code>: Modern, rendkívül halk meghajtó (StealthChop™ technológia), a legtöbb új építéshez ez ajánlott.",
+                "AXIS_MS_LABEL": "Mikrolépés (Követés)",
+                "AXIS_MS_DESC": "A motor egy teljes lépését ennyi kisebb, köztes lépésre (mikrolépésre) bontja a meghajtó. A magasabb érték simább, rezonanciamentesebb mozgást eredményez követés közben.<br><br><strong>Ajánlás:</strong><br>- <code>A4988</code>/<code>DRV8825</code>: Általában 16 vagy 32.<br>- <code>TMCxxxx</code>: Általában 32 vagy 64. A túl magas érték (128+) már nem feltétlenül javítja a pontosságot, és jobban terhelheti a vezérlőt.",
+                "AXIS_MSG_LABEL": "Mikrolépés (GOTO)",
+                "AXIS_MSG_DESC": "GOTO (gyors pozicionálás) közben a vezérlő alacsonyabb mikrolépés beállításra válthat a nagyobb sebesség és nyomaték elérése érdekében.<br><br><strong>Ajánlás:</strong><br>Jellemzően 4 vagy 8. Ez lehetővé teszi, hogy a motorok elérjék a maximális sebességüket anélkül, hogy lépést vesztenének.",
+                "AXIS_REV_LABEL": "Forgásirány Megfordítása",
+                "AXIS_REV_DESC": "Ha a tengely a vártal ellenkező irányba mozog, ezzel a kapcsolóval megfordíthatod a motor forgásirányát szoftveresen. Alternatív megoldás a motorra menő 4 vezeték közül az egyik tekercs két vezetékének a felcserélése.",
+                "CALC_MOTOR_STEPS_LABEL": "Motor Lépés",
+                "CALC_MOTOR_STEPS_DESC": "A léptetőmotor egy teljes, 360 fokos körbefordulásához szükséges lépések száma. A leggyakoribb érték a 200 (1.8°/lépés), de léteznek 400 lépéses (0.9°/lépés) motorok is.",
+                "CALC_MICROSTEPS_LABEL": "Mikrolépés",
+                "CALC_MICROSTEPS_DESC": "A motor egy teljes lépését ennyi kisebb, köztes lépésre (mikrolépésre) bontja a meghajtó. Ezt az értéket a 'Meghajtó Beállítások' lépésben állítod be a követési (tracking) sebességhez.",
+                "CALC_BELT_MOTOR_LABEL": "Motor Szíjtárcsa",
+                "CALC_BELT_MOTOR_DESC": "Ha van szíjhajtás a motor és a csiga között, itt add meg a motor tengelyén lévő szíjtárcsa fogainak számát. Ha nincs szíjhajtás, hagyd az értéket 1-en.",
+                "CALC_BELT_WORM_LABEL": "Csiga Szíjtárcsa",
+                "CALC_BELT_WORM_DESC": "Ha van szíjhajtás a motor és a csiga között, itt add meg a csiga tengelyén lévő szíjtárcsa fogainak számát. Ha nincs szíjhajtás, hagyd az értéket 1-en.",
+                "CALC_WORM_TEETH_LABEL": "Csigakerék Fogszám",
+                "CALC_WORM_TEETH_DESC": "A mechanika fő áttételét adó csigakerék fogainak száma. Ez egy kritikus adat, nézd meg a mechanikád dokumentációjában. Pl. EQ5/HEQ5: 144, EQ6: 180.",
+                "wiki_page_prerequisites_title": "Előfeltételek",
+                "wiki_page_prerequisites_content": "<p>Mielőtt belevágnál az OnStep építésébe, fontos tisztában lenni néhány alapvető feltétellel és szükséges eszközzel.</p><ul><li><b>Alapvető elektronikai ismeretek:</b> Tudnod kell, hogyan kell forrasztani, mi a különbség a feszültség (V) és az áramerősség (A) között, és hogyan kell biztonságosan dolgozni alacsony feszültségű (12V) áramkörökkel.</li><li><b>Mechanikai alapismeretek:</b> Értened kell a fogaskerekek, szíjtácsák működését és az alapvető mechanikai áttételek fogalmát.</li><li><b>Számítógépes ismeretek:</b> Képesnek kell lenned szoftvereket telepíteni (Arduino IDE, PlatformIO), drivereket kezelni és szöveges konfigurációs fájlokat szerkeszteni.</li><li><b>Türelem és kitartás:</b> Az OnStep egy DIY (Csináld magad!) projekt. Lesznek kihívások, és időt kell szánnod a hibakeresésre. A közösségi fórumok (Groups.io) nagy segítséget nyújtanak!</li></ul>",
+                "wiki_page_hardware_title": "Hardver választás",
+                "wiki_page_hardware_content": "<h2>Vezérlő (MCU)</h2><p>A vezérlő az OnStep \"agya\". Két fő kategória létezik:</p><ul><li><b>8-bit (OnStep Classic):</b> Jellemzően <b>Arduino Mega 2560</b>. Megbízható, olcsó, de korlátozottabb a teljesítménye. Tökéletes kezdésnek vagy egyszerűbb mechanikákhoz.</li><li><b>32-bit (OnStepX):</b> Jellemzően <b>ESP32</b> vagy <b>STM32</b> alapú panelek (pl. FYSETC E4, MKS Gen L). Sokkal nagyobb számítási kapacitás, ami lehetővé teszi a fejlettebb funkciókat (WiFi, webes felület, komplexebb pointing modellek). Ma már ezek az ajánlott vezérlők.</li></ul><h2>Motor Meghajtók (Driverek)</h2><p>Ezek az áramkörök kapcsolódnak a vezérlő és a léptetőmotorok közé. A vezérlő által küldött jeleket alakítják át a motorok mozgatásához szükséges energiává.</p><ul><li><b>Csendes meghajtók:</b> A <code>TMC2209</code> a legnépszerűbb választás. Rendkívül halk működést biztosítanak (StealthChop™ mód), ami asztrofotózásnál és vizuális észlelésnél is kellemes.</li><li><b>Hagyományos meghajtók:</b> <code>DRV8825</code> vagy <code>A4988</code>. Olcsóbbak, de hangosabbak. Teljesen jól működnek, de a zaj zavaró lehet.</li></ul><h2>Léptetőmotorok</h2><p>A <code>NEMA 17</code> méretű léptetőmotorok a legelterjedtebbek. A legfontosabb paraméter a lépés/fordulat (jellemzően 200 vagy 400) és a nyomaték. Egy átlagos mechanikához 40 N·cm körüli nyomatékú motorok általában elegendőek.</p>",
+                "wiki_page_gearing_title": "Áttételek Megértése",
+                "wiki_page_gearing_content": "<h2>Miért van rá szükség?</h2><p>A léptetőmotorok önmagukban túl gyorsan forognak és túl gyenge a nyomatékuk ahhoz, hogy egy nehéz távcsövet finoman és pontosan mozgassanak. Az áttételek lecsökkentik a sebességet és megsokszorozzák a nyomatékot.</p><h2>Típusok</h2><ul><li><b>Csigás meghajtás (Worm Gear):</b> Ez a leggyakoribb a csillagászati mechanikákban. Egyetlen csiga hajt egy nagy fogaskereket. Az áttételi arányt a fogaskerék fogainak száma adja meg (pl. egy 144 fogú kerék 144:1 áttételt jelent).</li><li><b>Szíjhajtás (Belt and Pulley):</b> Gyakran használják a motor és a csigás meghajtás között. Az áttételi arányt a két szíjtárcsa fogainak aránya adja meg. Például, ha a motoron egy 16 fogú tárcsa van, és a csigát egy 48 fogú tárcsa hajtja, az áttétel 48/16 = 3:1.</li></ul><h2>A `STEPS_PER_DEGREE` Kiszámítása</h2><p>Ez a legfontosabb paraméter a konfigurációban. Azt adja meg, hogy a vezérlőnek hány jelet (mikrolépést) kell kiadnia ahhoz, hogy a távcső egy fokot elmozduljon az égen.<br>A képlete: <code>(Motor lépés * Mikrolépés * Teljes áttétel) / 360</code><br><br><b>Példa:</b><ul><li>Motor: 200 lépés/fordulat</li><li>Meghajtó: 16 mikrolépés</li><li>Szíjhajtás: 16 fogú motoron, 48 fogú a csigán (3:1)</li><li>Csigás hajtás: 144 fogú kerék (144:1)</li><li>Teljes áttétel: 3 * 144 = 432:1</li></ul><code>(200 * 16 * 432) / 360 = 3840</code><br>Ebben az esetben a <code>AXIS1_STEPS_PER_DEGREE</code> értéke 3840 lenne."
+            },
+            // ... ENGLISH ...
+            en: {
+                "appTitle": "OnStep Configurator",
+                "appDescription": "Welcome! This tool helps you create a personalized configuration file for your OnStep telescope controller. Please select a firmware version to begin.",
+                "classicTitle": "OnStep Classic",
+                "onstepxTitle": "OnStepX",
+                "classicTagline": "The stable choice for 8-bit controllers.",
+                "onstepxTagline": "The modern, feature-rich firmware for 32-bit controllers.",
+                "classicFeatures": "<li><b>Target Hardware:</b> 8-bit microcontrollers (e.g., Arduino Mega 2560).</li><li><b>Performance:</b> Reliable but with limited processing power.</li><li><b>Features:</b> Includes all essential functions for basic astronomical tracking and GOTO.</li><li><b>Ideal for:</b> Simpler, older hardware, or when maximum stability is the goal.</li>",
+                "onstepxFeatures": "<li><b>Target Hardware:</b> 32-bit microcontrollers (e.g., ESP32, STM32).</li><li><b>Performance:</b> Significantly faster with more memory.</li><li><b>Features:</b> Advanced pointing models, WiFi, Bluetooth, web interface, and many other extra capabilities.</li><li><b>Ideal for:</b> Modern hardware, if you want the latest features and highest precision.</li>",
+                "wikiButton": "Wiki / Help",
+                "backToHomeButton": "‹ Back to Main Menu",
+                "wizardTitleStep1": "Basic Settings",
+                "wizardTitleStep2": "Motor and Gearing",
+                "wizardTitleStep3": "Driver Settings",
+                "wizardTitleStep4": "Summary and Generation",
+                "wizardPrev": "Back",
+                "wizardNext": "Next",
+                "wizardSummary": "Summary",
+                "summaryText": "Based on your settings, the preview of the generated <code>Config.h</code> file is shown below. If everything looks correct, you can save the file with the 'Download' button.",
+                "summaryWaiting": "Generating configuration...",
+                "downloadButton": "Download (Config.h)",
+                "wikiTitle": "Knowledge Base",
+                "wikiNavPrerequisites": "Prerequisites",
+                "wikiNavHardware": "Hardware Selection",
+                "wikiNavGearing": "Gearing",
+                "PINMAP_LABEL": "Controller Board (PINMAP)",
+                "PINMAP_DESC": "<strong>What is this?</strong><br>The PINMAP defines which pin on the microcontroller is responsible for which function (e.g., which pin controls the 'step' signal for the RA stepper motor).<br><br><strong>Why is it important?</strong><br>Every OnStep controller board (e.g., FYSETC E4, MaxPCB3) has a different pinout. Selecting the correct PINMAP is essential, otherwise, the controller won't be able to move the motors. This setting selects the appropriate <code>Pins.xxx.h</code> file during compilation. Check your board's documentation for the correct value!",
+                "MOUNT_TYPE_LABEL": "Mount Type (MOUNT_TYPE)",
+                "MOUNT_TYPE_DESC": "Specify the physical construction of your telescope mount. This fundamentally affects how the controller calculates the tracking of celestial objects.<br><br><strong>German Equatorial (GEM) Types:</strong><br>- <code>GEM</code>: Standard German equatorial mount. Most equatorial mounts fall into this category. OnStep automatically handles meridian flips.<br>- <code>GEM_TA</code>, <code>GEM_TAC</code>: For GEM mounts with a tangent arm declination drive.<br><br><strong>Fork Types:</strong><br>- <code>FORK</code>: Standard equatorial fork mount. Typically used with Schmidt-Cassegrain or Maksutov-Cassegrain telescopes.<br><br><strong>Alt-Azimuth (ALTAZM) Types:</strong><br>- <code>ALTAZM</code>: For Dobsonian telescopes and other alt-azimuth mounts. The controller continuously moves both axes (azimuth and altitude) for tracking.",
+                "AXIS1_SPD_LABEL": "RA/AZM Axis Steps/Degree (STEPS_PER_DEGREE)",
+                "AXIS2_SPD_LABEL": "DEC/ALT Axis Steps/Degree (STEPS_PER_DEGREE)",
+                "AXIS_SPD_DESC": "<strong>This is the most important setting!</strong><br>It specifies how many microsteps the controller must send to the motor driver for the axis to rotate exactly one degree.<br><br><strong>Use the calculator!</strong><br>Enter the exact data for your mount, and the calculator will automatically fill in the correct value. The formula is: <code>(Motor Steps * Microsteps * Total Gear Ratio) / 360</code>",
+                "AXIS_DM_LABEL": "Driver Model",
+                "AXIS_DM_DESC": "Select the type of stepper motor driver IC. Choosing the correct model is critical as it determines how microstepping is set and the availability of special features (e.g., silent mode).<br><br><strong>Common Types:</strong><br>- <code>A4988</code> / <code>DRV8825</code>: Basic, reliable, but louder drivers.<br>- <code>TMC2209</code>: Modern, extremely quiet driver (StealthChop™ technology), recommended for most new builds.",
+                "AXIS_MS_LABEL": "Microsteps (Tracking)",
+                "AXIS_MS_DESC": "The driver divides one full step of the motor into this many smaller, intermediate steps (microsteps). A higher value results in smoother, resonance-free motion during tracking.<br><br><strong>Recommendation:</strong><br>- <code>A4988</code>/<code>DRV8825</code>: Usually 16 or 32.<br>- <code>TMCxxxx</code>: Usually 32 or 64. A very high value (128+) does not necessarily improve accuracy and can put more load on the controller.",
+                "AXIS_MSG_LABEL": "Microsteps (GOTO)",
+                "AXIS_MSG_DESC": "During a GOTO (fast positioning), the controller can switch to a lower microstep setting to achieve higher speed and torque.<br><br><strong>Recommendation:</strong><br>Typically 4 or 8. This allows the motors to reach their maximum speed without losing steps.",
+                "AXIS_REV_LABEL": "Reverse Direction",
+                "AXIS_REV_DESC": "If an axis moves in the opposite direction of what is expected, you can use this switch to reverse the motor's direction in software. An alternative is to swap the two wires of one coil of the 4 wires going to the motor.",
+                "CALC_MOTOR_STEPS_LABEL": "Motor Steps",
+                "CALC_MOTOR_STEPS_DESC": "The number of steps required for the stepper motor to complete one full 360-degree revolution. The most common value is 200 (1.8°/step), but 400-step (0.9°/step) motors also exist.",
+                "CALC_MICROSTEPS_LABEL": "Microsteps",
+                "CALC_MICROSTEPS_DESC": "The number of microsteps the driver divides a single full step into. You will set this value for tracking speed in the 'Driver Settings' step.",
+                "CALC_BELT_MOTOR_LABEL": "Motor Pulley",
+                "CALC_BELT_MOTOR_DESC": "If there is a belt drive between the motor and the worm gear, enter the number of teeth on the pulley attached to the motor shaft here. If there is no belt drive, leave this value at 1.",
+                "CALC_BELT_WORM_LABEL": "Worm Pulley",
+                "CALC_BELT_WORM_DESC": "If there is a belt drive between the motor and the worm gear, enter the number of teeth on the pulley attached to the worm shaft here. If there is no belt drive, leave this value at 1.",
+                "CALC_WORM_TEETH_LABEL": "Worm Wheel Teeth",
+                "CALC_WORM_TEETH_DESC": "The number of teeth on the main worm wheel of the mount, which provides the primary gear reduction. This is a critical piece of data; check your mount's documentation. E.g., EQ5/HEQ5: 144, EQ6: 180.",
+                "wiki_page_prerequisites_title": "Prerequisites",
+                "wiki_page_prerequisites_content": "<p>Before you start building your OnStep, it's important to be aware of some basic requirements and necessary tools.</p><ul><li><b>Basic electronics knowledge:</b> You should know how to solder, understand the difference between voltage (V) and current (A), and how to safely work with low-voltage (12V) circuits.</li><li><b>Basic mechanical skills:</b> You should understand how gears and pulleys work and the concept of basic mechanical reduction.</li><li><b>Computer skills:</b> You must be able to install software (Arduino IDE, PlatformIO), manage drivers, and edit text-based configuration files.</li><li><b>Patience and perseverance:</b> OnStep is a DIY project. There will be challenges, and you will need to spend time troubleshooting. The community forums (Groups.io) are a great help!</li></ul>",
+                "wiki_page_hardware_title": "Hardware Selection",
+                "wiki_page_hardware_content": "<h2>Controller (MCU)</h2><p>The controller is the \"brain\" of OnStep. There are two main categories:</p><ul><li><b>8-bit (OnStep Classic):</b> Typically an <b>Arduino Mega 2560</b>. Reliable and cheap, but has limited performance. Perfect for getting started or for simpler mounts.</li><li><b>32-bit (OnStepX):</b> Typically <b>ESP32</b> or <b>STM32</b> based boards (e.g., FYSETC E4, MKS Gen L). Much higher processing power, enabling advanced features (WiFi, web interface, more complex pointing models). These are the recommended controllers today.</li></ul><h2>Motor Drivers</h2><p>These circuits connect between the controller and the stepper motors. They convert the signals from the controller into the power needed to move the motors.</p><ul><li><b>Silent Drivers:</b> The <code>TMC2209</code> is the most popular choice. They provide extremely quiet operation (StealthChop™ mode), which is pleasant for both astrophotography and visual observing.</li><li><b>Traditional Drivers:</b> <code>DRV8825</code> or <code>A4988</code>. They are cheaper but louder. They work perfectly fine, but the noise can be distracting.</li></ul><h2>Stepper Motors</h2><p><code>NEMA 17</code> size stepper motors are the most common. The most important parameters are steps per revolution (typically 200 or 400) and torque. For an average mount, motors with around 40 N·cm of torque are usually sufficient.</p>",
+                "wiki_page_gearing_title": "Understanding Gearing",
+                "wiki_page_gearing_content": "<h2>Why is it necessary?</h2><p>Stepper motors on their own turn too fast and have too little torque to move a heavy telescope smoothly and precisely. Gearing reduces the speed and multiplies the torque.</p><h2>Types</h2><ul><li><b>Worm Gear Drive:</b> This is the most common in astronomical mounts. A single worm drives a large gear. The gear ratio is determined by the number of teeth on the gear (e.g., a 144-tooth wheel means a 144:1 ratio).</li><li><b>Belt and Pulley Drive:</b> Often used between the motor and the worm drive. The gear ratio is the ratio of the teeth on the two pulleys. For example, if the motor has a 16-tooth pulley and it drives a 48-tooth pulley on the worm, the ratio is 48/16 = 3:1.</li></ul><h2>Calculating `STEPS_PER_DEGREE`</h2><p>This is the most important parameter in the configuration. It specifies how many signals (microsteps) the controller must output to move the telescope one degree across the sky.<br>The formula is: <code>(Motor Steps * Microsteps * Total Gear Ratio) / 360</code><br><br><b>Example:</b><ul><li>Motor: 200 steps/revolution</li><li>Driver: 16 microsteps</li><li>Belt Drive: 16-tooth on motor, 48-tooth on worm (3:1)</li><li>Worm Drive: 144-tooth wheel (144:1)</li><li>Total Gear Ratio: 3 * 144 = 432:1</li></ul><code>(200 * 16 * 432) / 360 = 3840</code><br>In this case, the value for <code>AXIS1_STEPS_PER_DEGREE</code> would be 3840."
+            },
+            // ... GERMAN ...
+            de: {
+                "appTitle": "OnStep Konfigurator",
+                "appDescription": "Willkommen! Dieses Tool hilft Ihnen, eine personalisierte Konfigurationsdatei für Ihre OnStep-Teleskopsteuerung zu erstellen. Bitte wählen Sie eine Firmware-Version, um zu beginnen.",
+                "classicTitle": "OnStep Classic",
+                "onstepxTitle": "OnStepX",
+                "classicTagline": "Die stabile Wahl für 8-Bit-Controller.",
+                "onstepxTagline": "Die moderne, funktionsreiche Firmware für 32-Bit-Controller.",
+                "classicFeatures": "<li><b>Zielhardware:</b> 8-Bit-Mikrocontroller (z. B. Arduino Mega 2560).</li><li><b>Leistung:</b> Zuverlässig, aber mit begrenzter Rechenleistung.</li><li><b>Funktionen:</b> Enthält alle wesentlichen Funktionen für die grundlegende astronomische Nachführung und GOTO.</li><li><b>Ideal für:</b> Einfachere, ältere Hardware oder wenn maximale Stabilität das Ziel ist.</li>",
+                "onstepxFeatures": "<li><b>Zielhardware:</b> 32-Bit-Mikrocontroller (z. B. ESP32, STM32).</li><li><b>Leistung:</b> Deutlich schneller mit mehr Speicher.</li><li><b>Funktionen:</b> Erweiterte Pointing-Modelle, WLAN, Bluetooth, Web-Interface und viele weitere Zusatzfunktionen.</li><li><b>Ideal für:</b> Moderne Hardware, wenn Sie die neuesten Funktionen und höchste Präzision wünschen.</li>",
+                "wikiButton": "Wiki / Hilfe",
+                "backToHomeButton": "‹ Zurück zum Hauptmenü",
+                "wizardTitleStep1": "Grundeinstellungen",
+                "wizardTitleStep2": "Motor und Getriebe",
+                "wizardTitleStep3": "Treiber-Einstellungen",
+                "wizardTitleStep4": "Zusammenfassung und Erstellung",
+                "wizardPrev": "Zurück",
+                "wizardNext": "Weiter",
+                "wizardSummary": "Zusammenfassung",
+                "summaryText": "Basierend auf Ihren Einstellungen wird unten die Vorschau der generierten <code>Config.h</code>-Datei angezeigt. Wenn alles korrekt aussieht, können Sie die Datei mit der Schaltfläche 'Herunterladen' speichern.",
+                "summaryWaiting": "Konfiguration wird generiert...",
+                "downloadButton": "Herunterladen (Config.h)",
+                "wikiTitle": "Wissensdatenbank",
+                "wikiNavPrerequisites": "Voraussetzungen",
+                "wikiNavHardware": "Hardware-Auswahl",
+                "wikiNavGearing": "Getriebe",
+                "PINMAP_LABEL": "Controller-Board (PINMAP)",
+                "PINMAP_DESC": "<strong>Was ist das?</strong><br>Das PINMAP legt fest, welcher Pin des Mikrocontrollers für welche Funktion zuständig ist (z.B. welcher Pin das 'Step'-Signal für den RA-Schrittmotor steuert).<br><br><strong>Warum ist es wichtig?</strong><br>Jedes OnStep-Controller-Board (z.B. FYSETC E4, MaxPCB3) hat eine andere Pinbelegung. Die Auswahl des korrekten PINMAP ist unerlässlich, da der Controller sonst die Motoren nicht bewegen kann. Diese Einstellung wählt die entsprechende <code>Pins.xxx.h</code>-Datei während der Kompilierung aus. Überprüfen Sie die Dokumentation Ihres Boards für den korrekten Wert!",
+                "MOUNT_TYPE_LABEL": "Montierungstyp (MOUNT_TYPE)",
+                "MOUNT_TYPE_DESC": "Geben Sie den physischen Aufbau Ihrer Teleskopmontierung an. Dies beeinflusst grundlegend, wie der Controller die Nachführung von Himmelsobjekten berechnet.<br><br><strong>Deutsche Äquatoriale (GEM) Typen:</strong><br>- <code>GEM</code>: Standardmäßige deutsche äquatoriale Montierung. Die meisten äquatorialen Montierungen fallen in diese Kategorie. OnStep handhabt den Meridiandurchgang automatisch.<br>- <code>GEM_TA</code>, <code>GEM_TAC</code>: Für GEM-Montierungen mit einem Tangentialarm-Deklinationsantrieb.<br><br><strong>Gabel-Typen (FORK):</strong><br>- <code>FORK</code>: Standardmäßige äquatoriale Gabelmontierung. Typischerweise bei Schmidt-Cassegrain- oder Maksutov-Cassegrain-Teleskopen verwendet.<br><br><strong>Alt-Azimut (ALTAZM) Typen:</strong><br>- <code>ALTAZM</code>: Für Dobson-Teleskope und andere alt-azimutale Montierungen. Der Controller bewegt kontinuierlich beide Achsen (Azimut und Höhe) zur Nachführung.",
+                "AXIS1_SPD_LABEL": "RA/AZM-Achse Schritte/Grad (STEPS_PER_DEGREE)",
+                "AXIS2_SPD_LABEL": "DEC/ALT-Achse Schritte/Grad (STEPS_PER_DEGREE)",
+                "AXIS_SPD_DESC": "<strong>Dies ist die wichtigste Einstellung!</strong><br>Sie gibt an, wie viele Mikroschritte der Controller an den Motortreiber senden muss, damit sich die Achse um genau ein Grad dreht.<br><br><strong>Benutzen Sie den Rechner!</strong><br>Geben Sie die genauen Daten Ihrer Montierung ein, und der Rechner füllt automatisch den korrekten Wert aus. Die Formel lautet: <code>(Motorschritte * Mikroschritte * Gesamtübersetzung) / 360</code>",
+                "AXIS_DM_LABEL": "Treibermodell",
+                "AXIS_DM_DESC": "Wählen Sie den Typ des Schrittmotor-Treiber-ICs. Die Wahl des richtigen Modells ist entscheidend, da es die Einstellung der Mikroschritte und die Verfügbarkeit von Sonderfunktionen (z. B. Leise-Modus) bestimmt.<br><br><strong>Häufige Typen:</strong><br>- <code>A4988</code> / <code>DRV8825</code>: Einfache, zuverlässige, aber lautere Treiber.<br>- <code>TMC2209</code>: Moderner, extrem leiser Treiber (StealthChop™-Technologie), empfohlen für die meisten Neubauten.",
+                "AXIS_MS_LABEL": "Mikroschritte (Nachführung)",
+                "AXIS_MS_DESC": "Der Treiber teilt einen vollen Schritt des Motors in so viele kleinere Zwischenschritte (Mikroschritte) auf. Ein höherer Wert führt zu einer sanfteren, resonanzfreieren Bewegung während der Nachführung.<br><br><strong>Empfehlung:</strong><br>- <code>A4988</code>/<code>DRV8825</code>: Normalerweise 16 oder 32.<br>- <code>TMCxxxx</code>: Normalerweise 32 oder 64. Ein sehr hoher Wert (128+) verbessert nicht unbedingt die Genauigkeit und kann den Controller stärker belasten.",
+                "AXIS_MSG_LABEL": "Mikroschritte (GOTO)",
+                "AXIS_MSG_DESC": "Während eines GOTO (schnelle Positionierung) kann der Controller auf eine niedrigere Mikroschritt-Einstellung umschalten, um eine höhere Geschwindigkeit und ein höheres Drehmoment zu erreichen.<br><br><strong>Empfehlung:</strong><br>Typischerweise 4 oder 8. Dies ermöglicht es den Motoren, ihre maximale Geschwindigkeit zu erreichen, ohne Schritte zu verlieren.",
+                "AXIS_REV_LABEL": "Richtung umkehren",
+                "AXIS_REV_DESC": "Wenn sich eine Achse in die entgegengesetzte Richtung bewegt, können Sie mit diesem Schalter die Drehrichtung des Motors per Software umkehren. Eine Alternative ist, die beiden Drähte einer Spule der 4 zum Motor führenden Drähte zu vertauschen.",
+                "CALC_MOTOR_STEPS_LABEL": "Motorschritte",
+                "CALC_MOTOR_STEPS_DESC": "Die Anzahl der Schritte, die der Schrittmotor für eine volle 360-Grad-Umdrehung benötigt. Der häufigste Wert ist 200 (1,8°/Schritt), es gibt aber auch 400-Schritt-Motoren (0,9°/Schritt).",
+                "CALC_MICROSTEPS_LABEL": "Mikroschritte",
+                "CALC_MICROSTEPS_DESC": "Die Anzahl der Mikroschritte, in die der Treiber einen einzelnen vollen Schritt unterteilt. Diesen Wert stellen Sie für die Nachführgeschwindigkeit im Schritt 'Treiber-Einstellungen' ein.",
+                "CALC_BELT_MOTOR_LABEL": "Motor-Riemenscheibe",
+                "CALC_BELT_MOTOR_DESC": "Wenn ein Riemenantrieb zwischen Motor und Schneckengetriebe vorhanden ist, geben Sie hier die Zähnezahl der Riemenscheibe auf der Motorwelle an. Wenn kein Riemenantrieb vorhanden ist, lassen Sie diesen Wert auf 1.",
+                "CALC_BELT_WORM_LABEL": "Schnecken-Riemenscheibe",
+                "CALC_BELT_WORM_DESC": "Wenn ein Riemenantrieb zwischen Motor und Schneckengetriebe vorhanden ist, geben Sie hier die Zähnezahl der Riemenscheibe auf der Schneckenwelle an. Wenn kein Riemenantrieb vorhanden ist, lassen Sie diesen Wert auf 1.",
+                "CALC_WORM_TEETH_LABEL": "Zähne Schneckenrad",
+                "CALC_WORM_TEETH_DESC": "Die Anzahl der Zähne am Haupt-Schneckenrad der Montierung, das die Hauptübersetzung bereitstellt. Dies ist eine wichtige Angabe; überprüfen Sie die Dokumentation Ihrer Montierung. Z.B.: EQ5/HEQ5: 144, EQ6: 180."
+            },
+            // ... SPANISH ...
+            es: {
+                "appTitle": "Configurador OnStep",
+                "appDescription": "¡Bienvenido! Esta herramienta le ayuda a crear un archivo de configuración personalizado para su controlador de telescopio OnStep. Por favor, seleccione una versión de firmware para comenzar.",
+                "classicTitle": "OnStep Classic",
+                "onstepxTitle": "OnStepX",
+                "classicTagline": "La opción estable para controladores de 8 bits.",
+                "onstepxTagline": "El firmware moderno y rico en funciones para controladores de 32 bits.",
+                "classicFeatures": "<li><b>Hardware de destino:</b> Microcontroladores de 8 bits (p. ej., Arduino Mega 2560).</li><li><b>Rendimiento:</b> Fiable pero con potencia de procesamiento limitada.</li><li><b>Funciones:</b> Incluye todas las funciones esenciales para el seguimiento astronómico básico y GOTO.</li><li><b>Ideal para:</b> Hardware más simple y antiguo, o cuando la máxima estabilidad es el objetivo.</li>",
+                "onstepxFeatures": "<li><b>Hardware de destino:</b> Microcontroladores de 32 bits (p. ej., ESP32, STM32).</li><li><b>Rendimiento:</b> Significativamente más rápido y con más memoria.</li><li><b>Funciones:</b> Modelos de apuntado avanzados, WiFi, Bluetooth, interfaz web y muchas otras capacidades adicionales.</li><li><b>Ideal para:</b> Hardware moderno, si desea las últimas funciones y la máxima precisión.</li>",
+                "wikiButton": "Wiki / Ayuda",
+                "backToHomeButton": "‹ Volver al Menú Principal",
+                "wizardTitleStep1": "Ajustes Básicos",
+                "wizardTitleStep2": "Motor y Engranajes",
+                "wizardTitleStep3": "Ajustes del Driver",
+                "wizardTitleStep4": "Resumen y Generación",
+                "wizardPrev": "Atrás",
+                "wizardNext": "Siguiente",
+                "wizardSummary": "Resumen",
+                "summaryText": "Basado en sus ajustes, a continuación se muestra la vista previa del archivo <code>Config.h</code> generado. Si todo parece correcto, puede guardar el archivo con el botón 'Descargar'.",
+                "summaryWaiting": "Generando configuración...",
+                "downloadButton": "Descargar (Config.h)",
+                "wikiTitle": "Base de Conocimientos",
+                "wikiNavPrerequisites": "Prerrequisitos",
+                "wikiNavHardware": "Selección de Hardware",
+                "wikiNavGearing": "Engranajes",
+                "PINMAP_LABEL": "Placa Controladora (PINMAP)",
+                "PINMAP_DESC": "<strong>¿Qué es esto?</strong><br>El PINMAP define qué pin del microcontrolador es responsable de qué función (p. ej., qué pin controla la señal 'step' del motor paso a paso de AR).<br><br><strong>¿Por qué es importante?</strong><br>Cada placa controladora de OnStep (p. ej., FYSETC E4, MaxPCB3) tiene una distribución de pines diferente. Seleccionar el PINMAP correcto es esencial, de lo contrario, el controlador no podrá mover los motores. Esta configuración selecciona el archivo <code>Pins.xxx.h</code> apropiado durante la compilación. ¡Consulte la documentación de su placa para obtener el valor correcto!",
+                "MOUNT_TYPE_LABEL": "Tipo de Montura (MOUNT_TYPE)",
+                "MOUNT_TYPE_DESC": "Especifique la construcción física de su montura de telescopio. Esto afecta fundamentalmente a cómo el controlador calcula el seguimiento de los objetos celestes.<br><br><strong>Tipos Ecuatoriales Alemanes (GEM):</strong><br>- <code>GEM</code>: Montura ecuatorial alemana estándar. La mayoría de las monturas ecuatoriales entran en esta categoría. OnStep maneja automáticamente los cambios de meridiano.<br>- <code>GEM_TA</code>, <code>GEM_TAC</code>: Para monturas GEM con un accionamiento de declinación de brazo tangente.<br><br><strong>Tipos de Horquilla (FORK):</strong><br>- <code>FORK</code>: Montura ecuatorial de horquilla estándar. Se utiliza normalmente con telescopios Schmidt-Cassegrain o Maksutov-Cassegrain.<br><br><strong>Tipos Alt-Azimut (ALTAZM):</strong><br>- <code>ALTAZM</code>: Para telescopios Dobson y otras monturas altazimutales. El controlador mueve continuamente ambos ejes (azimut y altitud) para el seguimiento.",
+                "AXIS1_SPD_LABEL": "Pasos/Grado Eje AR/AZM (STEPS_PER_DEGREE)",
+                "AXIS2_SPD_LABEL": "Pasos/Grado Eje DEC/ALT (STEPS_PER_DEGREE)",
+                "AXIS_SPD_DESC": "<strong>¡Esta es la configuración más importante!</strong><br>Especifica cuántos micropasos debe enviar el controlador al driver del motor para que el eje gire exactamente un grado.<br><br><strong>¡Use la calculadora!</strong><br>Introduzca los datos exactos de su montura y la calculadora rellenará automáticamente el valor correcto. La fórmula es: <code>(Pasos del Motor * Micropasos * Relación de Engranajes Total) / 360</code>",
+                "AXIS_DM_LABEL": "Modelo del Driver",
+                "AXIS_DM_DESC": "Seleccione el tipo de CI del driver del motor paso a paso. Elegir el modelo correcto es fundamental, ya que determina cómo se configuran los micropasos y la disponibilidad de funciones especiales (p. ej., modo silencioso).<br><br><strong>Tipos Comunes:</strong><br>- <code>A4988</code> / <code>DRV8825</code>: Drivers básicos, fiables, pero más ruidosos.<br>- <code>TMC2209</code>: Driver moderno y extremadamente silencioso (tecnología StealthChop™), recomendado para la mayoría de las construcciones nuevas.",
+                "AXIS_MS_LABEL": "Micropasos (Seguimiento)",
+                "AXIS_MS_DESC": "El driver divide un paso completo del motor en esta cantidad de pasos intermedios más pequeños (micropasos). Un valor más alto resulta en un movimiento más suave y sin resonancias durante el seguimiento.<br><br><strong>Recomendación:</strong><br>- <code>A4988</code>/<code>DRV8825</code>: Generalmente 16 o 32.<br>- <code>TMCxxxx</code>: Generalmente 32 o 64. Un valor muy alto (128+) no mejora necesariamente la precisión y puede sobrecargar el controlador.",
+                "AXIS_MSG_LABEL": "Micropasos (GOTO)",
+                "AXIS_MSG_DESC": "Durante un GOTO (posicionamiento rápido), el controlador puede cambiar a una configuración de micropasos más baja para lograr mayor velocidad y par.<br><br><strong>Recomendación:</strong><br>Típicamente 4 u 8. Esto permite que los motores alcancen su velocidad máxima sin perder pasos.",
+                "AXIS_REV_LABEL": "Invertir Dirección",
+                "AXIS_REV_DESC": "Si un eje se mueve en la dirección opuesta a la esperada, puede usar este interruptor para invertir la dirección del motor por software. Una alternativa es intercambiar los dos cables de una de las bobinas de los 4 cables que van al motor.",
+                "CALC_MOTOR_STEPS_LABEL": "Pasos del Motor",
+                "CALC_MOTOR_STEPS_DESC": "El número de pasos necesarios para que el motor paso a paso complete una revolución completa de 360 grados. El valor más común es 200 (1.8°/paso), pero también existen motores de 400 pasos (0.9°/paso).",
+                "CALC_MICROSTEPS_LABEL": "Micropasos",
+                "CALC_MICROSTEPS_DESC": "El número de micropasos en los que el driver divide un único paso completo. Este valor lo configurará para la velocidad de seguimiento en el paso 'Ajustes del Driver'.",
+                "CALC_BELT_MOTOR_LABEL": "Polea del Motor",
+                "CALC_BELT_MOTOR_DESC": "Si hay una transmisión por correa entre el motor y el tornillo sin fin, introduzca aquí el número de dientes de la polea del eje del motor. Si no hay transmisión por correa, deje este valor en 1.",
+                "CALC_BELT_WORM_LABEL": "Polea del Sin Fin",
+                "CALC_BELT_WORM_DESC": "Si hay una transmisión por correa entre el motor y el tornillo sin fin, introduzca aquí el número de dientes de la polea del eje del tornillo sin fin. Si no hay transmisión por correa, deje este valor en 1.",
+                "CALC_WORM_TEETH_LABEL": "Dientes Rueda Corona",
+                "CALC_WORM_TEETH_DESC": "El número de dientes de la rueda de corona principal de la montura, que proporciona la reducción de engranajes principal. Este es un dato crítico; consulte la documentación de su montura. Por ej.: EQ5/HEQ5: 144, EQ6: 180."
+            }
+        };
+
+        const calculatorOptions = {
+            motorSteps: [200, 400],
+            microsteps: [1, 2, 4, 8, 16, 32, 64, 128, 256],
+            beltMotor: [1, 12, 16, 20, 24, 30, 32, 36, 40, 48, 60],
+            beltWorm: [1, 12, 16, 20, 24, 30, 32, 36, 40, 48, 60],
+            wormTeeth: [1, 96, 130, 135, 144, 150, 180, 256, 360, 435]
+        };
+
+        const schemas = {
+            onstepx: [
+                { // Step 1: Alapbeállítások
+                    PINMAP: { type: 'select', labelKey: 'PINMAP_LABEL', descriptionKey: 'PINMAP_DESC', options: ['FYSETC_E4', 'MiniPCB', 'MiniPCB2', 'MaxPCB2', 'MaxESP3', 'CNC3', 'STM32Blue', 'MaxSTM3', 'FYSETC_S6_2'], defaultValue: 'FYSETC_E4' },
+                    MOUNT_TYPE: { type: 'select', labelKey: 'MOUNT_TYPE_LABEL', descriptionKey: 'MOUNT_TYPE_DESC', options: ['GEM', 'GEM_TA', 'GEM_TAC', 'FORK', 'FORK_TA', 'FORK_TAC', 'ALTAZM', 'ALTAZM_UNL'], defaultValue: 'GEM' }
+                },
+                { // Step 2: Motor és Áttétel
+                    AXIS1_STEPS_PER_DEGREE: { type: 'calculator', labelKey: 'AXIS1_SPD_LABEL', descriptionKey: 'AXIS_SPD_DESC', defaultValue: 3840.0 },
+                    AXIS2_STEPS_PER_DEGREE: { type: 'calculator', labelKey: 'AXIS2_SPD_LABEL', descriptionKey: 'AXIS_SPD_DESC', defaultValue: 3840.0 },
+                },
+                { // Step 3: Meghajtó Beállítások
+                    AXIS1_DRIVER_MODEL: { type: 'select', labelKey: 'AXIS_DM_LABEL', descriptionKey: 'AXIS_DM_DESC', options: ['A4988', 'DRV8825', 'TMC2130', 'TMC2209', 'TMC5160'], defaultValue: 'TMC2209' },
+                    AXIS1_DRIVER_MICROSTEPS: { type: 'select', labelKey: 'AXIS_MS_LABEL', descriptionKey: 'AXIS_MS_DESC', options: [8, 16, 32, 64, 128], defaultValue: 32 },
+                    AXIS1_DRIVER_MICROSTEPS_GOTO: { type: 'select', labelKey: 'AXIS_MSG_LABEL', descriptionKey: 'AXIS_MSG_DESC', options: [1, 2, 4, 8, 16], defaultValue: 4 },
+                    AXIS1_REVERSE: { type: 'select', labelKey: 'AXIS_REV_LABEL', descriptionKey: 'AXIS_REV_DESC', options: ['OFF', 'ON'], defaultValue: 'OFF' },
+                    AXIS2_DRIVER_MODEL: { type: 'select', labelKey: 'AXIS_DM_LABEL', descriptionKey: 'AXIS_DM_DESC', options: ['A4988', 'DRV8825', 'TMC2130', 'TMC2209', 'TMC5160'], defaultValue: 'TMC2209' },
+                    AXIS2_DRIVER_MICROSTEPS: { type: 'select', labelKey: 'AXIS_MS_LABEL', descriptionKey: 'AXIS_MS_DESC', options: [8, 16, 32, 64, 128], defaultValue: 32 },
+                    AXIS2_DRIVER_MICROSTEPS_GOTO: { type: 'select', labelKey: 'AXIS_MSG_LABEL', descriptionKey: 'AXIS_MSG_DESC', options: [1, 2, 4, 8, 16], defaultValue: 4 },
+                    AXIS2_REVERSE: { type: 'select', labelKey: 'AXIS_REV_LABEL', descriptionKey: 'AXIS_REV_DESC', options: ['OFF', 'ON'], defaultValue: 'OFF' },
+                },
+                { // Step 4: Összegzés és Generálás
+                    _summary: true
+                } 
+            ],
+            classic: [
+                { // Step 1
+                    PINMAP: { type: 'select', labelKey: 'PINMAP_LABEL', descriptionKey: 'PINMAP_DESC', options: ['MksGenL2', 'MiniPCB2', 'MaxPCB2', 'MaxESP3', 'CNC3', 'STM32Blue', 'MaxSTM3', 'FYSETC_S6_2'], defaultValue: 'OFF' },
+                    MOUNT_TYPE: { type: 'select', labelKey: 'MOUNT_TYPE_LABEL', descriptionKey: 'MOUNT_TYPE_DESC', options: ['GEM', 'FORK', 'ALTAZM'], defaultValue: 'GEM' }
+                },
+                { // Step 2
+                    AXIS1_STEPS_PER_DEGREE: { type: 'calculator', labelKey: 'AXIS1_SPD_LABEL', descriptionKey: 'AXIS_SPD_DESC', defaultValue: 3840.0 },
+                    AXIS2_STEPS_PER_DEGREE: { type: 'calculator', labelKey: 'AXIS2_SPD_LABEL', descriptionKey: 'AXIS_SPD_DESC', defaultValue: 3840.0 },
+                },
+                { // Step 3
+                    AXIS1_DRIVER_MODEL: { type: 'select', labelKey: 'AXIS_DM_LABEL', descriptionKey: 'AXIS_DM_DESC', options: ['A4988', 'DRV8825', 'LV8729', 'TMC2209'], defaultValue: 'A4988' },
+                    AXIS1_DRIVER_MICROSTEPS: { type: 'select', labelKey: 'AXIS_MS_LABEL', descriptionKey: 'AXIS_MS_DESC', options: [8, 16, 32], defaultValue: 16 },
+                    AXIS1_DRIVER_MICROSTEPS_GOTO: { type: 'select', labelKey: 'AXIS_MSG_LABEL', descriptionKey: 'AXIS_MSG_DESC', options: [1, 2, 4, 8], defaultValue: 4 },
+                    AXIS1_DRIVER_REVERSE: { type: 'select', labelKey: 'AXIS_REV_LABEL', descriptionKey: 'AXIS_REV_DESC', options: ['OFF', 'ON'], defaultValue: 'OFF' },
+                    AXIS2_DRIVER_MODEL: { type: 'select', labelKey: 'AXIS_DM_LABEL', descriptionKey: 'AXIS_DM_DESC', options: ['A4988', 'DRV8825', 'LV8729', 'TMC2209'], defaultValue: 'A4988' },
+                    AXIS2_DRIVER_MICROSTEPS: { type: 'select', labelKey: 'AXIS_MS_LABEL', descriptionKey: 'AXIS_MS_DESC', options: [8, 16, 32], defaultValue: 16 },
+                    AXIS2_DRIVER_MICROSTEPS_GOTO: { type: 'select', labelKey: 'AXIS_MSG_LABEL', descriptionKey: 'AXIS_MSG_DESC', options: [1, 2, 4, 8], defaultValue: 4 },
+                    AXIS2_DRIVER_REVERSE: { type: 'select', labelKey: 'AXIS_REV_LABEL', descriptionKey: 'AXIS_REV_DESC', options: ['OFF', 'ON'], defaultValue: 'OFF' },
+                },
+                { // Step 4
+                    _summary: true
+                }
+            ]
+        };
+
+        // ===================================================================================
+        // APPLICATION STATE
+        // ===================================================================================
+        const appState = { version: null, language: 'hu', config: {}, i18n: {}, wizardStep: 0 };
+        let stars = [];
+
+        // ===================================================================================
+        // DOM ELEMENTS
+        // ===================================================================================
+        const dom = {
+            main: document.querySelector('main'),
+            versionSelector: document.getElementById('version-selector'),
+            configWizard: document.getElementById('config-wizard'),
+            modal: document.getElementById('info-modal'),
+            modalTitle: document.getElementById('modal-title'),
+            modalText: document.getElementById('modal-text'),
+            modalClose: document.querySelector('.modal-close'),
+            appFooter: document.getElementById('app-footer'),
+            constellationCanvas: document.getElementById('constellation-canvas'),
+            wikiButton: document.getElementById('wiki-button'),
+            wikiSection: document.getElementById('wiki-section'),
+            wikiNav: document.getElementById('wiki-nav'),
+            wikiArticle: document.getElementById('wiki-article'),
+            wikiBackButton: document.getElementById('wiki-back-button'),
+            languageSelector: document.getElementById('language-selector'),
+        };
+        
+        // ===================================================================================
+        // UI RENDERING
+        // ===================================================================================
+        function applyLocalization() {
+            const lang = appState.language;
+            document.documentElement.lang = lang;
+            document.querySelectorAll('[data-lang-key]').forEach(el => { 
+                const key = el.dataset.langKey; 
+                if (appState.i18n[key]) el.innerHTML = appState.i18n[key]; 
+            });
+            // Re-render wizard if visible to update labels
+            if (!dom.configWizard.classList.contains('hidden')) {
+                renderWizard();
+            }
+             if (!dom.wikiSection.classList.contains('hidden')) {
+                const activeLink = dom.wikiNav.querySelector('a.active');
+                if (activeLink) renderWikiPage(activeLink.hash.substring(1));
+            }
+        }
+
+        function renderWizard() {
+            dom.configWizard.innerHTML = '';
+            const schema = schemas[appState.version];
+            if (!schema) return;
+
+            const maxSteps = schema.length;
+            const currentStepSchema = schema[appState.wizardStep];
+            
+            const wizardHeader = document.createElement('div');
+            wizardHeader.className = 'wizard-header';
+            const backButton = document.createElement('button');
+            backButton.className = 'back-button';
+            backButton.textContent = appState.i18n.backToHomeButton;
+            backButton.onclick = handleBackToHome;
+            const wizardTitle = document.createElement('h2');
+            const titleKey = `wizardTitleStep${appState.wizardStep + 1}`;
+            wizardTitle.textContent = `${appState.i18n[titleKey] || 'Lépés'} (${appState.wizardStep + 1}/${maxSteps})`;
+            wizardHeader.append(backButton, wizardTitle);
+            
+            const stepContainer = document.createElement('div');
+            stepContainer.className = 'step-container';
+            
+            if (currentStepSchema._summary) {
+                stepContainer.style.display = 'flex';
+                stepContainer.style.flexDirection = 'column';
+                const summaryText = document.createElement('p');
+                summaryText.innerHTML = appState.i18n.summaryText;
+                stepContainer.appendChild(summaryText);
+                
+                const previewArea = document.createElement('textarea');
+                previewArea.id = 'config-preview';
+                previewArea.readOnly = true;
+                previewArea.textContent = appState.i18n.summaryWaiting;
+                stepContainer.appendChild(previewArea);
+                
+                // Immediately generate the preview
+                generateConfigFile();
+            } else {
+                const formContent = buildFormForStep(currentStepSchema);
+                stepContainer.appendChild(formContent);
+            }
+            
+            const nav = document.createElement('div');
+            nav.className = 'wizard-nav';
+            const prevButton = document.createElement('button');
+            prevButton.textContent = appState.i18n.wizardPrev;
+            prevButton.className = 'button';
+            prevButton.disabled = appState.wizardStep === 0;
+            prevButton.onclick = () => changeWizardStep(-1);
+            
+            const nextButtonContainer = document.createElement('div');
+            if (appState.wizardStep < maxSteps - 2) {
+                const nextButton = document.createElement('button');
+                nextButton.textContent = appState.i18n.wizardNext;
+                nextButton.className = 'button primary';
+                nextButton.onclick = () => changeWizardStep(1);
+                nextButtonContainer.appendChild(nextButton);
+            } else if (appState.wizardStep === maxSteps - 2) {
+                const summaryButton = document.createElement('button');
+                summaryButton.textContent = appState.i18n.wizardSummary;
+                summaryButton.className = 'button primary';
+                summaryButton.onclick = () => changeWizardStep(1);
+                nextButtonContainer.appendChild(summaryButton);
+            } else {
+                 const downloadButton = document.createElement('button');
+                 downloadButton.id = 'download-btn';
+                 downloadButton.textContent = appState.i18n.downloadButton;
+                 downloadButton.className = 'button primary';
+                 downloadButton.disabled = true;
+                 downloadButton.onclick = downloadConfigFile;
+                 nextButtonContainer.appendChild(downloadButton);
+            }
+            
+            nav.append(prevButton, nextButtonContainer);
+            dom.configWizard.append(wizardHeader, stepContainer, nav);
+            bindWizardEvents();
+        }
+        
+        function buildFormForStep(stepSchema) {
+            const fragment = document.createDocumentFragment();
+            if (stepSchema.AXIS1_DRIVER_MODEL) {
+                const axis1Section = document.createElement('div');
+                axis1Section.className = 'axis-section';
+                const h3_1 = document.createElement('h3');
+                h3_1.textContent = 'RA/AZM Axis';
+                axis1Section.appendChild(h3_1);
+                
+                const axis2Section = document.createElement('div');
+                axis2Section.className = 'axis-section';
+                const h3_2 = document.createElement('h3');
+                h3_2.textContent = 'DEC/ALT Axis';
+                axis2Section.appendChild(h3_2);
+                
+                for (const key in stepSchema) {
+                    const def = stepSchema[key];
+                    const formControl = createFormControl(key, def);
+                    if(key.startsWith('AXIS1')) axis1Section.appendChild(formControl);
+                    else if (key.startsWith('AXIS2')) axis2Section.appendChild(formControl);
+                }
+                fragment.append(axis1Section, axis2Section);
+            } else {
+                 for (const key in stepSchema) {
+                    const def = stepSchema[key];
+                    fragment.appendChild(createFormControl(key, def));
+                }
+            }
+            return fragment;
+        }
+
+        function createFormControl(key, def) {
+            if (appState.config[key] === undefined) appState.config[key] = def.defaultValue;
+            const lang = appState.i18n;
+            const group = document.createElement('div');
+            group.className = 'form-group';
+            const label = document.createElement('label');
+            label.htmlFor = key;
+            label.textContent = lang[def.labelKey] || key;
+            const infoIcon = document.createElement('span');
+            infoIcon.className = 'info-icon';
+            infoIcon.textContent = '?';
+            infoIcon.dataset.key = key;
+            label.appendChild(infoIcon);
+            group.appendChild(label);
+
+            if (def.type === 'select') {
+                const select = document.createElement('select');
+                select.id = key; select.name = key;
+                def.options.forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt; option.textContent = opt;
+                    if (opt == appState.config[key]) option.selected = true;
+                    select.appendChild(option);
+                });
+                group.appendChild(select);
+            } else if (def.type === 'calculator') {
+                const output = document.createElement('input');
+                output.type = 'text'; output.id = key; output.name = key;
+                output.value = appState.config[key]; output.readOnly = true;
+                group.appendChild(output);
+                group.appendChild(createCalculatorDOM(key));
+            }
+            return group;
+        }
+
+        function createCalculatorDOM(axisKey) {
+            const grid = document.createElement('div');
+            grid.className = 'calculator-grid';
+            grid.dataset.axis = axisKey;
+            
+            const fields = { 
+                motorSteps: { labelKey: 'CALC_MOTOR_STEPS_LABEL', descKey: 'CALC_MOTOR_STEPS_DESC', defaultValue: 200 },
+                microsteps: { labelKey: 'CALC_MICROSTEPS_LABEL', descKey: 'CALC_MICROSTEPS_DESC', defaultValue: 16 },
+                beltMotor: { labelKey: 'CALC_BELT_MOTOR_LABEL', descKey: 'CALC_BELT_MOTOR_DESC', defaultValue: 16 },
+                beltWorm: { labelKey: 'CALC_BELT_WORM_LABEL', descKey: 'CALC_BELT_WORM_DESC', defaultValue: 48 },
+                wormTeeth: { labelKey: 'CALC_WORM_TEETH_LABEL', descKey: 'CALC_WORM_TEETH_DESC', defaultValue: 144 }
+            };
+
+            for (const fieldKey in fields) {
+                const field = fields[fieldKey];
+                const formGroup = document.createElement('div');
+                formGroup.className = 'form-group';
+
+                const label = document.createElement('label');
+                label.textContent = appState.i18n[field.labelKey];
+                label.dataset.infoKey = fieldKey;
+                
+                const select = document.createElement('select');
+                select.dataset.field = fieldKey;
+                
+                calculatorOptions[fieldKey].forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt; option.textContent = opt;
+                    if (opt === field.defaultValue) option.selected = true;
+                    select.appendChild(option);
+                });
+                
+                formGroup.append(label, select);
+                grid.appendChild(formGroup);
+            }
+            return grid;
+        }
+        
+        function renderWikiPage(pageKey) {
+            dom.wikiNav.querySelectorAll('a').forEach(a => a.classList.remove('active'));
+            const activeLink = dom.wikiNav.querySelector(`a[href="#${pageKey}"]`);
+            if (activeLink) activeLink.classList.add('active');
+            
+            const title = appState.i18n[`wiki_page_${pageKey}_title`] || "";
+            const content = appState.i18n[`wiki_page_${pageKey}_content`] || "";
+            dom.wikiArticle.innerHTML = `<h2>${title}</h2>${content}`;
+        }
+
+        // ===================================================================================
+        // EVENT HANDLERS & ACTIONS
+        // ===================================================================================
+        function loadLanguage(lang) {
+            appState.language = lang;
+            localStorage.setItem('onstep_language', lang);
+            dom.languageSelector.value = lang;
+            appState.i18n = localizationData[lang] || localizationData.hu;
+            applyLocalization();
+        }
+        
+        function handleVersionSelect(selectedVersion) {
+            appState.version = selectedVersion;
+            appState.wizardStep = 0;
+            appState.config = {}; // Reset config
+            dom.versionSelector.classList.add('hidden');
+            dom.configWizard.classList.remove('hidden');
+            renderWizard();
+        }
+
+        function handleBackToHome() {
+            appState.version = null; appState.config = {};
+            dom.configWizard.classList.add('hidden');
+            dom.wikiSection.classList.add('hidden');
+            dom.versionSelector.classList.remove('hidden');
+            dom.configWizard.innerHTML = '';
+        }
+        
+        function showWiki() {
+            dom.versionSelector.classList.add('hidden');
+            dom.wikiSection.classList.remove('hidden');
+            const firstLink = dom.wikiNav.querySelector('a');
+            if(firstLink) renderWikiPage(firstLink.hash.substring(1));
+        }
+
+        function changeWizardStep(direction) {
+            appState.wizardStep += direction;
+            renderWizard();
+        }
+
+        function updateSPD(axisKey) {
+            const grid = document.querySelector(`.calculator-grid[data-axis="${axisKey}"]`);
+            if (!grid) return;
+            const motorSteps = parseFloat(grid.querySelector('[data-field="motorSteps"]').value) || 0;
+            const microsteps = parseFloat(grid.querySelector('[data-field="microsteps"]').value) || 0;
+            const beltMotor = parseFloat(grid.querySelector('[data-field="beltMotor"]').value) || 1;
+            const beltWorm = parseFloat(grid.querySelector('[data-field="beltWorm"]').value) || 1;
+            const wormTeeth = parseFloat(grid.querySelector('[data-field="wormTeeth"]').value) || 0;
+
+            const beltRatio = beltMotor > 0 ? beltWorm / beltMotor : 0;
+            const totalRatio = beltRatio * wormTeeth;
+            const spd = (motorSteps * microsteps * totalRatio) / 360;
+
+            const output = document.getElementById(axisKey);
+            if (output) output.value = isFinite(spd) ? spd.toFixed(4) : '0.0000';
+            appState.config[axisKey] = output.value;
+            
+            updatePreviewIfVisible();
+        }
+        
+        function updatePreviewIfVisible() {
+             const schema = schemas[appState.version];
+             if (schema && appState.wizardStep === schema.length - 1) {
+                generateConfigFile();
+             }
+        }
+
+        async function generateConfigFile() {
+            const previewArea = document.getElementById('config-preview');
+            const downloadBtn = document.getElementById('download-btn');
+
+            if (!previewArea || !downloadBtn) return;
+
+            downloadBtn.disabled = true;
+
+            try {
+                const templateName = appState.version === 'classic' ? 'template-onstep.txt' : 'template-onstepx.txt';
+                const response = await fetch(`${templateName}?v=${APP_VERSION}`);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                let content = await response.text();
+
+                for (const key in appState.config) {
+                    const value = appState.config[key];
+                    // Updated regex to handle defines without a value and preserve comments
+                    const regex = new RegExp(`(#define\\s+${key}\\s+)([^\\/\\n]*)`);
+                    if (regex.test(content)) {
+                        content = content.replace(regex, `$1${value} `);
+                    }
+                }
+                
+                previewArea.value = content;
+                downloadBtn.disabled = false;
+
+            } catch (error) {
+                console.error("Hiba a fájl generálása közben:", error);
+                previewArea.textContent = "Hiba történt a generálás során. Kérlek, próbáld újra.";
+            }
+        }
+        
+        function downloadConfigFile() {
+            const content = document.getElementById('config-preview').value;
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Config.h';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function showInfoModal(key, isCalc = false) {
+            let def;
+            if (isCalc) {
+                const fields = { 
+                    motorSteps: { labelKey: 'CALC_MOTOR_STEPS_LABEL', descriptionKey: 'CALC_MOTOR_STEPS_DESC' },
+                    microsteps: { labelKey: 'CALC_MICROSTEPS_LABEL', descriptionKey: 'CALC_MICROSTEPS_DESC' },
+                    beltMotor: { labelKey: 'CALC_BELT_MOTOR_LABEL', descriptionKey: 'CALC_BELT_MOTOR_DESC' },
+                    beltWorm: { labelKey: 'CALC_BELT_WORM_LABEL', descriptionKey: 'CALC_BELT_WORM_DESC' },
+                    wormTeeth: { labelKey: 'CALC_WORM_TEETH_LABEL', descriptionKey: 'CALC_WORM_TEETH_DESC' }
+                };
+                def = fields[key];
+            } else {
+                 const stepSchema = schemas[appState.version]?.[appState.wizardStep];
+                 def = stepSchema?.[key];
+            }
+           
+            if (def) {
+                dom.modalTitle.innerHTML = appState.i18n[def.labelKey] || key;
+                dom.modalText.innerHTML = (appState.i18n[def.descriptionKey] || 'N/A');
+                dom.modal.classList.add('visible');
+            }
+        }
+
+        function hideInfoModal() {
+            dom.modal.classList.remove('visible');
+        }
+        
+        // ===================================================================================
+        // BACKGROUND ANIMATION
+        // ===================================================================================
+        function initBackground() {
+            const canvas = dom.constellationCanvas;
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            stars = [];
+            for (let i = 0; i < 250; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    r: Math.random() * 1.5 + 0.5,
+                    vx: (Math.random() - 0.5) * 0.1,
+                    vy: (Math.random() - 0.5) * 0.1,
+                });
+            }
+        }
+
+        function animateBackground() {
+            const canvas = dom.constellationCanvas;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            stars.forEach(star => {
+                star.x += star.vx; star.y += star.vy;
+                if (star.x < 0 || star.x > canvas.width) star.vx *= -1;
+                if (star.y < 0 || star.y > canvas.height) star.vy *= -1;
+                ctx.fillStyle = 'rgba(224, 229, 240, 0.7)';
+                ctx.beginPath(); ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2); ctx.fill();
+            });
+
+            ctx.strokeStyle = 'rgba(90, 110, 160, 0.3)'; ctx.lineWidth = 0.5;
+            stars.forEach(star => {
+                let neighbors = stars
+                    .map(neighbor => ({ dist: Math.hypot(star.x - neighbor.x, star.y - neighbor.y), neighbor }))
+                    .sort((a, b) => a.dist - b.dist)
+                    .slice(1, 3);
+                
+                neighbors.forEach(({dist, neighbor}) => {
+                    if (dist < 120) {
+                        ctx.beginPath();
+                        ctx.moveTo(star.x, star.y);
+                        ctx.lineTo(neighbor.x, neighbor.y);
+                        ctx.stroke();
+                    }
+                });
+            });
+            requestAnimationFrame(animateBackground);
+        }
+        
+        // ===================================================================================
+        // EVENT BINDING
+        // ===================================================================================
+        function bindEventListeners() {
+            document.querySelectorAll('.version-card').forEach(card => card.addEventListener('click', () => handleVersionSelect(card.dataset.version)));
+            dom.modalClose.addEventListener('click', hideInfoModal);
+            dom.modal.addEventListener('click', e => { if (e.target === dom.modal) hideInfoModal(); });
+            window.addEventListener('keydown', e => { if (e.key === 'Escape') hideInfoModal(); });
+            dom.wikiButton.addEventListener('click', showWiki);
+            dom.wikiBackButton.addEventListener('click', handleBackToHome);
+            dom.wikiNav.addEventListener('click', e => { e.preventDefault(); if (e.target.tagName === 'A') renderWikiPage(e.target.hash.substring(1)); });
+            dom.languageSelector.addEventListener('change', (e) => loadLanguage(e.target.value));
+        }
+        
+        function bindWizardEvents() {
+            dom.configWizard.addEventListener('click', e => {
+                 if (e.target.classList.contains('info-icon')) {
+                     showInfoModal(e.target.dataset.key);
+                 } else if (e.target.matches('.calculator-grid label[data-info-key]')) {
+                     showInfoModal(e.target.dataset.infoKey, true);
+                 }
+            });
+            dom.configWizard.addEventListener('change', e => {
+                if (e.target.tagName === 'SELECT') {
+                    appState.config[e.target.id] = e.target.value;
+                    const grid = e.target.closest('.calculator-grid');
+                    if (grid) {
+                        updateSPD(grid.dataset.axis);
+                    } else {
+                        updatePreviewIfVisible();
+                    }
+                }
+            });
+            document.querySelectorAll('.calculator-grid').forEach(grid => updateSPD(grid.dataset.axis));
+        }
+
+        // ===================================================================================
+        // INITIALIZATION
+        // ===================================================================================
+        function initFooter() {
+            const year = new Date().getFullYear();
+            dom.appFooter.innerHTML = `&copy; ${year} OnStep Konfigurátor v${APP_VERSION}`;
+        }
+
+        function init() {
+            const savedLang = localStorage.getItem('onstep_language');
+            const browserLang = navigator.language.split('-')[0];
+            const defaultLang = 'hu';
+            
+            let initialLang = defaultLang;
+            if (savedLang && localizationData[savedLang]) {
+                initialLang = savedLang;
+            } else if (localizationData[browserLang]) {
+                initialLang = browserLang;
+            }
+            
+            loadLanguage(initialLang);
+            bindEventListeners();
+            initFooter();
+            initBackground();
+            animateBackground();
+            window.addEventListener('resize', initBackground);
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
