@@ -2,7 +2,7 @@
 // ===================================================================================
 // APP STATE
 // ===================================================================================
-const APP_VERSION = "0.0.6.1-beta";
+const APP_VERSION = "0.0.6.2-beta";
 
 const appState = { 
     version: null, 
@@ -295,25 +295,24 @@ function generateConfigFile() {
     // Process line by line
     const lines = rawTemplate.split('\n');
     const processedLines = lines.map(line => {
-        // Regex to match: #define KEY VALUE // Comment
-        // Group 1: "#define " + KEY
-        // Group 2: whitespace
-        // Group 3: VALUE
-        // Group 4: whitespace + "//"
-        // Group 5: Comment text
-        const defineMatch = line.match(/^(\s*#define\s+)(\w+)(\s+)(.*?)(\s*\/\/)(.*)$/);
+        // More robust Regex:
+        // Group 1: Leading whitespace + #define + space
+        // Group 2: Key (variable name)
+        // Group 3: Separator space
+        // Group 4: Value (lazy match until comment or end)
+        // Group 5: Whitespace before comment
+        // Group 6: Comment (starting with //) or undefined
+        const defineMatch = line.match(/^(\s*#define\s+)(\w+)(\s+)(.*?)(\s*)(\/\/.*)?$/);
         
         if (defineMatch) {
             const prefix = defineMatch[1];
             const key = defineMatch[2];
             const spacing1 = defineMatch[3];
             let value = defineMatch[4];
-            const commentPrefix = defineMatch[5];
-            let comment = defineMatch[6];
+            const spacing2 = defineMatch[5];
+            let comment = defineMatch[6] || "";
 
             // 1. Update Value if user changed it in Wizard
-            // The value might have extra trailing spaces in the original file, we trim it for logic but keep spacing?
-            // Actually, we just replace the value part if we have a config for it.
             if (appState.config.hasOwnProperty(key)) {
                 value = appState.config[key]; 
                 // Pad value to align comments? (Optional, skipping for simplicity)
@@ -321,13 +320,14 @@ function generateConfigFile() {
 
             // 2. Update Comment if translation exists
             if (comments[key]) {
-                comment = " " + comments[key]; // Add space after //
+                // Replace everything after // with the new text
+                comment = "// " + comments[key]; 
             }
 
-            return `${prefix}${key}${spacing1}${value}${commentPrefix}${comment}`;
+            return `${prefix}${key}${spacing1}${value}${spacing2}${comment}`;
         }
         
-        // Return line unchanged if not a define with comment
+        // Return line unchanged if not a define we need to touch
         return line;
     });
 

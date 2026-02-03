@@ -99,15 +99,15 @@ function renderAxisCalculatorTable() {
 
     container.appendChild(table);
 
-    // INFO BOX (Explanations based on user images)
+    // INFO BOX (Localized)
     const infoBox = document.createElement('div');
     infoBox.className = 'info-box';
     infoBox.innerHTML = `
-        <strong>Guide / Limits:</strong>
+        <strong>${appState.i18n.XLS_GUIDE_TITLE}</strong>
         <ul>
-            <li><strong>RPM:</strong> Should be <code>&lt; 1500</code> (ideally &lt; 1200) to avoid motor stalling.</li>
-            <li><strong>Resolution:</strong> Ideally <code>&lt; 1.0 arc-sec</code> for astrophotography.</li>
-            <li><strong>Slew Rate:</strong> 62.5 us/step -> 1.3°/s | 15.6 us/step -> 5°/s (for 32-bit MCU).</li>
+            <li>${appState.i18n.XLS_GUIDE_RPM}</li>
+            <li>${appState.i18n.XLS_GUIDE_RES}</li>
+            <li>${appState.i18n.XLS_GUIDE_SLEW}</li>
         </ul>
     `;
     container.appendChild(infoBox);
@@ -119,8 +119,6 @@ function renderAxisCalculatorTable() {
 function recalculateXLS() {
     if (!document.querySelector('.xls-table')) return;
 
-    // We get Slew Rate from appState or if it is on this page (it moved to Step 1 in new Schema, but we keep fallback)
-    // If slew rate is not on this page, grab from config
     const slewRateInput = document.getElementById('SLEW_RATE_BASE_DESIRED');
     let slewRate = slewRateInput ? parseFloat(slewRateInput.value) : (appState.config.SLEW_RATE_BASE_DESIRED || 2.5);
     
@@ -164,7 +162,7 @@ function recalculateXLS() {
         const res = 3600 / spd; 
         if (trEl) {
             trEl.textContent = res.toFixed(2);
-            trEl.style.color = res > 1.0 ? '#ffaa00' : '#28a745'; // Orange if > 1 arcsec
+            trEl.style.color = res > 1.0 ? '#ffaa00' : '#28a745'; 
         }
 
         const totalRatio = p.gr1 * p.gr2;
@@ -231,6 +229,7 @@ function calculateBeltLength() {
     const teeth = Math.round(length / pitch);
     const ratio = (p2/p1).toFixed(4);
     
+    // Corrected to use proper localization keys
     dom.beltResultText.innerHTML = `
         ${appState.i18n.beltCalcLength}: <strong>${length.toFixed(2)} mm</strong><br>
         ${appState.i18n.beltCalcTeeth}: <strong>${teeth}</strong><br>
