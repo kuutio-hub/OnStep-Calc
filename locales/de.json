@@ -9,7 +9,7 @@
     "classicFeatures": "<li><b>Zielhardware:</b> 8-Bit-Mikrocontroller (z. B. Arduino Mega 2560).</li><li><b>Leistung:</b> Zuverlässig, aber mit begrenzter Rechenleistung.</li><li><b>Funktionen:</b> Enthält alle wesentlichen Funktionen für die grundlegende astronomische Nachführung und GOTO.</li><li><b>Ideal für:</b> Einfachere, ältere Hardware oder wenn maximale Stabilität das Ziel ist.</li>",
     "onstepxFeatures": "<li><b>Zielhardware:</b> 32-Bit-Mikrocontroller (z. B. ESP32, STM32).</li><li><b>Leistung:</b> Deutlich schneller mit mehr Speicher.</li><li><b>Funktionen:</b> Erweiterte Pointing-Modelle, WLAN, Bluetooth, Web-Interface und viele weitere Zusatzfunktionen.</li><li><b>Ideal für:</b> Moderne Hardware, wenn Sie die neuesten Funktionen und höchste Präzision wünschen.</li>",
     "wikiButton": "Wiki / Hilfe",
-    "backToHomeButton": "‹ Zurück zum Hauptmenü",
+    "backToHomeButton": "Zurück zum Hauptmenü",
     "wizardTitleStep1": "Grundeinstellungen",
     "wizardTitleStep2": "Motor und Getriebe (Rechner)",
     "wizardTitleStep3": "Treiber-Einstellungen",

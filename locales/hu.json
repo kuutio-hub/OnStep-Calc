@@ -9,7 +9,7 @@
     "classicFeatures": "<li><b>Célhardver:</b> 8-bites mikrokontrollerek (pl. Arduino Mega 2560).</li><li><b>Teljesítmény:</b> Megbízható, de korlátozottabb számítási kapacitás.</li><li><b>Funkciók:</b> Az alapvető csillagászati követéshez és GOTO-hoz szükséges összes funkciót tartalmazza.</li><li><b>Ideális:</b> Egyszerűbb, régebbi hardverekhez, vagy ha a maximális stabilitás a cél.</li>",
     "onstepxFeatures": "<li><b>Célhardver:</b> 32-bites mikrokontrollerek (pl. ESP32, STM32).</li><li><b>Teljesítmény:</b> Jelentősen gyorsabb és több memóriával rendelkezik.</li><li><b>Funkciók:</b> Fejlett pointing modellek, WiFi, Bluetooth, webes felület és sok más extra képesség.</li><li><b>Ideális:</b> Modern hardverekhez, ha a legújabb funkciókat és a legnagyobb pontosságot szeretnéd elérni.</li>",
     "wikiButton": "Wiki / Súgó",
-    "backToHomeButton": "‹ Vissza a főmenübe",
+    "backToHomeButton": "Vissza a főmenübe",
     "wizardTitleStep1": "Alapbeállítások",
     "wizardTitleStep2": "Motor és Áttétel (Kalkulátor)",
     "wizardTitleStep3": "Meghajtó Beállítások",

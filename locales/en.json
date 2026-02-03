@@ -9,7 +9,7 @@
     "classicFeatures": "<li><b>Target Hardware:</b> 8-bit microcontrollers (e.g., Arduino Mega 2560).</li><li><b>Performance:</b> Reliable but with limited processing power.</li><li><b>Features:</b> Includes all essential functions for basic astronomical tracking and GOTO.</li><li><b>Ideal for:</b> Simpler, older hardware, or when maximum stability is the goal.</li>",
     "onstepxFeatures": "<li><b>Target Hardware:</b> 32-bit microcontrollers (e.g., ESP32, STM32).</li><li><b>Performance:</b> Significantly faster with more memory.</li><li><b>Features:</b> Advanced pointing models, WiFi, Bluetooth, web interface, and many other extra capabilities.</li><li><b>Ideal for:</b> Modern hardware, if you want the latest features and highest precision.</li>",
     "wikiButton": "Wiki / Help",
-    "backToHomeButton": "‹ Back to Main Menu",
+    "backToHomeButton": "Back to Main Menu",
     "wizardTitleStep1": "Basic Settings",
     "wizardTitleStep2": "Motor and Gearing (Calculator)",
     "wizardTitleStep3": "Driver Settings",

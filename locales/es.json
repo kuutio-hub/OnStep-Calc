@@ -9,7 +9,7 @@
     "classicFeatures": "<li><b>Hardware de destino:</b> Microcontroladores de 8 bits (p. ej., Arduino Mega 2560).</li><li><b>Rendimiento:</b> Fiable pero con potencia de procesamiento limitada.</li><li><b>Funciones:</b> Incluye todas las funciones esenciales para el seguimiento astronómico básico y GOTO.</li><li><b>Ideal para:</b> Hardware más simple y antiguo, o cuando la máxima estabilidad es el objetivo.</li>",
     "onstepxFeatures": "<li><b>Hardware de destino:</b> Microcontroladores de 32 bits (p. ej., ESP32, STM32).</li><li><b>Rendimiento:</b> Significativamente más rápido y con más memoria.</li><li><b>Funciones:</b> Modelos de apuntado avanzados, WiFi, Bluetooth, interfaz web y muchas otras capacidades adicionales.</li><li><b>Ideal para:</b> Hardware moderno, si desea las últimas funciones y la máxima precisión.</li>",
     "wikiButton": "Wiki / Ayuda",
-    "backToHomeButton": "‹ Volver al Menú Principal",
+    "backToHomeButton": "Volver al Menú Principal",
     "wizardTitleStep1": "Ajustes Básicos",
     "wizardTitleStep2": "Motor y Engranajes (Calculadora)",
     "wizardTitleStep3": "Ajustes del Driver",
