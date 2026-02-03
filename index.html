@@ -9,153 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
-
-    <style>
-        :root {
-            --bg-color: #0c0f1a;
-            --container-bg: rgba(26, 29, 46, 0.95);
-            --primary-accent: #00aaff;
-            --secondary-accent: #ffaa00;
-            --text-color: #e0e5f0;
-            --text-muted: #8a99b5;
-            --border-color: #343a5e;
-            --input-bg: #10121e;
-            --shadow-color: rgba(0, 170, 255, 0.2);
-            --success-color: #28a745;
-            --error-color: #dc3545;
-            --border-radius: 12px;
-            --font-main: 'Roboto', sans-serif;
-            --font-title: 'Orbitron', sans-serif;
-
-            /* XLS Calculator Colors */
-            --xls-bg-orange: rgba(255, 170, 0, 0.15);
-            --xls-bg-green: rgba(40, 167, 69, 0.15);
-            --xls-border-orange: #ffaa00;
-            --xls-border-green: #28a745;
-            --xls-text-red: #ff4444;
-        }
-
-        *, *::before, *::after { box-sizing: border-box; }
-
-        body {
-            font-family: var(--font-main);
-            margin: 0;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            line-height: 1.6;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: 100vh;
-            padding: 2rem 1rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        #constellation-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
-        .hidden { display: none !important; }
-
-        main {
-            position: relative; z-index: 10; max-width: 1000px; width: 100%;
-            padding: 2.5rem; background-color: var(--container-bg); border-radius: var(--border-radius);
-            border: 1px solid var(--border-color); box-shadow: 0 8px 32px 0 var(--shadow-color);
-            text-align: center; transition: all 0.3s ease; flex: 1; display: flex; flex-direction: column;
-            max-height: calc(100vh - 4rem);
-        }
-        
-        .app-header { position: absolute; top: 1rem; right: 1rem; display: flex; align-items: center; z-index: 20; }
-        #language-selector { background-color: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-muted); border-radius: 6px; padding: 0.25rem 0.5rem; font-size: 0.8rem; }
-
-        h1, h2, h3, h4 { font-family: var(--font-title); color: var(--primary-accent); letter-spacing: 1.5px; text-shadow: 0 0 5px var(--shadow-color); }
-        h1 { font-size: 2.5rem; margin: 0 0 1rem 0; }
-        h2 { font-size: 1.8rem; margin-bottom: 2rem; text-align: center; }
-        h3 { font-size: 1.5rem; margin-bottom: 1rem; }
-        p { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; margin: 0 auto 2.5rem auto; }
-        
-        .main-content { flex: 1; display: flex; flex-direction: column; min-height: 0; }
-        .version-selector-container { display: flex; gap: 2rem; justify-content: center; align-items: stretch; margin-bottom: 2rem; }
-        .version-card { background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 2rem; flex: 1; max-width: 320px; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; text-align: center; }
-        .version-card:hover { transform: translateY(-5px); border-color: var(--primary-accent); box-shadow: 0 10px 30px 0 var(--shadow-color); }
-        .version-card h3 { margin: 0 0 0.5rem 0; }
-        .version-card p { font-size: 0.9rem; margin-bottom: 0; color: var(--text-muted); text-align: center; max-width: 100%; }
-
-        .comparison-section { display: flex; gap: 2rem; text-align: left; margin-bottom: 2rem; background-color: var(--input-bg); padding: 1.5rem; border-radius: var(--border-radius); }
-        .comparison-column { flex: 1; }
-        .comparison-column ul { padding-left: 1.2rem; margin: 0; font-size: 0.9rem; color: var(--text-muted); }
-        .comparison-column li { margin-bottom: 0.5rem; }
-
-        .button { background: none; border: 1px solid var(--border-color); color: var(--text-muted); padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; font-size: 1rem; transition: all 0.2s ease; font-family: var(--font-title); }
-        .button:hover { color: var(--text-color); border-color: var(--primary-accent); background-color: var(--shadow-color); }
-        .button.primary { border-color: var(--primary-accent); color: var(--primary-accent); }
-        .button:disabled { opacity: 0.5; cursor: not-allowed; border-color: var(--border-color); color: var(--text-muted); background: none; }
-        
-        /* --- Wizard Styles --- */
-        #config-wizard { text-align: left; display: flex; flex-direction: column; flex: 1; min-height: 0; }
-        .wizard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; position: relative; flex-shrink: 0; }
-        .back-button { background: none; border: 1px solid var(--border-color); color: var(--text-muted); padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s ease; }
-        .back-button:hover { color: var(--text-color); border-color: var(--primary-accent); }
-        .wizard-header h2 { position: absolute; left: 50%; transform: translateX(-50%); margin: 0; }
-        
-        .form-group { margin-bottom: 1.5rem; display: flex; flex-direction: column; }
-        .form-group-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
-        .form-group label { font-size: 1rem; font-weight: bold; color: var(--text-color); margin-bottom: 0.5rem; display: flex; align-items: center; }
-        .form-group label code { margin-left: 8px; font-size: 0.8em; opacity: 0.6; background: var(--border-color); padding: 0.1em 0.4em; border-radius: 4px; }
-        .info-icon { display: inline-block; width: 18px; height: 18px; border-radius: 50%; background-color: var(--border-color); color: var(--text-color); text-align: center; font-size: 12px; line-height: 18px; margin-left: 8px; cursor: pointer; transition: background-color 0.2s; flex-shrink: 0; }
-        .info-icon:hover { background-color: var(--primary-accent); }
-        
-        .form-group select, .form-group input[type="text"], .form-group input[type="number"] { width: 100%; padding: 0.75rem 1rem; background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color); font-size: 1rem; transition: border-color 0.2s, box-shadow 0.2s; }
-        .form-group select:focus, .form-group input:focus { outline: none; border-color: var(--primary-accent); box-shadow: 0 0 0 3px var(--shadow-color); }
-        .form-group .radio-group { display: flex; gap: 1rem; margin-bottom: 1rem; }
-        
-        .wizard-nav { margin-top: auto; padding-top: 1.5rem; display: flex; justify-content: space-between; flex-shrink: 0; border-top: 1px solid var(--border-color); }
-        .step-container { flex: 1; overflow-y: auto; padding: 1.5rem 1rem 1.5rem 0; margin-top: 1.5rem; border-top: 1px solid var(--border-color); min-height: 0; }
-        
-        /* --- Calculator Table Styles (Step 2) --- */
-        .xls-table { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; align-items: center; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
-        .xls-header { font-family: var(--font-title); color: var(--text-muted); font-size: 0.9rem; text-align: center; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 0.5rem; }
-        .xls-label { font-weight: bold; font-size: 0.95rem; }
-        .xls-input { background: var(--xls-bg-orange); border: 1px solid var(--xls-border-orange); color: var(--text-color); padding: 0.5rem; border-radius: 4px; width: 100%; text-align: center; }
-        .xls-input:focus { outline: none; box-shadow: 0 0 5px var(--xls-border-orange); }
-        .xls-result { background: var(--xls-bg-green); border: 1px solid var(--xls-border-green); color: var(--text-color); padding: 0.5rem; border-radius: 4px; width: 100%; text-align: center; font-weight: bold; }
-        .xls-readout { text-align: center; font-size: 0.9rem; color: var(--text-muted); }
-        .xls-warning { color: var(--xls-text-red); font-size: 0.8rem; display: block; text-align: center; margin-top: 2px; }
-        .xls-section-title { grid-column: 1 / -1; font-family: var(--font-title); color: var(--secondary-accent); margin-top: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); }
-        .xls-calc-btn { background: none; border: 1px solid var(--border-color); color: var(--text-muted); cursor: pointer; padding: 2px 6px; font-size: 0.8rem; border-radius: 4px; margin-left: 5px; }
-
-        #config-preview { width: 100%; height: 100%; background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-muted); font-family: 'Courier New', Courier, monospace; font-size: 0.8rem; padding: 1rem; resize: vertical; }
-        .axis-section h3 { font-size: 1.2rem; color: var(--secondary-accent); border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-top: 2rem; }
-        .axis-section:first-child h3 { margin-top: 0; }
-
-        /* --- Wiki Section --- */
-        #wiki-section { text-align: left; display: flex; flex-direction: column; flex: 1; min-height: 0; }
-        #wiki-content { display: flex; gap: 2rem; margin-top: 1rem; flex: 1; overflow: hidden; min-height: 0; }
-        #wiki-nav { flex: 0 0 200px; overflow-y: auto; }
-        #wiki-nav ul { list-style: none; padding: 0; margin: 0; }
-        #wiki-nav a { display: block; padding: 0.5rem 1rem; color: var(--text-muted); text-decoration: none; border-radius: 6px; transition: background-color 0.2s, color 0.2s; }
-        #wiki-nav a:hover { background-color: var(--input-bg); color: var(--text-color); }
-        #wiki-nav a.active { background-color: var(--primary-accent); color: var(--bg-color); font-weight: bold; }
-        #wiki-article { flex-grow: 1; overflow-y: auto; padding-right: 1rem; }
-        #wiki-article h2 { text-align: left; }
-        #wiki-article p, #wiki-article ul, #wiki-article li { font-size: 1rem; color: var(--text-muted); max-width: 100%; }
-        #wiki-article a { color: var(--primary-accent); }
-        #wiki-article code { background-color: var(--input-bg); padding: 0.1rem 0.3rem; border-radius: 4px; font-family: 'Courier New', Courier, monospace; color: var(--secondary-accent); }
-
-        /* --- Modal Styles --- */
-        .modal { position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(12, 15, 26, 0.8); display: flex; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
-        .modal.visible { opacity: 1; pointer-events: auto; }
-        .modal-content { background-color: var(--container-bg); margin: auto; padding: 2rem; border: 1px solid var(--border-color); border-radius: var(--border-radius); max-width: 700px; width: 90%; box-shadow: 0 8px 32px 0 var(--shadow-color); transform: scale(0.95); transition: transform 0.3s ease; }
-        .modal.visible .modal-content { transform: scale(1); }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1rem; }
-        .modal-header h3 { margin: 0; }
-        .modal-close { color: var(--text-muted); font-size: 28px; font-weight: bold; cursor: pointer; }
-        .modal-close:hover { color: var(--text-color); }
-        .modal-body p { font-size: 1rem; text-align: left; margin-bottom: 0; max-width: 100%; color: var(--text-muted); }
-        .modal-body code { background-color: var(--input-bg); padding: 0.1rem 0.3rem; border-radius: 4px; font-family: 'Courier New', Courier, monospace; color: var(--secondary-accent); }
-        .modal-body strong { color: var(--text-color); }
-
-        /* --- Footer --- */
-        footer { width: 100%; max-width: 900px; padding-top: 1.5rem; text-align: center; font-size: 0.9rem; color: var(--text-muted); }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <canvas id="constellation-canvas"></canvas>
@@ -173,15 +27,15 @@
         <div class="main-content">
             <section id="version-selector">
                 <h1 data-lang-key="appTitle">OnStep Konfigurátor</h1>
-                <p data-lang-key="appDescription"></p>
+                <p data-lang-key="appDescription">Betöltés...</p>
                 <div class="version-selector-container">
                     <article class="version-card" data-version="classic" role="button" tabindex="0">
-                        <h3 data-lang-key="classicTitle"></h3>
-                        <p data-lang-key="classicTagline"></p>
+                        <h3 data-lang-key="classicTitle">OnStep Classic</h3>
+                        <p data-lang-key="classicTagline">...</p>
                     </article>
                     <article class="version-card" data-version="onstepx" role="button" tabindex="0">
-                        <h3 data-lang-key="onstepxTitle"></h3>
-                        <p data-lang-key="onstepxTagline"></p>
+                        <h3 data-lang-key="onstepxTitle">OnStepX</h3>
+                        <p data-lang-key="onstepxTagline">...</p>
                     </article>
                 </div>
 
@@ -196,7 +50,7 @@
                     </div>
                 </div>
 
-                <button id="wiki-button" class="button" data-lang-key="wikiButton"></button>
+                <button id="wiki-button" class="button" data-lang-key="wikiButton">Wiki</button>
             </section>
 
             <section id="config-wizard" class="hidden">
@@ -205,15 +59,15 @@
 
             <section id="wiki-section" class="hidden">
                  <div class="wizard-header">
-                    <button class="back-button" id="wiki-back-button" data-lang-key="backToHomeButton"></button>
-                    <h2 data-lang-key="wikiTitle"></h2>
+                    <button class="back-button" id="wiki-back-button" data-lang-key="backToHomeButton">Back</button>
+                    <h2 data-lang-key="wikiTitle">Wiki</h2>
                  </div>
                  <div id="wiki-content">
                     <nav id="wiki-nav">
                         <ul>
-                            <li><a href="#prerequisites" data-lang-key="wikiNavPrerequisites" class="wiki-nav-link"></a></li>
-                            <li><a href="#hardware" data-lang-key="wikiNavHardware" class="wiki-nav-link"></a></li>
-                            <li><a href="#gearing" data-lang-key="wikiNavGearing" class="wiki-nav-link"></a></li>
+                            <li><a href="#prerequisites" data-lang-key="wikiNavPrerequisites" class="wiki-nav-link">Pre-reqs</a></li>
+                            <li><a href="#hardware" data-lang-key="wikiNavHardware" class="wiki-nav-link">Hardware</a></li>
+                            <li><a href="#gearing" data-lang-key="wikiNavGearing" class="wiki-nav-link">Gearing</a></li>
                         </ul>
                     </nav>
                     <article id="wiki-article"></article>
@@ -224,10 +78,11 @@
 
     <footer id="app-footer"></footer>
 
+    <!-- Modals -->
     <div id="info-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="modal-title"></h3>
+                <h3 id="modal-title">Info</h3>
                 <span class="modal-close" role="button" aria-label="Close">&times;</span>
             </div>
             <div class="modal-body">
@@ -239,13 +94,13 @@
     <div id="belt-calc-modal" class="modal">
          <div class="modal-content">
             <div class="modal-header">
-                <h3 data-lang-key="beltCalcTitle"></h3>
+                <h3 data-lang-key="beltCalcTitle">Belt Calculator</h3>
                 <span class="modal-close" role="button" aria-label="Close">&times;</span>
             </div>
             <div class="modal-body">
                 <div class="form-group-grid">
                      <div class="form-group">
-                        <label for="belt-type" data-lang-key="beltCalcType"></label>
+                        <label for="belt-type" data-lang-key="beltCalcType">Type</label>
                         <select id="belt-type">
                             <option value="2">GT2 (2mm pitch)</option>
                             <option value="3">GT3 (3mm pitch)</option>
@@ -254,707 +109,31 @@
                         </select>
                     </div>
                      <div class="form-group">
-                        <label for="belt-pitch" data-lang-key="beltCalcPitch"></label>
+                        <label for="belt-pitch" data-lang-key="beltCalcPitch">Pitch</label>
                         <input type="number" id="belt-pitch" value="2" readonly style="background: #222;">
                     </div>
                     <div class="form-group">
-                        <label for="belt-p1" data-lang-key="beltCalcP1"></label>
+                        <label for="belt-p1" data-lang-key="beltCalcP1">P1</label>
                         <input type="number" id="belt-p1" value="16">
                     </div>
                      <div class="form-group">
-                        <label for="belt-p2" data-lang-key="beltCalcP2"></label>
+                        <label for="belt-p2" data-lang-key="beltCalcP2">P2</label>
                         <input type="number" id="belt-p2" value="48">
                     </div>
                     <div class="form-group">
-                        <label for="belt-distance" data-lang-key="beltCalcDist"></label>
+                        <label for="belt-distance" data-lang-key="beltCalcDist">Distance</label>
                         <input type="number" id="belt-distance" value="50">
                     </div>
                 </div>
                 <div id="belt-calc-results" style="margin-top: 1rem; background: var(--input-bg); padding: 1rem; border-radius: 8px;">
-                    <h4 data-lang-key="beltCalcResult"></h4>
+                    <h4 data-lang-key="beltCalcResult">Result</h4>
                     <p id="belt-result-text"></p>
                 </div>
             </div>
         </div>
     </div>
 
-    <script type="module">
-        // ===================================================================================
-        // CONSTANTS & CONFIGURATION
-        // ===================================================================================
-        const APP_VERSION = "0.0.4.4-beta";
-
-        const TEMPLATE_ONSTEP_CLASSIC = `
-// Configuration for OnStep
-#define PINMAP                        OFF
-#define SERIAL_A_BAUD_DEFAULT        9600
-#define MOUNT_TYPE                    GEM
-#define AXIS1_STEPS_PER_DEGREE    12800.0
-#define AXIS1_DRIVER_MODEL            OFF
-#define AXIS1_DRIVER_MICROSTEPS       OFF
-#define AXIS1_DRIVER_MICROSTEPS_GOTO  OFF
-#define AXIS1_DRIVER_REVERSE          OFF
-#define AXIS2_STEPS_PER_DEGREE    12800.0
-#define AXIS2_DRIVER_MODEL            OFF
-#define AXIS2_DRIVER_MICROSTEPS       OFF
-#define AXIS2_DRIVER_MICROSTEPS_GOTO  OFF
-#define AXIS2_DRIVER_REVERSE          OFF
-#define SLEW_RATE_BASE_DESIRED        2.5
-// End of minimal template for brevity in this example. Real app has full template.
-`;
-
-        // Note: Full templates are used in logic, but shortened here for readability of the fix demo
-        // The real implementation uses the full string blocks as in previous version.
-        
-        const schemas = {
-            onstepx: [
-                { // Step 1: Alapbeállítások
-                    PINMAP: { type: 'select', labelKey: 'PINMAP_LABEL', descriptionKey: 'PINMAP_DESC', options: ['FYSETC_E4', 'MiniPCB', 'MiniPCB2', 'MaxPCB2', 'MaxESP3', 'CNC3', 'STM32Blue', 'MaxSTM3', 'FYSETC_S6_2'], defaultValue: 'FYSETC_E4' },
-                    MOUNT_TYPE: { type: 'select', labelKey: 'MOUNT_TYPE_LABEL', descriptionKey: 'MOUNT_TYPE_DESC', options: ['GEM', 'GEM_TA', 'GEM_TAC', 'FORK', 'FORK_TA', 'FORK_TAC', 'ALTAZM', 'ALTAZM_UNL'], defaultValue: 'GEM' }
-                },
-                { // Step 2: Motor és Áttétel (XLS Style)
-                    AXIS_GEARING: { type: 'axis_calculator_table' }
-                },
-                { // Step 3: Meghajtó Beállítások
-                    AXIS1_DRIVER_MODEL: { type: 'select', labelKey: 'AXIS_DM_LABEL', descriptionKey: 'AXIS_DM_DESC', options: ['A4988', 'DRV8825', 'TMC2130', 'TMC2209', 'TMC5160'], defaultValue: 'TMC2209' },
-                    AXIS1_DRIVER_MICROSTEPS: { type: 'select', labelKey: 'AXIS_MS_LABEL', descriptionKey: 'AXIS_MS_DESC', options: [8, 16, 32, 64, 128], defaultValue: 32 },
-                    AXIS1_DRIVER_MICROSTEPS_GOTO: { type: 'select', labelKey: 'AXIS_MSG_LABEL', descriptionKey: 'AXIS_MSG_DESC', options: [1, 2, 4, 8, 16], defaultValue: 4 },
-                    AXIS1_REVERSE: { type: 'select', labelKey: 'AXIS_REV_LABEL', descriptionKey: 'AXIS_REV_DESC', options: ['OFF', 'ON'], defaultValue: 'OFF' },
-                    AXIS2_DRIVER_MODEL: { type: 'select', labelKey: 'AXIS_DM_LABEL', descriptionKey: 'AXIS_DM_DESC', options: ['A4988', 'DRV8825', 'TMC2130', 'TMC2209', 'TMC5160'], defaultValue: 'TMC2209' },
-                    AXIS2_DRIVER_MICROSTEPS: { type: 'select', labelKey: 'AXIS_MS_LABEL', descriptionKey: 'AXIS_MS_DESC', options: [8, 16, 32, 64, 128], defaultValue: 32 },
-                    AXIS2_DRIVER_MICROSTEPS_GOTO: { type: 'select', labelKey: 'AXIS_MSG_LABEL', descriptionKey: 'AXIS_MSG_DESC', options: [1, 2, 4, 8, 16], defaultValue: 4 },
-                    AXIS2_REVERSE: { type: 'select', labelKey: 'AXIS_REV_LABEL', descriptionKey: 'AXIS_REV_DESC', options: ['OFF', 'ON'], defaultValue: 'OFF' },
-                },
-                { // Step 4: Összegzés és Generálás
-                    _summary: true
-                } 
-            ],
-            classic: [
-                { // Step 1
-                    PINMAP: { type: 'select', labelKey: 'PINMAP_LABEL', descriptionKey: 'PINMAP_DESC', options: ['MksGenL2', 'MiniPCB2', 'MaxPCB2', 'MaxESP3', 'CNC3', 'STM32Blue', 'MaxSTM3', 'FYSETC_S6_2'], defaultValue: 'OFF' },
-                    MOUNT_TYPE: { type: 'select', labelKey: 'MOUNT_TYPE_LABEL', descriptionKey: 'MOUNT_TYPE_DESC', options: ['GEM', 'FORK', 'ALTAZM'], defaultValue: 'GEM' }
-                },
-                 { // Step 2: Motor és Áttétel (XLS Style)
-                    AXIS_GEARING: { type: 'axis_calculator_table' }
-                },
-                { // Step 3
-                    AXIS1_DRIVER_MODEL: { type: 'select', labelKey: 'AXIS_DM_LABEL', descriptionKey: 'AXIS_DM_DESC', options: ['A4988', 'DRV8825', 'LV8729', 'TMC2209'], defaultValue: 'A4988' },
-                    AXIS1_DRIVER_MICROSTEPS: { type: 'select', labelKey: 'AXIS_MS_LABEL', descriptionKey: 'AXIS_MS_DESC', options: [8, 16, 32], defaultValue: 16 },
-                    AXIS1_DRIVER_MICROSTEPS_GOTO: { type: 'select', labelKey: 'AXIS_MSG_LABEL', descriptionKey: 'AXIS_MSG_DESC', options: [1, 2, 4, 8], defaultValue: 4 },
-                    AXIS1_DRIVER_REVERSE: { type: 'select', labelKey: 'AXIS_REV_LABEL', descriptionKey: 'AXIS_REV_DESC', options: ['OFF', 'ON'], defaultValue: 'OFF' },
-                    AXIS2_DRIVER_MODEL: { type: 'select', labelKey: 'AXIS_DM_LABEL', descriptionKey: 'AXIS_DM_DESC', options: ['A4988', 'DRV8825', 'LV8729', 'TMC2209'], defaultValue: 'A4988' },
-                    AXIS2_DRIVER_MICROSTEPS: { type: 'select', labelKey: 'AXIS_MS_LABEL', descriptionKey: 'AXIS_MS_DESC', options: [8, 16, 32], defaultValue: 16 },
-                    AXIS2_DRIVER_MICROSTEPS_GOTO: { type: 'select', labelKey: 'AXIS_MSG_LABEL', descriptionKey: 'AXIS_MSG_DESC', options: [1, 2, 4, 8], defaultValue: 4 },
-                    AXIS2_DRIVER_REVERSE: { type: 'select', labelKey: 'AXIS_REV_LABEL', descriptionKey: 'AXIS_REV_DESC', options: ['OFF', 'ON'], defaultValue: 'OFF' },
-                },
-                { // Step 4
-                    _summary: true
-                }
-            ]
-        };
-
-        // ===================================================================================
-        // APPLICATION STATE
-        // ===================================================================================
-        const appState = { 
-            version: null, 
-            language: 'en', 
-            config: {}, 
-            calcParams: {
-                AXIS1: { motor: 200, micro: 32, gr1: 4, gr2: 144 },
-                AXIS2: { motor: 200, micro: 32, gr1: 4, gr2: 144 },
-                SLEW_RATE: 2.5
-            },
-            i18n: {}, 
-            wizardStep: 0, 
-            constellations: [] 
-        };
-        let stars = [];
-
-        // ===================================================================================
-        // DOM ELEMENTS
-        // ===================================================================================
-        const dom = {
-            main: document.querySelector('main'),
-            versionSelector: document.getElementById('version-selector'),
-            configWizard: document.getElementById('config-wizard'),
-            appFooter: document.getElementById('app-footer'),
-            constellationCanvas: document.getElementById('constellation-canvas'),
-            wikiButton: document.getElementById('wiki-button'),
-            wikiSection: document.getElementById('wiki-section'),
-            wikiNav: document.getElementById('wiki-nav'),
-            wikiArticle: document.getElementById('wiki-article'),
-            wikiBackButton: document.getElementById('wiki-back-button'),
-            languageSelector: document.getElementById('language-selector'),
-            
-            infoModal: document.getElementById('info-modal'),
-            infoModalTitle: document.getElementById('modal-title'),
-            infoModalText: document.getElementById('modal-text'),
-            
-            beltCalcModal: document.getElementById('belt-calc-modal'),
-            beltResultText: document.getElementById('belt-result-text'),
-        };
-        
-        // ===================================================================================
-        // UI RENDERING
-        // ===================================================================================
-        function applyLocalization() {
-            const lang = appState.language;
-            document.documentElement.lang = lang;
-            document.querySelectorAll('[data-lang-key]').forEach(el => { 
-                const key = el.dataset.langKey; 
-                if (appState.i18n[key]) el.innerHTML = appState.i18n[key]; 
-            });
-            if (!dom.configWizard.classList.contains('hidden')) renderWizard();
-        }
-
-        function renderWizard() {
-            dom.configWizard.innerHTML = '';
-            const schema = schemas[appState.version];
-            if (!schema) return;
-
-            const maxSteps = schema.length;
-            const currentStepSchema = schema[appState.wizardStep];
-            
-            const wizardHeader = document.createElement('div');
-            wizardHeader.className = 'wizard-header';
-            const backButton = document.createElement('button');
-            backButton.className = 'back-button';
-            backButton.textContent = appState.i18n.backToHomeButton;
-            backButton.onclick = handleBackToHome;
-            const wizardTitle = document.createElement('h2');
-            const titleKey = `wizardTitleStep${appState.wizardStep + 1}`;
-            wizardTitle.textContent = `${appState.i18n[titleKey] || 'Step'} (${appState.wizardStep + 1}/${maxSteps})`;
-            wizardHeader.append(backButton, wizardTitle);
-            
-            const stepContainer = document.createElement('div');
-            stepContainer.className = 'step-container';
-            
-            if (currentStepSchema._summary) {
-                stepContainer.style.display = 'flex'; flex-direction: 'column';
-                const summaryText = document.createElement('p');
-                summaryText.innerHTML = appState.i18n.summaryText;
-                stepContainer.appendChild(summaryText);
-                
-                const previewArea = document.createElement('textarea');
-                previewArea.id = 'config-preview';
-                previewArea.readOnly = true;
-                previewArea.textContent = appState.i18n.summaryWaiting;
-                stepContainer.appendChild(previewArea);
-                
-                generateConfigFile();
-            } else if (currentStepSchema.AXIS_GEARING) {
-                stepContainer.appendChild(renderAxisCalculatorTable());
-            } else {
-                const formContent = buildFormForStep(currentStepSchema);
-                stepContainer.appendChild(formContent);
-            }
-            
-            const nav = document.createElement('div');
-            nav.className = 'wizard-nav';
-            const prevButton = document.createElement('button');
-            prevButton.textContent = appState.i18n.wizardPrev;
-            prevButton.className = 'button';
-            prevButton.disabled = appState.wizardStep === 0;
-            prevButton.onclick = () => changeWizardStep(-1);
-            
-            const nextButtonContainer = document.createElement('div');
-            if (appState.wizardStep < maxSteps - 1) {
-                const nextButton = document.createElement('button');
-                nextButton.textContent = appState.i18n.wizardNext;
-                nextButton.className = 'button primary';
-                nextButton.onclick = () => changeWizardStep(1);
-                nextButtonContainer.appendChild(nextButton);
-            } else {
-                 const downloadButton = document.createElement('button');
-                 downloadButton.id = 'download-btn';
-                 downloadButton.textContent = appState.i18n.downloadButton;
-                 downloadButton.className = 'button primary';
-                 downloadButton.disabled = true;
-                 downloadButton.onclick = downloadConfigFile;
-                 nextButtonContainer.appendChild(downloadButton);
-            }
-            
-            nav.append(prevButton, nextButtonContainer);
-            dom.configWizard.append(wizardHeader, stepContainer, nav);
-            bindWizardEvents();
-        }
-
-        function renderAxisCalculatorTable() {
-            const container = document.createElement('div');
-            
-            // Slew Rate Global Input
-            const slewDiv = document.createElement('div');
-            slewDiv.style.marginBottom = '1.5rem';
-            slewDiv.innerHTML = `
-                <div class="form-group" style="max-width: 300px; margin: 0 auto;">
-                    <label>SLEW_RATE_BASE_DESIRED (°/s) <code>(SLEW_RATE_BASE_DESIRED)</code></label>
-                    <input type="number" id="SLEW_RATE_BASE_DESIRED" class="xls-input" value="${appState.calcParams.SLEW_RATE}" step="0.1">
-                </div>
-            `;
-            container.appendChild(slewDiv);
-
-            const table = document.createElement('div');
-            table.className = 'xls-table';
-
-            // Header
-            table.innerHTML += `
-                <div class="xls-header">Parameter</div>
-                <div class="xls-header">Axis 1 (RA/AZM)</div>
-                <div class="xls-header">Axis 2 (DEC/ALT)</div>
-            `;
-
-            const params = [
-                { id: 'motor', label: 'XLS_MOTOR_STEPS', default: 200 },
-                { id: 'micro', label: 'XLS_MICROSTEPS', default: 32, options: [16, 32, 64, 128] },
-                { id: 'gr1', label: 'XLS_GR1', default: 4 },
-                { id: 'gr2', label: 'XLS_GR2', default: 144 }
-            ];
-
-            params.forEach(p => {
-                table.innerHTML += `<div class="xls-label">${appState.i18n[p.label] || p.label}</div>`;
-                ['AXIS1', 'AXIS2'].forEach(axis => {
-                    const val = appState.calcParams[axis][p.id];
-                    if (p.id === 'micro') {
-                         let opts = p.options.map(o => `<option value="${o}" ${o==val?'selected':''}>${o}</option>`).join('');
-                         table.innerHTML += `<div><select class="xls-input calc-trigger" data-axis="${axis}" data-param="${p.id}">${opts}</select></div>`;
-                    } else {
-                        let extra = '';
-                        if (p.id.startsWith('gr')) extra = `<button class="xls-calc-btn" onclick="document.getElementById('belt-calc-modal').classList.add('visible')">Calc</button>`;
-                        table.innerHTML += `<div><input type="number" class="xls-input calc-trigger" data-axis="${axis}" data-param="${p.id}" value="${val}">${extra}</div>`;
-                    }
-                });
-            });
-
-            // Results Section
-             table.innerHTML += `<div class="xls-section-title">Calculated Results</div>`;
-             
-             // Steps Per Degree
-             table.innerHTML += `<div class="xls-label">STEPS_PER_DEGREE</div>`;
-             ['AXIS1', 'AXIS2'].forEach(axis => {
-                 table.innerHTML += `<div><div id="${axis}_RES_SPD" class="xls-result">-</div><span id="${axis}_WARN_SPD" class="xls-warning"></span></div>`;
-             });
-
-             // Tracking Resolution
-             table.innerHTML += `<div class="xls-label">${appState.i18n.XLS_RESOLUTION} (arc-sec)</div>`;
-             ['AXIS1', 'AXIS2'].forEach(axis => {
-                 table.innerHTML += `<div id="${axis}_RES_TR" class="xls-readout">-</div>`;
-             });
-
-             // RPM
-             table.innerHTML += `<div class="xls-label">${appState.i18n.XLS_RPM} (@SlewMax)</div>`;
-             ['AXIS1', 'AXIS2'].forEach(axis => {
-                 table.innerHTML += `<div><div id="${axis}_RES_RPM" class="xls-readout">-</div><span id="${axis}_WARN_RPM" class="xls-warning"></span></div>`;
-             });
-
-            container.appendChild(table);
-            
-            // Trigger initial calculation after render
-            setTimeout(() => recalculateXLS(), 0);
-            return container;
-        }
-
-        function recalculateXLS() {
-            if (!document.querySelector('.xls-table')) return;
-
-            const slewRate = parseFloat(document.getElementById('SLEW_RATE_BASE_DESIRED').value) || 2.5;
-            appState.calcParams.SLEW_RATE = slewRate;
-            appState.config['SLEW_RATE_BASE_DESIRED'] = slewRate;
-
-            ['AXIS1', 'AXIS2'].forEach(axis => {
-                const p = appState.calcParams[axis];
-                const spd = (p.motor * p.micro * p.gr1 * p.gr2) / 360.0;
-                
-                // Update App Config
-                appState.config[`${axis}_STEPS_PER_DEGREE`] = spd.toFixed(1);
-                appState.config[`${axis}_DRIVER_MICROSTEPS`] = p.micro; // Sync with Step 3
-
-                // Update DOM
-                const spdEl = document.getElementById(`${axis}_RES_SPD`);
-                const warnSpdEl = document.getElementById(`${axis}_WARN_SPD`);
-                const trEl = document.getElementById(`${axis}_RES_TR`);
-                const rpmEl = document.getElementById(`${axis}_RES_RPM`);
-                const warnRpmEl = document.getElementById(`${axis}_WARN_RPM`);
-
-                if (spdEl) spdEl.textContent = spd.toLocaleString(undefined, {maximumFractionDigits: 1});
-                
-                // Limits check
-                if (spd < 12800 || spd > 61200) {
-                    warnSpdEl.textContent = "[12,800 - 61,200]";
-                    if (spdEl) spdEl.style.backgroundColor = 'rgba(255,0,0,0.2)';
-                } else {
-                    warnSpdEl.textContent = "";
-                    if (spdEl) spdEl.style.backgroundColor = '';
-                }
-
-                // Resolution: 1 degree = 3600 arcsec. Res = 3600 / SPD * Microstep? No.
-                // Resolution = 3600 / SPD is degrees per step in arcsec? No.
-                // 1 step = 1/SPD degrees. 1/SPD * 3600 arcsec.
-                // XLS says: 0.28 arc sec/Microstep.
-                const res = 3600 / spd; 
-                if (trEl) trEl.textContent = res.toFixed(3);
-
-                // RPM: (Deg/s * SPD) = Steps/s. 
-                // Revs/s = Steps/s / (Motor * Micro)
-                // RPM = Revs/s * 60
-                // RPM = (SlewRate * SPD / (Motor * Micro)) * 60
-                // Simplified: RPM = (SlewRate * (Motor*Micro*TotalRatio/360) / (Motor*Micro)) * 60
-                // RPM = (SlewRate * TotalRatio / 360) * 60 = SlewRate * TotalRatio / 6
-                const totalRatio = p.gr1 * p.gr2;
-                const rpm = (slewRate * totalRatio) / 6.0;
-                
-                if (rpmEl) rpmEl.textContent = rpm.toFixed(1);
-                if (rpm > 1500) {
-                     warnRpmEl.textContent = "[< 1500 RPM]";
-                } else {
-                     warnRpmEl.textContent = "";
-                }
-            });
-        }
-        
-        function buildFormForStep(stepSchema) {
-            const fragment = document.createDocumentFragment();
-            if (stepSchema.AXIS1_DRIVER_MODEL) {
-                const axis1Section = document.createElement('div');
-                axis1Section.className = 'axis-section';
-                const h3_1 = document.createElement('h3');
-                h3_1.textContent = 'RA/AZM Axis';
-                axis1Section.appendChild(h3_1);
-                
-                const axis2Section = document.createElement('div');
-                axis2Section.className = 'axis-section';
-                const h3_2 = document.createElement('h3');
-                h3_2.textContent = 'DEC/ALT Axis';
-                axis2Section.appendChild(h3_2);
-                
-                for (const key in stepSchema) {
-                    const def = stepSchema[key];
-                    const formControl = createFormControl(key, def);
-                    if(key.startsWith('AXIS1')) axis1Section.appendChild(formControl);
-                    else if (key.startsWith('AXIS2')) axis2Section.appendChild(formControl);
-                }
-                fragment.append(axis1Section, axis2Section);
-            } else {
-                 for (const key in stepSchema) {
-                    const def = stepSchema[key];
-                    fragment.appendChild(createFormControl(key, def));
-                }
-            }
-            return fragment;
-        }
-
-        function createFormControl(key, def) {
-            if (appState.config[key] === undefined) appState.config[key] = def.defaultValue;
-            
-            const group = document.createElement('div');
-            group.className = 'form-group';
-            const label = document.createElement('label');
-            label.htmlFor = key;
-            label.textContent = appState.i18n[def.labelKey] || key;
-            
-            const codeTag = document.createElement('code');
-            codeTag.textContent = `(${key})`;
-            label.appendChild(codeTag);
-
-            const infoIcon = document.createElement('span');
-            infoIcon.className = 'info-icon';
-            infoIcon.textContent = '?';
-            infoIcon.dataset.key = key;
-            label.appendChild(infoIcon);
-            group.appendChild(label);
-
-            if (def.type === 'select') {
-                const select = document.createElement('select');
-                select.id = key; select.name = key;
-                def.options.forEach(opt => {
-                    const option = document.createElement('option');
-                    option.value = opt; option.textContent = opt;
-                    if (opt == appState.config[key]) option.selected = true;
-                    select.appendChild(option);
-                });
-                group.appendChild(select);
-            }
-            return group;
-        }
-        
-        function renderWikiPage(pageKey) {
-            dom.wikiNav.querySelectorAll('a').forEach(a => a.classList.remove('active'));
-            const activeLink = dom.wikiNav.querySelector(`a[href="#${pageKey}"]`);
-            if (activeLink) activeLink.classList.add('active');
-            
-            dom.wikiArticle.innerHTML = `<h2>${appState.i18n[`wiki_page_${pageKey}_title`]}</h2>${appState.i18n[`wiki_page_${pageKey}_content`]}`;
-        }
-
-        // ===================================================================================
-        // EVENT HANDLERS & ACTIONS
-        // ===================================================================================
-        async function loadLanguage(lang) {
-            appState.language = lang;
-            localStorage.setItem('onstep_language', lang);
-            dom.languageSelector.value = lang;
-
-            try {
-                const response = await fetch(`locales/${lang}.json?v=${APP_VERSION}`);
-                if (!response.ok) throw new Error(`Language file for ${lang} not found.`);
-                appState.i18n = await response.json();
-            } catch (error) {
-                console.error(error.message, "Falling back to English.");
-                try {
-                    const response = await fetch(`locales/en.json?v=${APP_VERSION}`);
-                    appState.i18n = await response.json();
-                    appState.language = 'en';
-                    dom.languageSelector.value = 'en';
-                } catch (fallbackError) {
-                    console.error("Fallback to English failed. Using empty translations.");
-                    appState.i18n = {};
-                }
-            } finally {
-                applyLocalization();
-            }
-        }
-        
-        function handleVersionSelect(selectedVersion) {
-            appState.version = selectedVersion;
-            appState.wizardStep = 0;
-            appState.config = {}; // Reset config
-            dom.versionSelector.classList.add('hidden');
-            dom.configWizard.classList.remove('hidden');
-            renderWizard();
-        }
-
-        function handleBackToHome() {
-            appState.version = null; appState.config = {};
-            dom.configWizard.classList.add('hidden');
-            dom.wikiSection.classList.add('hidden');
-            dom.versionSelector.classList.remove('hidden');
-            dom.configWizard.innerHTML = '';
-        }
-        
-        function showWiki() {
-            dom.versionSelector.classList.add('hidden');
-            dom.wikiSection.classList.remove('hidden');
-            const firstLink = dom.wikiNav.querySelector('a');
-            if(firstLink) renderWikiPage(firstLink.hash.substring(1));
-        }
-
-        function changeWizardStep(direction) {
-            appState.wizardStep += direction;
-            renderWizard();
-        }
-
-        function generateConfigFile() {
-            // Placeholder: In a real scenario, this embeds the full template string.
-            // For this response, I am assuming the template logic from previous turns is preserved or re-implemented here.
-            // To keep the response concise, I will not re-paste the 500-line template string again unless necessary, 
-            // but the logic requires it. Since I must output the full file content, I will re-include the minimal logic.
-            
-            // Re-declaring templates for completeness of the file output
-            const T_CLASSIC = `// OnStep Classic Config\n#define PINMAP OFF\n#define MOUNT_TYPE GEM\n// ... (Full template would be here)`;
-            const T_X = `// OnStepX Config\n#define PINMAP FYSETC_E4\n// ... (Full template would be here)`;
-
-            const previewArea = document.getElementById('config-preview');
-            const downloadBtn = document.getElementById('download-btn');
-            if (!previewArea || !downloadBtn) return;
-            
-            downloadBtn.disabled = true;
-
-            // In production, use the large const strings defined at top. 
-            // For now, let's output the params.
-            let content = "// Configuration generated by OnStep Configurator\n";
-            for(let key in appState.config) {
-                content += `#define ${key} ${appState.config[key]}\n`;
-            }
-            
-            previewArea.value = content;
-            downloadBtn.disabled = false;
-        }
-        
-        function downloadConfigFile() {
-            const content = document.getElementById('config-preview').value;
-            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'Config.h';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-
-        function showInfoModal(key) {
-             const stepSchema = schemas[appState.version]?.[appState.wizardStep];
-             const def = stepSchema?.[key];
-           
-            if (def) {
-                dom.infoModalTitle.innerHTML = appState.i18n[def.labelKey] || key;
-                dom.infoModalText.innerHTML = (appState.i18n[def.descriptionKey] || 'N/A');
-                dom.infoModal.classList.add('visible');
-            }
-        }
-        function hideInfoModal(modal) { modal.classList.remove('visible'); }
-        
-        function showBeltCalcModal() { dom.beltCalcModal.classList.add('visible'); calculateBeltLength(); }
-        function calculateBeltLength() {
-            const p1 = parseFloat(document.getElementById('belt-p1').value);
-            const p2 = parseFloat(document.getElementById('belt-p2').value);
-            const pitch = parseFloat(document.getElementById('belt-pitch').value);
-            const dist = parseFloat(document.getElementById('belt-distance').value);
-            if ([p1, p2, pitch, dist].some(isNaN)) return;
-
-            const r1 = (p1 * pitch) / (2 * Math.PI);
-            const r2 = (p2 * pitch) / (2 * Math.PI);
-            const length = Math.sqrt(4 * dist**2 - (r1 - r2)**2) + Math.PI * (r1 + r2) + Math.asin((r1 - r2) / (2*dist)) * (r1 - r2);
-            const teeth = Math.round(length / pitch);
-            dom.beltResultText.innerHTML = `${appState.i18n.beltCalcLength}: <strong>${length.toFixed(2)} mm</strong><br>${appState.i18n.beltCalcTeeth}: <strong>${teeth}</strong>`;
-        }
-
-        // ===================================================================================
-        // BACKGROUND ANIMATION
-        // ===================================================================================
-        function distance(p1, p2) {
-            return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
-        }
-
-        function initBackground() {
-            const canvas = dom.constellationCanvas;
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            stars = [];
-            appState.constellations = [];
-
-            for (let i = 0; i < 250; i++) {
-                stars.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    r: Math.random() * 1.5 + 0.5,
-                    vx: (Math.random() - 0.5) * 0.1,
-                    vy: (Math.random() - 0.5) * 0.1,
-                });
-            }
-
-            let availableStars = [...stars];
-            while(availableStars.length > 0) {
-                const seedStar = availableStars.shift();
-                const constellation = [seedStar];
-                const size = Math.floor(Math.random() * (15 - 5 + 1)) + 5;
-                
-                availableStars.sort((a,b) => distance(a, seedStar) - distance(b, seedStar));
-
-                const neighbors = availableStars.splice(0, size - 1);
-                constellation.push(...neighbors);
-                appState.constellations.push(constellation);
-            }
-        }
-
-        function animateBackground() {
-            const canvas = dom.constellationCanvas;
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = 'rgba(224, 229, 240, 0.7)';
-            
-            stars.forEach(star => {
-                star.x += star.vx; star.y += star.vy;
-                if (star.x < 0 || star.x > canvas.width) star.vx *= -1;
-                if (star.y < 0 || star.y > canvas.height) star.vy *= -1;
-                ctx.beginPath(); ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2); ctx.fill();
-            });
-
-            ctx.strokeStyle = 'rgba(224, 229, 240, 0.1)';
-            ctx.lineWidth = 0.5;
-            appState.constellations.forEach(constellation => {
-                for (let i = 0; i < constellation.length; i++) {
-                    for (let j = i + 1; j < constellation.length; j++) {
-                        const dist = distance(constellation[i], constellation[j]);
-                        if (dist < 150) {
-                             ctx.beginPath();
-                             ctx.moveTo(constellation[i].x, constellation[i].y);
-                             ctx.lineTo(constellation[j].x, constellation[j].y);
-                             ctx.stroke();
-                        }
-                    }
-                }
-            });
-
-            requestAnimationFrame(animateBackground);
-        }
-        
-        // ===================================================================================
-        // EVENT BINDING
-        // ===================================================================================
-        function bindEventListeners() {
-            document.querySelectorAll('.version-card').forEach(card => card.addEventListener('click', () => handleVersionSelect(card.dataset.version)));
-            
-            [dom.infoModal, dom.beltCalcModal].forEach(modal => {
-                modal.querySelector('.modal-close').addEventListener('click', () => hideInfoModal(modal));
-                modal.addEventListener('click', e => { if (e.target === modal) hideInfoModal(modal); });
-            });
-            
-            window.addEventListener('keydown', e => { if (e.key === 'Escape') { hideInfoModal(dom.infoModal); hideInfoModal(dom.beltCalcModal); }});
-            dom.wikiButton.addEventListener('click', showWiki);
-            dom.wikiBackButton.addEventListener('click', handleBackToHome);
-            dom.wikiNav.addEventListener('click', e => { e.preventDefault(); if (e.target.tagName === 'A') renderWikiPage(e.target.hash.substring(1)); });
-            dom.languageSelector.addEventListener('change', (e) => loadLanguage(e.target.value));
-
-            const beltTypeSelector = document.getElementById('belt-type');
-            const beltPitchInput = document.getElementById('belt-pitch');
-            beltTypeSelector.addEventListener('change', (e) => {
-                beltPitchInput.value = e.target.value;
-                calculateBeltLength();
-            });
-            dom.beltCalcModal.addEventListener('input', e => {
-                if (e.target.id !== 'belt-type') calculateBeltLength();
-            });
-        }
-        
-        function bindWizardEvents() {
-            dom.configWizard.addEventListener('click', e => {
-                 if (e.target.classList.contains('info-icon')) showInfoModal(e.target.dataset.key);
-            });
-
-            dom.configWizard.addEventListener('change', e => {
-                 const target = e.target;
-                 if (target.classList.contains('calc-trigger')) {
-                    const axis = target.dataset.axis;
-                    const param = target.dataset.param;
-                    appState.calcParams[axis][param] = parseFloat(target.value);
-                    recalculateXLS();
-                 } else if (target.id === 'SLEW_RATE_BASE_DESIRED') {
-                    recalculateXLS();
-                 } else if (target.tagName === 'SELECT') {
-                    if (target.id) appState.config[target.id] = target.value;
-                 }
-            });
-            
-            // Re-calc triggers for manual inputs if any
-        }
-
-        // ===================================================================================
-        // INITIALIZATION
-        // ===================================================================================
-        function initFooter() {
-            const year = new Date().getFullYear();
-            dom.appFooter.innerHTML = `&copy; ${year} OnStep Configurator v${APP_VERSION}`;
-        }
-
-        async function init() {
-            const savedLang = localStorage.getItem('onstep_language');
-            const browserLang = navigator.language.split('-')[0];
-            let initialLang = 'en'; 
-            if (savedLang && ['en', 'de', 'es', 'hu'].includes(savedLang)) {
-                initialLang = savedLang;
-            } else if (['en', 'de', 'es', 'hu'].includes(browserLang)) {
-                initialLang = browserLang;
-            }
-            await loadLanguage(initialLang);
-            bindEventListeners();
-            initFooter();
-            initBackground();
-            animateBackground();
-            window.addEventListener('resize', initBackground);
-        }
-
-        document.addEventListener('DOMContentLoaded', init);
-    </script>
+    <!-- Logic -->
+    <script type="module" src="app.js"></script>
 </body>
 </html>
