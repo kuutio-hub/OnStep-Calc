@@ -1,10 +1,11 @@
 
 import { TEMPLATE_ONSTEP_CLASSIC, TEMPLATE_ONSTEPX } from './templates.js';
+import { LOCALES } from './locales.js';
 
 // ===================================================================================
 // CONSTANTS & CONFIGURATION
 // ===================================================================================
-const APP_VERSION = "0.0.5.0-alpha";
+const APP_VERSION = "0.0.5.1-beta";
 
 const schemas = {
     onstepx: [
@@ -221,7 +222,7 @@ function renderAxisCalculatorTable() {
             } else {
                 let extra = '';
                 if (p.id.startsWith('gr')) extra = `<button class="xls-calc-btn" onclick="document.getElementById('belt-calc-modal').classList.add('visible')">Calc</button>`;
-                table.innerHTML += `<div><input type="number" class="xls-input calc-trigger" data-axis="${axis}" data-param="${p.id}" value="${val}">${extra}</div>`;
+                table.innerHTML += `<div><input type="number" class="xls-input calc-trigger" id="${axis}_${p.id}_input" data-axis="${axis}" data-param="${p.id}" value="${val}">${extra}<div id="${axis}_${p.id}_err" class="xls-warning"></div></div>`;
             }
         });
     });
@@ -263,6 +264,51 @@ function recalculateXLS() {
 
     ['AXIS1', 'AXIS2'].forEach(axis => {
         const p = appState.calcParams[axis];
+        
+        // --- INPUT VALIDATION ---
+        let isValid = true;
+        
+        // Motor Steps Validation
+        const motorInput = document.getElementById(`${axis}_motor_input`);
+        const motorErr = document.getElementById(`${axis}_motor_err`);
+        if (p.motor <= 0) {
+            motorInput.classList.add('input-error');
+            motorErr.textContent = "Invalid (>0)";
+            isValid = false;
+        } else if (p.motor !== 200 && p.motor !== 400) {
+            motorInput.classList.remove('input-error');
+            motorErr.textContent = "Std: 200/400"; // Warning
+        } else {
+            motorInput.classList.remove('input-error');
+            motorErr.textContent = "";
+        }
+
+        // GR1 Validation
+        const gr1Input = document.getElementById(`${axis}_gr1_input`);
+        const gr1Err = document.getElementById(`${axis}_gr1_err`);
+        if (p.gr1 <= 0) {
+            gr1Input.classList.add('input-error');
+            gr1Err.textContent = "Invalid (>0)";
+            isValid = false;
+        } else {
+             gr1Input.classList.remove('input-error');
+             gr1Err.textContent = "";
+        }
+
+        // GR2 Validation
+        const gr2Input = document.getElementById(`${axis}_gr2_input`);
+        const gr2Err = document.getElementById(`${axis}_gr2_err`);
+        if (p.gr2 <= 0) {
+            gr2Input.classList.add('input-error');
+            gr2Err.textContent = "Invalid (>0)";
+            isValid = false;
+        } else {
+             gr2Input.classList.remove('input-error');
+             gr2Err.textContent = "";
+        }
+
+        if (!isValid) return; // Stop calc if invalid inputs
+
         const spd = (p.motor * p.micro * p.gr1 * p.gr2) / 360.0;
         
         // Update App Config
@@ -378,27 +424,19 @@ function renderWikiPage(pageKey) {
 // ===================================================================================
 // EVENT HANDLERS & ACTIONS
 // ===================================================================================
-async function loadLanguage(lang) {
+function loadLanguage(lang) {
     appState.language = lang;
     localStorage.setItem('onstep_language', lang);
     dom.languageSelector.value = lang;
 
-    try {
-        const response = await fetch(`locales/${lang}.json?v=${APP_VERSION}`);
-        if (!response.ok) throw new Error(`Language file for ${lang} not found.`);
-        appState.i18n = await response.json();
-    } catch (error) {
-        console.error("Language load error:", error.message);
-        // Fallback or empty to avoid crash
-        appState.i18n = {};
-        // Optionally try English if failed
-        if (lang !== 'en') {
-             loadLanguage('en');
-             return;
-        }
-    } finally {
-        applyLocalization();
+    // Direct synchronous load from imported constant
+    if (LOCALES[lang]) {
+        appState.i18n = LOCALES[lang];
+    } else {
+        console.warn(`Language ${lang} not found, falling back to English.`);
+        appState.i18n = LOCALES['en'] || {};
     }
+    applyLocalization();
 }
 
 function handleVersionSelect(selectedVersion) {
@@ -509,19 +547,19 @@ function initBackground() {
     appState.constellations = [];
 
     // 1. Background Stars (Static, unconnected)
+    // INCREASED VISIBILITY: higher alpha range
     for (let i = 0; i < 200; i++) {
         appState.bgStars.push({
             x: Math.random() * canvas.width,
             y: Math.random() * canvas.height,
-            r: Math.random() * 1.0 + 0.2, // Smaller
-            alpha: Math.random() * 0.5 + 0.1,
+            r: Math.random() * 1.2 + 0.3, 
+            alpha: Math.random() * 0.6 + 0.2, // Was 0.1 to 0.6, now 0.2 to 0.8
             vx: (Math.random() - 0.5) * 0.05,
             vy: (Math.random() - 0.5) * 0.05,
         });
     }
 
-    // 2. Constellations (Brighter, connected in paths)
-    // We create a separate set of stars for constellations to ensure they look structured
+    // 2. Constellations
     let cStars = [];
     for (let i = 0; i < 60; i++) {
         cStars.push({
@@ -571,8 +609,6 @@ function initBackground() {
         if(chain.length > 3) {
             appState.constellations.push(chain);
         } else {
-            // If chain is too short, return stars to bg (visually) or just ignore lines
-            // We just leave them as points in the constellation layer
             appState.constellations.push(chain); 
         }
     }
@@ -584,7 +620,7 @@ function animateBackground() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
     // Draw Background Stars
-    ctx.fillStyle = 'rgba(224, 229, 240, 0.4)';
+    ctx.fillStyle = 'rgba(224, 229, 240, 1)'; // Alpha handled individually
     appState.bgStars.forEach(star => {
         star.x += star.vx; star.y += star.vy;
         if(star.x < 0) star.x = canvas.width; else if(star.x > canvas.width) star.x = 0;
@@ -596,9 +632,9 @@ function animateBackground() {
     ctx.globalAlpha = 1.0;
 
     // Draw Constellations
-    ctx.strokeStyle = 'rgba(224, 229, 240, 0.15)';
+    ctx.strokeStyle = 'rgba(224, 229, 240, 0.2)'; // Brighter lines
     ctx.lineWidth = 1;
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'; // Brighter stars
 
     appState.constellations.forEach(chain => {
         // Update positions
@@ -689,7 +725,7 @@ async function init() {
     } else if (['en', 'de', 'es', 'hu'].includes(browserLang)) {
         initialLang = browserLang;
     }
-    await loadLanguage(initialLang);
+    loadLanguage(initialLang);
     bindEventListeners();
     initFooter();
     initBackground();
