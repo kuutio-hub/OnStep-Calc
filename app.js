@@ -5,7 +5,7 @@ import { LOCALES } from './locales.js';
 // ===================================================================================
 // CONSTANTS & CONFIGURATION
 // ===================================================================================
-const APP_VERSION = "0.0.5.2-beta";
+const APP_VERSION = "0.0.5.3-beta";
 
 const schemas = {
     onstepx: [
@@ -717,20 +717,25 @@ function initFooter() {
 }
 
 async function init() {
-    const savedLang = localStorage.getItem('onstep_language');
-    const browserLang = navigator.language.split('-')[0];
-    let initialLang = 'en'; 
-    if (savedLang && ['en', 'de', 'es', 'hu'].includes(savedLang)) {
-        initialLang = savedLang;
-    } else if (['en', 'de', 'es', 'hu'].includes(browserLang)) {
-        initialLang = browserLang;
+    try {
+        const savedLang = localStorage.getItem('onstep_language');
+        const browserLang = navigator.language.split('-')[0];
+        let initialLang = 'en'; 
+        if (savedLang && ['en', 'de', 'es', 'hu'].includes(savedLang)) {
+            initialLang = savedLang;
+        } else if (['en', 'de', 'es', 'hu'].includes(browserLang)) {
+            initialLang = browserLang;
+        }
+        loadLanguage(initialLang);
+        bindEventListeners();
+        initFooter();
+        initBackground();
+        animateBackground();
+        window.addEventListener('resize', initBackground);
+    } catch (e) {
+        console.error("Critical Initialization Error:", e);
+        alert("Critical Error: Application failed to start. Check console for details.\n\n" + e.message);
     }
-    loadLanguage(initialLang);
-    bindEventListeners();
-    initFooter();
-    initBackground();
-    animateBackground();
-    window.addEventListener('resize', initBackground);
 }
 
 document.addEventListener('DOMContentLoaded', init);

@@ -6,6 +6,15 @@ All notable changes to this project will be documented in this file.
 The format is based on on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.5.3-beta] - 2024-06-07
+
+### Fixed
+- **Major Bugfix:** Fixed syntax errors in `locales.js` (missing quote marks on keys) that were causing the entire application to crash on load.
+- **Safety:** Added global error handling to the application initialization process.
+
+### Removed
+- **Cleanup:** Instructions provided to remove unused files (`metadata.json`, `LOGIC.md`) from the project structure.
+
 ## [0.0.5.2-beta] - 2024-06-07
 
 ### Fixed
