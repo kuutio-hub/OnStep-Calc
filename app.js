@@ -2,7 +2,7 @@
 // ===================================================================================
 // APP STATE
 // ===================================================================================
-const APP_VERSION = "0.0.6.0-beta";
+const APP_VERSION = "0.0.6.1-beta";
 
 const appState = { 
     version: null, 
@@ -283,29 +283,61 @@ function changeWizardStep(direction) {
 
 function generateConfigFile() {
     if (!appState.version) return;
-    const template = appState.version === 'classic' ? TEMPLATE_ONSTEP_CLASSIC : TEMPLATE_ONSTEPX;
     
+    // Pick the BASE template (full original text)
+    const rawTemplate = appState.version === 'classic' ? TEMPLATE_ONSTEP_CLASSIC_BASE : TEMPLATE_ONSTEPX_BASE;
     const previewArea = document.getElementById('config-preview');
-    if (!previewArea) return;
-    
-    let content = template;
-    // Inject user values
-    for (const key in appState.config) {
-        const value = appState.config[key];
-        const regex = new RegExp(`(#define\\s+${key}\\s+)(.*?)(\\s*\\/\\/|$)`, 'gm');
-        if (content.match(regex)) {
-                content = content.replace(regex, `$1${value}$3`);
-        }
-    }
-    
-    // Inject Comments about Gearing Modes
-    let comments = "\n// --- User Selected Hardware Modes ---\n";
-    ['AXIS1', 'AXIS2'].forEach(axis => {
-        comments += `// ${axis}: Motor=${appState.calcModes[axis].motor}, Micro=${appState.calcModes[axis].micro}, GR1=${appState.calcModes[axis].gr1}, GR2=${appState.calcModes[axis].gr2}\n`;
-    });
-    content += comments;
+    if (!previewArea || !rawTemplate) return;
 
-    previewArea.value = content;
+    // Get comment translations for current language
+    const comments = CONFIG_COMMENTS[appState.language] || {};
+
+    // Process line by line
+    const lines = rawTemplate.split('\n');
+    const processedLines = lines.map(line => {
+        // Regex to match: #define KEY VALUE // Comment
+        // Group 1: "#define " + KEY
+        // Group 2: whitespace
+        // Group 3: VALUE
+        // Group 4: whitespace + "//"
+        // Group 5: Comment text
+        const defineMatch = line.match(/^(\s*#define\s+)(\w+)(\s+)(.*?)(\s*\/\/)(.*)$/);
+        
+        if (defineMatch) {
+            const prefix = defineMatch[1];
+            const key = defineMatch[2];
+            const spacing1 = defineMatch[3];
+            let value = defineMatch[4];
+            const commentPrefix = defineMatch[5];
+            let comment = defineMatch[6];
+
+            // 1. Update Value if user changed it in Wizard
+            // The value might have extra trailing spaces in the original file, we trim it for logic but keep spacing?
+            // Actually, we just replace the value part if we have a config for it.
+            if (appState.config.hasOwnProperty(key)) {
+                value = appState.config[key]; 
+                // Pad value to align comments? (Optional, skipping for simplicity)
+            }
+
+            // 2. Update Comment if translation exists
+            if (comments[key]) {
+                comment = " " + comments[key]; // Add space after //
+            }
+
+            return `${prefix}${key}${spacing1}${value}${commentPrefix}${comment}`;
+        }
+        
+        // Return line unchanged if not a define with comment
+        return line;
+    });
+
+    // Inject Comments about Gearing Modes (Append to end or specific location)
+    let extraComments = "\n// --- User Selected Hardware Modes ---\n";
+    ['AXIS1', 'AXIS2'].forEach(axis => {
+        extraComments += `// ${axis}: Motor=${appState.calcModes[axis].motor}, Micro=${appState.calcModes[axis].micro}, GR1=${appState.calcModes[axis].gr1}, GR2=${appState.calcModes[axis].gr2}\n`;
+    });
+    
+    previewArea.value = processedLines.join('\n') + extraComments;
 }
 
 function downloadConfigFile() {
