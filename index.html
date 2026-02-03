@@ -22,12 +22,19 @@
 
     <main>
         <header class="app-header">
-             <select id="language-selector" aria-label="Nyelvválasztás">
-                <option value="hu">Magyar</option>
-                <option value="en">English</option>
-                <option value="de">Deutsch</option>
-                <option value="es">Español</option>
-            </select>
+             <div class="header-controls">
+                 <label class="toggle-switch" id="advanced-mode-wrapper" style="display:none;">
+                    <input type="checkbox" id="advanced-mode-toggle">
+                    <span class="slider"></span>
+                    <span class="toggle-label" data-lang-key="advancedMode">Advanced</span>
+                </label>
+                <select id="language-selector" aria-label="Nyelvválasztás">
+                    <option value="hu">Magyar</option>
+                    <option value="en">English</option>
+                    <option value="de">Deutsch</option>
+                    <option value="es">Español</option>
+                </select>
+             </div>
         </header>
 
         <div class="main-content">
@@ -60,7 +67,23 @@
             </section>
 
             <section id="config-wizard" class="hidden">
-                <!-- Varázsló tartalma ide generálódik -->
+                <!-- Tematikus elrendezés (Grid) -->
+                <div class="wizard-layout">
+                    <aside class="wizard-sidebar">
+                        <button class="back-button" id="wizard-home-btn" data-lang-key="backToHomeButton">Main Menu</button>
+                        <nav id="wizard-categories"></nav>
+                    </aside>
+                    <div class="wizard-content-area">
+                        <div class="wizard-header-inline">
+                            <h2 id="current-category-title">Category</h2>
+                        </div>
+                        <div id="step-content" class="step-container"></div>
+                        <div class="wizard-nav">
+                            <button id="prev-btn" class="button">Back</button>
+                            <button id="next-btn" class="button primary">Next</button>
+                        </div>
+                    </div>
+                </div>
             </section>
 
             <section id="wiki-section" class="hidden">

@@ -14,13 +14,17 @@ const LOCALES = {
         "onstepxFeatures": "<li>Target: 32-bit MCU</li><li>Features: Web Interface, WiFi, Advanced Pointing</li>",
         "wikiButton": "Wiki / Help",
         "backToHomeButton": "Main Menu",
-        "wizardTitleStep1": "Basic Hardware",
-        "wizardTitleStep2": "Gearing (Calculator)",
-        "wizardTitleStep3": "Driver Settings",
-        "wizardTitleStep4": "Peripherals & Features",
-        "wizardTitleStep5": "Summary",
-        "wizardPrev": "Back",
-        "wizardNext": "Next",
+        "advancedMode": "Advanced Mode",
+        
+        "cat_Controller": "Controller & Hardware",
+        "cat_Mount": "Mount Geometry",
+        "cat_Gearing": "Motors & Gearing",
+        "cat_Axis1": "Axis 1 (RA/AZM)",
+        "cat_Axis2": "Axis 2 (DEC/ALT)",
+        "cat_Tracking": "Tracking & Guiding",
+        "cat_Features": "Aux Features & Sensors",
+        "cat_Summary": "Summary",
+
         "downloadButton": "Download Config.h",
         "summaryText": "Preview your configuration below. The file includes full original comments, translated to your language.",
         "summaryWaiting": "Click Download to generate...",
@@ -50,53 +54,32 @@ const LOCALES = {
         "wikiNavGearing": "Gearing & Motors",
         "wikiTitle": "Knowledge Base",
 
-        // Labels & Descriptions
+        // Labels
         "PINMAP_LABEL": "Board Type",
-        "PINMAP_DESC": "Select the specific microcontroller board you are using (e.g., FYSETC E4, CNC3).",
         "MOUNT_TYPE_LABEL": "Mount Type",
-        "MOUNT_TYPE_DESC": "Defines the geometry of your mount (GEM for Equatorial, ALTAZM for Alt-Az).",
         "SLEW_RATE_BASE_DESIRED_LABEL": "Max Slew Rate (°/s)",
-        "SLEW_RATE_BASE_DESIRED_DESC": "The maximum speed for GOTO movements. Lower this if motors stall.",
         "SERIAL_A_BAUD_DEFAULT_LABEL": "Serial Baud Rate",
-        "SERIAL_A_BAUD_DEFAULT_DESC": "Communication speed for the USB/Serial connection.",
         "TIME_LOCATION_SOURCE_LABEL": "Time/Location Source",
-        "TIME_LOCATION_SOURCE_DESC": "Hardware used to provide real-time clock and location (GPS, DS3231).",
         "GUIDE_TIME_LIMIT_LABEL": "Guide Time Limit (s)",
-        "GUIDE_TIME_LIMIT_DESC": "Safety feature: stops guiding if no command is received for N seconds.",
         "LIMIT_SENSE_LABEL": "Limit Switch Logic",
-        "LIMIT_SENSE_DESC": "Defines the active state (HIGH/LOW) of limit switches.",
         "PIER_SIDE_PREFERRED_DEFAULT_LABEL": "Preferred Pier Side",
-        "PIER_SIDE_PREFERRED_DEFAULT_DESC": "Preferred side of pier to stay on after a Meridian Flip.",
         "STATUS_LED_LABEL": "Status LED",
-        "STATUS_LED_DESC": "Enables the onboard LED to blink status codes.",
         "STATUS_BUZZER_LABEL": "Buzzer Frequency",
-        "STATUS_BUZZER_DESC": "Frequency in Hz. Set to 0 to disable sound.",
         "SERIAL_RADIO_LABEL": "WiFi Mode (ESP32)",
-        "SERIAL_RADIO_DESC": "Configures the ESP32 wireless radio (Access Point or Station).",
         "STEP_WAVE_FORM_LABEL": "Step Wave Form",
-        "STEP_WAVE_FORM_DESC": "Pulse allows higher speeds, Square is more compatible.",
-        
         "XLS_MOTOR_STEPS": "Motor Steps",
         "XLS_MICROSTEPS": "Microsteps",
         "XLS_GR1": "Gear Ratio 1",
         "XLS_GR2": "Gear Ratio 2",
         "XLS_RESOLUTION": "Resolution",
         "XLS_RPM": "Motor RPM",
-        
         "AXIS_DM_LABEL": "Driver Model",
-        "AXIS_DM_DESC": "Type of stepper driver (e.g., TMC2209, A4988).",
         "AXIS_MS_LABEL": "Microsteps (Tracking)",
-        "AXIS_MS_DESC": "Microstepping used during sidereal tracking.",
         "AXIS_MSG_LABEL": "Microsteps (GoTo)",
-        "AXIS_MSG_DESC": "Microstepping used during high-speed slewing.",
         "AXIS_REV_LABEL": "Reverse Direction",
-        "AXIS_REV_DESC": "Reverses motor rotation via software.",
         "AXIS_LIMIT_MIN_LABEL": "Limit Min (°)",
-        "AXIS_LIMIT_MIN_DESC": "Software limit: Minimum angle.",
         "AXIS_LIMIT_MAX_LABEL": "Limit Max (°)",
-        "AXIS_LIMIT_MAX_DESC": "Software limit: Maximum angle.",
-        "AXIS_IRUN_LABEL": "Run Current (mA)",
-        "AXIS_IRUN_DESC": "Current supplied to the motor during movement (TMC drivers)."
+        "AXIS_IRUN_LABEL": "Run Current (mA)"
     },
     hu: {
         "appTitle": "OnStep Konfigurátor",
@@ -109,13 +92,17 @@ const LOCALES = {
         "onstepxFeatures": "<li>Cél: 32-bit MCU</li><li>Funkciók: Web interfész, WiFi, Fejlett modellek</li>",
         "wikiButton": "Wiki / Súgó",
         "backToHomeButton": "Főmenü",
-        "wizardTitleStep1": "Alap Hardver",
-        "wizardTitleStep2": "Áttételek (Kalkulátor)",
-        "wizardTitleStep3": "Meghajtó Beállítások",
-        "wizardTitleStep4": "Perifériák és Funkciók",
-        "wizardTitleStep5": "Összegzés",
-        "wizardPrev": "Vissza",
-        "wizardNext": "Tovább",
+        "advancedMode": "Haladó Mód",
+
+        "cat_Controller": "Vezérlő és Hardver",
+        "cat_Mount": "Mechanika",
+        "cat_Gearing": "Motorok és Áttétel",
+        "cat_Axis1": "Tengely 1 (RA/AZM)",
+        "cat_Axis2": "Tengely 2 (DEC/ALT)",
+        "cat_Tracking": "Követés és Vezetés",
+        "cat_Features": "Szenzorok és Extrák",
+        "cat_Summary": "Összegzés",
+
         "downloadButton": "Letöltés (Config.h)",
         "summaryText": "A generált fájl előnézete. A fájl tartalmazza az összes eredeti kommentet, magyarra fordítva.",
         "summaryWaiting": "Kattints a letöltéshez a generáláshoz...",
@@ -145,137 +132,159 @@ const LOCALES = {
         "wikiNavGearing": "Áttételek",
         "wikiTitle": "Tudásbázis",
 
-        // Labels & Descriptions
+        // Labels
         "PINMAP_LABEL": "Vezérlőpanel Típusa",
-        "PINMAP_DESC": "Válaszd ki a használt vezérlőpanelt (pl. FYSETC E4, CNC3).",
         "MOUNT_TYPE_LABEL": "Mechanika Típusa",
-        "MOUNT_TYPE_DESC": "A mechanika geometriája (GEM: Német Ekvatoriális, ALTAZM: Alt-Az).",
         "SLEW_RATE_BASE_DESIRED_LABEL": "Max Sebesség (°/s)",
-        "SLEW_RATE_BASE_DESIRED_DESC": "A GOTO mozgás maximális sebessége.",
         "SERIAL_A_BAUD_DEFAULT_LABEL": "Soros Baud Ráta",
-        "SERIAL_A_BAUD_DEFAULT_DESC": "Kommunikációs sebesség USB/Soros porton.",
         "TIME_LOCATION_SOURCE_LABEL": "Idő/Hely Forrás",
-        "TIME_LOCATION_SOURCE_DESC": "Valós idejű óra és helymeghatározó hardver (GPS, DS3231).",
         "GUIDE_TIME_LIMIT_LABEL": "Vezetési Idő Limit (s)",
-        "GUIDE_TIME_LIMIT_DESC": "Biztonsági funkció: leállítja a vezetést, ha nem érkezik parancs.",
         "LIMIT_SENSE_LABEL": "Végállás Logika",
-        "LIMIT_SENSE_DESC": "A végállás kapcsolók aktív állapota (HIGH/LOW).",
         "PIER_SIDE_PREFERRED_DEFAULT_LABEL": "Preferált Oldal",
-        "PIER_SIDE_PREFERRED_DEFAULT_DESC": "Meridián átfordulás után melyik oldalon maradjon.",
         "STATUS_LED_LABEL": "Állapot LED",
-        "STATUS_LED_DESC": "A vezérlő LED-je villog hibakódokat vagy állapotot.",
         "STATUS_BUZZER_LABEL": "Csipogó Frekvencia",
-        "STATUS_BUZZER_DESC": "Frekvencia Hz-ben. 0 a kikapcsoláshoz.",
         "SERIAL_RADIO_LABEL": "WiFi Mód (ESP32)",
-        "SERIAL_RADIO_DESC": "ESP32 WiFi beállítása (Access Point vagy Station).",
         "STEP_WAVE_FORM_LABEL": "Lépés Hullámforma",
-        "STEP_WAVE_FORM_DESC": "PULSE: nagyobb sebesség, SQUARE: nagyobb kompatibilitás.",
-        
         "XLS_MOTOR_STEPS": "Motor Lépés",
         "XLS_MICROSTEPS": "Mikrolépés",
         "XLS_GR1": "Áttétel 1",
         "XLS_GR2": "Áttétel 2",
         "XLS_RESOLUTION": "Felbontás",
         "XLS_RPM": "Motor Fordulat",
-        
         "AXIS_DM_LABEL": "Driver Modell",
-        "AXIS_DM_DESC": "Léptetőmotor vezérlő típusa (pl. TMC2209).",
         "AXIS_MS_LABEL": "Mikrolépés (Követés)",
-        "AXIS_MS_DESC": "Mikrolépés beállítás követés közben.",
         "AXIS_MSG_LABEL": "Mikrolépés (GoTo)",
-        "AXIS_MSG_DESC": "Mikrolépés beállítás gyorsmozgás közben.",
         "AXIS_REV_LABEL": "Irányváltás",
-        "AXIS_REV_DESC": "Szoftveresen megfordítja a motor forgásirányát.",
         "AXIS_LIMIT_MIN_LABEL": "Limit Min (°)",
-        "AXIS_LIMIT_MIN_DESC": "Szoftveres végállás: Minimum szög.",
         "AXIS_LIMIT_MAX_LABEL": "Limit Max (°)",
-        "AXIS_LIMIT_MAX_DESC": "Szoftveres végállás: Maximum szög.",
-        "AXIS_IRUN_LABEL": "Áramerősség (mA)",
-        "AXIS_IRUN_DESC": "A motor árama mozgás közben (TMC drivereknél)."
+        "AXIS_IRUN_LABEL": "Áramerősség (mA)"
     }
 };
 
 // ===================================================================================
-// SCHEMAS (Expanded for detailed configuration)
+// SCHEMAS (Organized by Categories for Advanced/Basic modes)
 // ===================================================================================
+// Structure:
+// key: { type: '...', options: [...], defaultValue: ..., basic: true/false (show in basic mode) }
+
 const SCHEMAS = {
-    onstepx: [
-        { // Step 1: Basics
-            PINMAP: { type: 'select', labelKey: 'PINMAP_LABEL', descriptionKey: 'PINMAP_DESC', options: ['FYSETC_E4', 'MiniPCB', 'MiniPCB2', 'MaxPCB2', 'MaxESP3', 'CNC3', 'STM32Blue', 'MaxSTM3', 'FYSETC_S6_2'], defaultValue: 'FYSETC_E4' },
-            MOUNT_TYPE: { type: 'select', labelKey: 'MOUNT_TYPE_LABEL', descriptionKey: 'MOUNT_TYPE_DESC', options: ['GEM', 'GEM_TA', 'GEM_TAC', 'FORK', 'FORK_TA', 'FORK_TAC', 'ALTAZM', 'ALTAZM_UNL'], defaultValue: 'GEM' },
-            SLEW_RATE_BASE_DESIRED: { type: 'number', labelKey: 'SLEW_RATE_BASE_DESIRED_LABEL', descriptionKey: 'SLEW_RATE_BASE_DESIRED_DESC', defaultValue: 2.5 }
+    onstepx: {
+        Controller: {
+            titleKey: "cat_Controller",
+            fields: {
+                PINMAP: { type: 'select', labelKey: 'PINMAP_LABEL', options: ['FYSETC_E4', 'MiniPCB', 'MiniPCB2', 'MaxPCB2', 'MaxESP3', 'CNC3', 'STM32Blue', 'MaxSTM3', 'FYSETC_S6_2'], defaultValue: 'FYSETC_E4', basic: true },
+                SERIAL_A_BAUD_DEFAULT: { type: 'select', labelKey: 'SERIAL_A_BAUD_DEFAULT_LABEL', options: [9600, 19200, 57600, 115200, 230400, 460800], defaultValue: 9600, basic: false },
+                SERIAL_RADIO: { type: 'select', labelKey: 'SERIAL_RADIO_LABEL', options: ['OFF', 'WIFI_ACCESS_POINT', 'WIFI_STATION', 'BLUETOOTH'], defaultValue: 'WIFI_ACCESS_POINT', basic: true },
+                STATUS_LED: { type: 'select', labelKey: 'STATUS_LED_LABEL', options: ['OFF', 'ON'], defaultValue: 'ON', basic: true },
+                STATUS_BUZZER: { type: 'number', labelKey: 'STATUS_BUZZER_LABEL', defaultValue: 2000, basic: false },
+                STEP_WAVE_FORM: { type: 'select', labelKey: 'STEP_WAVE_FORM_LABEL', options: ['SQUARE', 'PULSE'], defaultValue: 'PULSE', basic: false }
+            }
         },
-        { // Step 2: Gearing (Custom Calculator UI)
-            AXIS_GEARING: { type: 'axis_calculator_table' }
+        Mount: {
+            titleKey: "cat_Mount",
+            fields: {
+                MOUNT_TYPE: { type: 'select', labelKey: 'MOUNT_TYPE_LABEL', options: ['GEM', 'GEM_TA', 'GEM_TAC', 'FORK', 'FORK_TA', 'FORK_TAC', 'ALTAZM', 'ALTAZM_UNL'], defaultValue: 'GEM', basic: true },
+                SLEW_RATE_BASE_DESIRED: { type: 'number', labelKey: 'SLEW_RATE_BASE_DESIRED_LABEL', defaultValue: 2.5, basic: true },
+                TIME_LOCATION_SOURCE: { type: 'select', labelKey: 'TIME_LOCATION_SOURCE_LABEL', options: ['OFF', 'DS3231', 'GPS', 'TEENSY'], defaultValue: 'DS3231', basic: true },
+                LIMIT_SENSE: { type: 'select', labelKey: 'LIMIT_SENSE_LABEL', options: ['LOW', 'HIGH', 'OFF'], defaultValue: 'LOW', basic: true },
+                PIER_SIDE_PREFERRED_DEFAULT: { type: 'select', labelKey: 'PIER_SIDE_PREFERRED_DEFAULT_LABEL', options: ['BEST', 'EAST', 'WEST'], defaultValue: 'EAST', basic: false }
+            }
         },
-        { // Step 3: Drivers
-            AXIS1_DRIVER_MODEL: { type: 'select', labelKey: 'AXIS_DM_LABEL', descriptionKey: 'AXIS_DM_DESC', options: ['A4988', 'DRV8825', 'TMC2130', 'TMC2209', 'TMC5160'], defaultValue: 'TMC2209' },
-            AXIS1_DRIVER_MICROSTEPS: { type: 'select', labelKey: 'AXIS_MS_LABEL', descriptionKey: 'AXIS_MS_DESC', options: [8, 16, 32, 64, 128], defaultValue: 32 },
-            AXIS1_DRIVER_MICROSTEPS_GOTO: { type: 'select', labelKey: 'AXIS_MSG_LABEL', descriptionKey: 'AXIS_MSG_DESC', options: [1, 2, 4, 8, 16], defaultValue: 4 },
-            AXIS1_DRIVER_IRUN: { type: 'number', labelKey: 'AXIS_IRUN_LABEL', descriptionKey: 'AXIS_IRUN_DESC', defaultValue: 500 },
-            AXIS1_REVERSE: { type: 'select', labelKey: 'AXIS_REV_LABEL', descriptionKey: 'AXIS_REV_DESC', options: ['OFF', 'ON'], defaultValue: 'OFF' },
-            AXIS1_LIMIT_MIN: { type: 'number', labelKey: 'AXIS_LIMIT_MIN_LABEL', descriptionKey: 'AXIS_LIMIT_MIN_DESC', defaultValue: -180 },
-            AXIS1_LIMIT_MAX: { type: 'number', labelKey: 'AXIS_LIMIT_MAX_LABEL', descriptionKey: 'AXIS_LIMIT_MAX_DESC', defaultValue: 180 },
-            
-            _separator: true, // Internal flag for visual separation
-
-            AXIS2_DRIVER_MODEL: { type: 'select', labelKey: 'AXIS_DM_LABEL', descriptionKey: 'AXIS_DM_DESC', options: ['A4988', 'DRV8825', 'TMC2130', 'TMC2209', 'TMC5160'], defaultValue: 'TMC2209' },
-            AXIS2_DRIVER_MICROSTEPS: { type: 'select', labelKey: 'AXIS_MS_LABEL', descriptionKey: 'AXIS_MS_DESC', options: [8, 16, 32, 64, 128], defaultValue: 32 },
-            AXIS2_DRIVER_MICROSTEPS_GOTO: { type: 'select', labelKey: 'AXIS_MSG_LABEL', descriptionKey: 'AXIS_MSG_DESC', options: [1, 2, 4, 8, 16], defaultValue: 4 },
-            AXIS2_DRIVER_IRUN: { type: 'number', labelKey: 'AXIS_IRUN_LABEL', descriptionKey: 'AXIS_IRUN_DESC', defaultValue: 500 },
-            AXIS2_REVERSE: { type: 'select', labelKey: 'AXIS_REV_LABEL', descriptionKey: 'AXIS_REV_DESC', options: ['OFF', 'ON'], defaultValue: 'OFF' },
-            AXIS2_LIMIT_MIN: { type: 'number', labelKey: 'AXIS_LIMIT_MIN_LABEL', descriptionKey: 'AXIS_LIMIT_MIN_DESC', defaultValue: -90 },
-            AXIS2_LIMIT_MAX: { type: 'number', labelKey: 'AXIS_LIMIT_MAX_LABEL', descriptionKey: 'AXIS_LIMIT_MAX_DESC', defaultValue: 90 },
+        Gearing: {
+            titleKey: "cat_Gearing",
+            special: "AXIS_GEARING", // Triggers the calculator UI
+            basic: true
         },
-        { // Step 4: Peripherals
-            SERIAL_A_BAUD_DEFAULT: { type: 'select', labelKey: 'SERIAL_A_BAUD_DEFAULT_LABEL', descriptionKey: 'SERIAL_A_BAUD_DEFAULT_DESC', options: [9600, 19200, 57600, 115200], defaultValue: 9600 },
-            SERIAL_RADIO: { type: 'select', labelKey: 'SERIAL_RADIO_LABEL', descriptionKey: 'SERIAL_RADIO_DESC', options: ['OFF', 'WIFI_ACCESS_POINT', 'WIFI_STATION', 'BLUETOOTH'], defaultValue: 'WIFI_ACCESS_POINT' },
-            TIME_LOCATION_SOURCE: { type: 'select', labelKey: 'TIME_LOCATION_SOURCE_LABEL', descriptionKey: 'TIME_LOCATION_SOURCE_DESC', options: ['OFF', 'DS3231', 'GPS', 'TEENSY'], defaultValue: 'DS3231' },
-            STATUS_LED: { type: 'select', labelKey: 'STATUS_LED_LABEL', descriptionKey: 'STATUS_LED_DESC', options: ['OFF', 'ON'], defaultValue: 'ON' },
-            STATUS_BUZZER: { type: 'number', labelKey: 'STATUS_BUZZER_LABEL', descriptionKey: 'STATUS_BUZZER_DESC', defaultValue: 2000 },
-            LIMIT_SENSE: { type: 'select', labelKey: 'LIMIT_SENSE_LABEL', descriptionKey: 'LIMIT_SENSE_DESC', options: ['LOW', 'HIGH', 'OFF'], defaultValue: 'LOW' },
-            PIER_SIDE_PREFERRED_DEFAULT: { type: 'select', labelKey: 'PIER_SIDE_PREFERRED_DEFAULT_LABEL', descriptionKey: 'PIER_SIDE_PREFERRED_DEFAULT_DESC', options: ['BEST', 'EAST', 'WEST'], defaultValue: 'EAST' },
-            GUIDE_TIME_LIMIT: { type: 'number', labelKey: 'GUIDE_TIME_LIMIT_LABEL', descriptionKey: 'GUIDE_TIME_LIMIT_DESC', defaultValue: 20 },
-            STEP_WAVE_FORM: { type: 'select', labelKey: 'STEP_WAVE_FORM_LABEL', descriptionKey: 'STEP_WAVE_FORM_DESC', options: ['SQUARE', 'PULSE'], defaultValue: 'PULSE' }
+        Axis1: {
+            titleKey: "cat_Axis1",
+            fields: {
+                AXIS1_DRIVER_MODEL: { type: 'select', labelKey: 'AXIS_DM_LABEL', options: ['A4988', 'DRV8825', 'TMC2130', 'TMC2209', 'TMC5160', 'LV8729'], defaultValue: 'TMC2209', basic: true },
+                AXIS1_DRIVER_MICROSTEPS: { type: 'select', labelKey: 'AXIS_MS_LABEL', options: [8, 16, 32, 64, 128, 256], defaultValue: 32, basic: true },
+                AXIS1_DRIVER_MICROSTEPS_GOTO: { type: 'select', labelKey: 'AXIS_MSG_LABEL', options: [1, 2, 4, 8, 16, 32], defaultValue: 4, basic: false },
+                AXIS1_DRIVER_IRUN: { type: 'number', labelKey: 'AXIS_IRUN_LABEL', defaultValue: 500, basic: true, condition: { key: 'AXIS1_DRIVER_MODEL', val: 'OFF', invert: true } },
+                AXIS1_REVERSE: { type: 'select', labelKey: 'AXIS_REV_LABEL', options: ['OFF', 'ON'], defaultValue: 'OFF', basic: true },
+                AXIS1_LIMIT_MIN: { type: 'number', labelKey: 'AXIS_LIMIT_MIN_LABEL', defaultValue: -180, basic: false },
+                AXIS1_LIMIT_MAX: { type: 'number', labelKey: 'AXIS_LIMIT_MAX_LABEL', defaultValue: 180, basic: false }
+            }
         },
-        { // Step 5: Summary
-            _summary: true
+        Axis2: {
+            titleKey: "cat_Axis2",
+            fields: {
+                AXIS2_DRIVER_MODEL: { type: 'select', labelKey: 'AXIS_DM_LABEL', options: ['A4988', 'DRV8825', 'TMC2130', 'TMC2209', 'TMC5160', 'LV8729'], defaultValue: 'TMC2209', basic: true },
+                AXIS2_DRIVER_MICROSTEPS: { type: 'select', labelKey: 'AXIS_MS_LABEL', options: [8, 16, 32, 64, 128, 256], defaultValue: 32, basic: true },
+                AXIS2_DRIVER_MICROSTEPS_GOTO: { type: 'select', labelKey: 'AXIS_MSG_LABEL', options: [1, 2, 4, 8, 16, 32], defaultValue: 4, basic: false },
+                AXIS2_DRIVER_IRUN: { type: 'number', labelKey: 'AXIS_IRUN_LABEL', defaultValue: 500, basic: true, condition: { key: 'AXIS2_DRIVER_MODEL', val: 'OFF', invert: true } },
+                AXIS2_REVERSE: { type: 'select', labelKey: 'AXIS_REV_LABEL', options: ['OFF', 'ON'], defaultValue: 'OFF', basic: true },
+                AXIS2_LIMIT_MIN: { type: 'number', labelKey: 'AXIS_LIMIT_MIN_LABEL', defaultValue: -90, basic: false },
+                AXIS2_LIMIT_MAX: { type: 'number', labelKey: 'AXIS_LIMIT_MAX_LABEL', defaultValue: 90, basic: false }
+            }
+        },
+        Tracking: {
+            titleKey: "cat_Tracking",
+            fields: {
+                GUIDE_TIME_LIMIT: { type: 'number', labelKey: 'GUIDE_TIME_LIMIT_LABEL', defaultValue: 20, basic: false },
+                TRACK_BACKLASH_RATE: { type: 'number', labelKey: 'TRACK_BACKLASH_RATE', defaultValue: 20, basic: false },
+                TRACK_AUTOSTART: { type: 'select', labelKey: 'TRACK_AUTOSTART', options: ['OFF', 'ON'], defaultValue: 'OFF', basic: false }
+            }
+        },
+        Features: {
+            titleKey: "cat_Features",
+            fields: {
+                FEATURE1_PURPOSE: { type: 'select', labelKey: 'FEATURE1_PURPOSE', options: ['OFF', 'DEW_HEATER', 'SWITCH', 'ANALOG_OUT'], defaultValue: 'OFF', basic: false },
+                FEATURE1_PIN: { type: 'number', labelKey: 'FEATURE1_PIN', defaultValue: 0, basic: false, condition: { key: 'FEATURE1_PURPOSE', val: 'OFF', invert: true } },
+                WEATHER: { type: 'select', labelKey: 'WEATHER', options: ['OFF', 'BME280_0x76', 'BME280', 'BMP280'], defaultValue: 'OFF', basic: false }
+            }
+        },
+        Summary: {
+            titleKey: "cat_Summary",
+            special: "_summary",
+            basic: true
         }
-    ],
-    classic: [
-        { // Step 1
-            PINMAP: { type: 'select', labelKey: 'PINMAP_LABEL', descriptionKey: 'PINMAP_DESC', options: ['MksGenL2', 'MiniPCB2', 'MaxPCB2', 'MaxESP3', 'CNC3', 'STM32Blue', 'MaxSTM3', 'FYSETC_S6_2'], defaultValue: 'OFF' },
-            MOUNT_TYPE: { type: 'select', labelKey: 'MOUNT_TYPE_LABEL', descriptionKey: 'MOUNT_TYPE_DESC', options: ['GEM', 'FORK', 'ALTAZM'], defaultValue: 'GEM' },
-            SLEW_RATE_BASE_DESIRED: { type: 'number', labelKey: 'SLEW_RATE_BASE_DESIRED_LABEL', descriptionKey: 'SLEW_RATE_BASE_DESIRED_DESC', defaultValue: 2.5 }
+    },
+    
+    // Classic Schema follows similar structure but with restricted options
+    classic: {
+        Controller: {
+            titleKey: "cat_Controller",
+            fields: {
+                PINMAP: { type: 'select', labelKey: 'PINMAP_LABEL', options: ['MksGenL2', 'MiniPCB2', 'MaxPCB2', 'MaxESP3', 'CNC3', 'STM32Blue', 'MaxSTM3', 'FYSETC_S6_2'], defaultValue: 'OFF', basic: true },
+                SERIAL_A_BAUD_DEFAULT: { type: 'select', labelKey: 'SERIAL_A_BAUD_DEFAULT_LABEL', options: [9600, 19200, 57600, 115200], defaultValue: 9600, basic: false },
+                STATUS_LED: { type: 'select', labelKey: 'STATUS_LED_LABEL', options: ['OFF', 'ON'], defaultValue: 'ON', basic: true }
+            }
         },
-        { // Step 2
-            AXIS_GEARING: { type: 'axis_calculator_table' }
+        Mount: {
+            titleKey: "cat_Mount",
+            fields: {
+                MOUNT_TYPE: { type: 'select', labelKey: 'MOUNT_TYPE_LABEL', options: ['GEM', 'FORK', 'ALTAZM'], defaultValue: 'GEM', basic: true },
+                SLEW_RATE_BASE_DESIRED: { type: 'number', labelKey: 'SLEW_RATE_BASE_DESIRED_LABEL', defaultValue: 2.5, basic: true },
+                TIME_LOCATION_SOURCE: { type: 'select', labelKey: 'TIME_LOCATION_SOURCE_LABEL', options: ['OFF', 'DS3231', 'GPS', 'TEENSY'], defaultValue: 'OFF', basic: true }
+            }
         },
-        { // Step 3
-            AXIS1_DRIVER_MODEL: { type: 'select', labelKey: 'AXIS_DM_LABEL', descriptionKey: 'AXIS_DM_DESC', options: ['A4988', 'DRV8825', 'LV8729', 'TMC2209'], defaultValue: 'A4988' },
-            AXIS1_DRIVER_MICROSTEPS: { type: 'select', labelKey: 'AXIS_MS_LABEL', descriptionKey: 'AXIS_MS_DESC', options: [8, 16, 32], defaultValue: 16 },
-            AXIS1_DRIVER_MICROSTEPS_GOTO: { type: 'select', labelKey: 'AXIS_MSG_LABEL', descriptionKey: 'AXIS_MSG_DESC', options: [1, 2, 4, 8], defaultValue: 4 },
-            AXIS1_DRIVER_REVERSE: { type: 'select', labelKey: 'AXIS_REV_LABEL', descriptionKey: 'AXIS_REV_DESC', options: ['OFF', 'ON'], defaultValue: 'OFF' },
-            AXIS1_LIMIT_MIN: { type: 'number', labelKey: 'AXIS_LIMIT_MIN_LABEL', descriptionKey: 'AXIS_LIMIT_MIN_DESC', defaultValue: -180 },
-            AXIS1_LIMIT_MAX: { type: 'number', labelKey: 'AXIS_LIMIT_MAX_LABEL', descriptionKey: 'AXIS_LIMIT_MAX_DESC', defaultValue: 180 },
-
-            _separator: true,
-
-            AXIS2_DRIVER_MODEL: { type: 'select', labelKey: 'AXIS_DM_LABEL', descriptionKey: 'AXIS_DM_DESC', options: ['A4988', 'DRV8825', 'LV8729', 'TMC2209'], defaultValue: 'A4988' },
-            AXIS2_DRIVER_MICROSTEPS: { type: 'select', labelKey: 'AXIS_MS_LABEL', descriptionKey: 'AXIS_MS_DESC', options: [8, 16, 32], defaultValue: 16 },
-            AXIS2_DRIVER_MICROSTEPS_GOTO: { type: 'select', labelKey: 'AXIS_MSG_LABEL', descriptionKey: 'AXIS_MSG_DESC', options: [1, 2, 4, 8], defaultValue: 4 },
-            AXIS2_DRIVER_REVERSE: { type: 'select', labelKey: 'AXIS_REV_LABEL', descriptionKey: 'AXIS_REV_DESC', options: ['OFF', 'ON'], defaultValue: 'OFF' },
-            AXIS2_LIMIT_MIN: { type: 'number', labelKey: 'AXIS_LIMIT_MIN_LABEL', descriptionKey: 'AXIS_LIMIT_MIN_DESC', defaultValue: -90 },
-            AXIS2_LIMIT_MAX: { type: 'number', labelKey: 'AXIS_LIMIT_MAX_LABEL', descriptionKey: 'AXIS_LIMIT_MAX_DESC', defaultValue: 90 },
+        Gearing: {
+            titleKey: "cat_Gearing",
+            special: "AXIS_GEARING",
+            basic: true
         },
-        { // Step 4
-            SERIAL_A_BAUD_DEFAULT: { type: 'select', labelKey: 'SERIAL_A_BAUD_DEFAULT_LABEL', descriptionKey: 'SERIAL_A_BAUD_DEFAULT_DESC', options: [9600, 19200, 57600, 115200], defaultValue: 9600 },
-            TIME_LOCATION_SOURCE: { type: 'select', labelKey: 'TIME_LOCATION_SOURCE_LABEL', descriptionKey: 'TIME_LOCATION_SOURCE_DESC', options: ['OFF', 'DS3231', 'GPS', 'TEENSY'], defaultValue: 'OFF' },
-            STATUS_LED: { type: 'select', labelKey: 'STATUS_LED_LABEL', descriptionKey: 'STATUS_LED_DESC', options: ['OFF', 'ON'], defaultValue: 'ON' },
-            STEP_WAVE_FORM: { type: 'select', labelKey: 'STEP_WAVE_FORM_LABEL', descriptionKey: 'STEP_WAVE_FORM_DESC', options: ['SQUARE', 'PULSE'], defaultValue: 'SQUARE' }
+        Axis1: {
+            titleKey: "cat_Axis1",
+            fields: {
+                AXIS1_DRIVER_MODEL: { type: 'select', labelKey: 'AXIS_DM_LABEL', options: ['A4988', 'DRV8825', 'LV8729', 'TMC2209'], defaultValue: 'A4988', basic: true },
+                AXIS1_DRIVER_MICROSTEPS: { type: 'select', labelKey: 'AXIS_MS_LABEL', options: [8, 16, 32], defaultValue: 16, basic: true },
+                AXIS1_REVERSE: { type: 'select', labelKey: 'AXIS_REV_LABEL', options: ['OFF', 'ON'], defaultValue: 'OFF', basic: true }
+            }
         },
-        { // Step 5
-            _summary: true
+        Axis2: {
+            titleKey: "cat_Axis2",
+            fields: {
+                AXIS2_DRIVER_MODEL: { type: 'select', labelKey: 'AXIS_DM_LABEL', options: ['A4988', 'DRV8825', 'LV8729', 'TMC2209'], defaultValue: 'A4988', basic: true },
+                AXIS2_DRIVER_MICROSTEPS: { type: 'select', labelKey: 'AXIS_MS_LABEL', options: [8, 16, 32], defaultValue: 16, basic: true },
+                AXIS2_REVERSE: { type: 'select', labelKey: 'AXIS_REV_LABEL', options: ['OFF', 'ON'], defaultValue: 'OFF', basic: true }
+            }
+        },
+        Summary: {
+            titleKey: "cat_Summary",
+            special: "_summary",
+            basic: true
         }
-    ]
+    }
 };
