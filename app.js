@@ -5,7 +5,7 @@ import { LOCALES } from './locales.js';
 // ===================================================================================
 // CONSTANTS & CONFIGURATION
 // ===================================================================================
-const APP_VERSION = "0.0.5.1-beta";
+const APP_VERSION = "0.0.5.2-beta";
 
 const schemas = {
     onstepx: [
