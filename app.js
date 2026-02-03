@@ -1,361 +1,9 @@
 
 // ===================================================================================
-// TEMPLATES (Merged from templates.js for offline compatibility)
+// APP STATE
 // ===================================================================================
-const TEMPLATE_ONSTEP_CLASSIC = `
-// Configuration for OnStep
-#define PINMAP                        OFF
-#define SERIAL_A_BAUD_DEFAULT        9600
-#define MOUNT_TYPE                    GEM
-#define AXIS1_STEPS_PER_DEGREE    12800.0
-#define AXIS1_DRIVER_MODEL            OFF
-#define AXIS1_DRIVER_MICROSTEPS       OFF
-#define AXIS1_DRIVER_MICROSTEPS_GOTO  OFF
-#define AXIS1_DRIVER_REVERSE          OFF
-#define AXIS2_STEPS_PER_DEGREE    12800.0
-#define AXIS2_DRIVER_MODEL            OFF
-#define AXIS2_DRIVER_MICROSTEPS       OFF
-#define AXIS2_DRIVER_MICROSTEPS_GOTO  OFF
-#define AXIS2_DRIVER_REVERSE          OFF
-#define SLEW_RATE_BASE_DESIRED        2.5
-// Note: This is a placeholder for the full template structure.
-// In a real usage, the entire Config.h content would be here.
-`;
+const APP_VERSION = "0.0.6.0-beta";
 
-const TEMPLATE_ONSTEPX = `
-/* ---------------------------------------------------------------------------------------------------------------------------------
- * Configuration for OnStepX
- */
-#define PINMAP                  FYSETC_E4
-#define SERIAL_A_BAUD_DEFAULT        9600
-#define MOUNT_TYPE                    GEM
-#define AXIS1_DRIVER_MODEL        TMC2209
-#define AXIS1_STEPS_PER_DEGREE      12800
-#define AXIS1_REVERSE                 OFF
-#define AXIS1_DRIVER_MICROSTEPS        32
-#define AXIS1_DRIVER_MICROSTEPS_GOTO    4
-#define AXIS2_DRIVER_MODEL        TMC2209
-#define AXIS2_STEPS_PER_DEGREE      12800
-#define AXIS2_REVERSE                 OFF
-#define AXIS2_DRIVER_MICROSTEPS        32
-#define AXIS2_DRIVER_MICROSTEPS_GOTO    4
-#define SLEW_RATE_BASE_DESIRED        2.5
-// Note: This is a placeholder for the full template structure.
-`;
-
-// ===================================================================================
-// LOCALES (Merged from locales.js for offline compatibility)
-// ===================================================================================
-const LOCALES = {
-    en: {
-        "appTitle": "OnStep Configurator",
-        "appDescription": "Welcome! This tool helps you create a personalized configuration file for your OnStep telescope controller. Please select a firmware version to begin.",
-        "classicTitle": "OnStep Classic",
-        "onstepxTitle": "OnStepX",
-        "classicTagline": "The stable choice for 8-bit controllers.",
-        "onstepxTagline": "The modern, feature-rich firmware for 32-bit controllers.",
-        "classicFeatures": "<li><b>Target Hardware:</b> 8-bit microcontrollers (e.g., Arduino Mega 2560).</li><li><b>Performance:</b> Reliable but with limited processing power.</li><li><b>Features:</b> Includes all essential functions for basic astronomical tracking and GOTO.</li><li><b>Ideal for:</b> Simpler, older hardware, or when maximum stability is the goal.</li>",
-        "onstepxFeatures": "<li><b>Target Hardware:</b> 32-bit microcontrollers (e.g., ESP32, STM32).</li><li><b>Performance:</b> Significantly faster with more memory.</li><li><b>Features:</b> Advanced pointing models, WiFi, Bluetooth, web interface, and many other extra capabilities.</li><li><b>Ideal for:</b> Modern hardware, if you want the latest features and highest precision.</li>",
-        "wikiButton": "Wiki / Help",
-        "backToHomeButton": "Back to Main Menu",
-        "wizardTitleStep1": "Basic Settings",
-        "wizardTitleStep2": "Motor and Gearing (Calculator)",
-        "wizardTitleStep3": "Driver Settings",
-        "wizardTitleStep4": "Summary and Generation",
-        "wizardPrev": "Back",
-        "wizardNext": "Next",
-        "wizardSummary": "Summary",
-        "summaryText": "Based on your settings, the preview of the generated <code>Config.h</code> file is shown below. If everything looks correct, you can save the file with the 'Download' button.",
-        "summaryWaiting": "Generating configuration...",
-        "downloadButton": "Download (Config.h)",
-        "wikiTitle": "Knowledge Base",
-        "wikiNavPrerequisites": "Prerequisites",
-        "wikiNavHardware": "Hardware Selection",
-        "wikiNavGearing": "Gearing",
-        "PINMAP_LABEL": "Controller Board",
-        "PINMAP_DESC": "Select your controller board (e.g., FYSETC E4).",
-        "MOUNT_TYPE_LABEL": "Mount Type",
-        "MOUNT_TYPE_DESC": "Select your telescope mount type (e.g., GEM - German Equatorial).",
-        "AXIS1_SPD_LABEL": "RA/AZM Axis Steps/Degree",
-        "AXIS2_SPD_LABEL": "DEC/ALT Axis Steps/Degree",
-        "AXIS_DM_LABEL": "Driver Model",
-        "AXIS_DM_DESC": "The stepper motor driver type (e.g., TMC2209).",
-        "AXIS_MS_LABEL": "Microsteps (Tracking)",
-        "AXIS_MS_DESC": "Microstep setting during tracking.",
-        "AXIS_MSG_LABEL": "Microsteps (GOTO)",
-        "AXIS_MSG_DESC": "Microstep setting during slewing.",
-        "AXIS_REV_LABEL": "Reverse Direction",
-        "AXIS_REV_DESC": "Reverses motor direction via software.",
-        "XLS_MOTOR_STEPS": "Motor Steps (Step/Rev)",
-        "XLS_MICROSTEPS": "Microsteps (Driver)",
-        "XLS_GR1": "Gear Ratio 1 (GR1)",
-        "XLS_GR2": "Gear Ratio 2 (GR2)",
-        "XLS_RESOLUTION": "Tracking Resolution",
-        "XLS_RPM": "Motor Speed",
-        "beltCalcButton": "Calculate Belt Length",
-        "beltCalcApply": "Apply Ratio & Close",
-        "beltCalcTitle": "Belt Length Calculator",
-        "beltCalcType": "Belt Type",
-        "beltCalcP1": "Pulley 1 Teeth",
-        "beltCalcP2": "Pulley 2 Teeth",
-        "beltCalcPitch": "Belt Pitch (mm)",
-        "beltCalcDist": "Axle Distance (mm)",
-        "beltCalcResult": "Result",
-        "beltCalcLength": "Required Belt Length",
-        "beltCalcTeeth": "Nearest Tooth Count",
-        "wiki_page_prerequisites_title": "Prerequisites",
-        "wiki_page_prerequisites_content": "Content...",
-        "wiki_page_hardware_title": "Hardware Selection",
-        "wiki_page_hardware_content": "Content...",
-        "wiki_page_gearing_title": "Gearing",
-        "wiki_page_gearing_content": "Content..."
-    },
-    hu: {
-        "appTitle": "OnStep Konfigurátor",
-        "appDescription": "Üdvözlünk! Ez az eszköz segít létrehozni a személyre szabott konfigurációs fájlt az OnStep távcsővezérlődhöz. Kérlek, válassz firmware verziót a kezdéshez.",
-        "classicTitle": "OnStep Classic",
-        "onstepxTitle": "OnStepX",
-        "classicTagline": "A stabil választás 8-bites vezérlőkhöz.",
-        "onstepxTagline": "A modern, funkciókban gazdag firmware 32-bites vezérlőkhöz.",
-        "classicFeatures": "<li><b>Célhardver:</b> 8-bites mikrokontrollerek (pl. Arduino Mega 2560).</li><li><b>Teljesítmény:</b> Megbízható, de korlátozottabb számítási kapacitás.</li><li><b>Funkciók:</b> Az alapvető csillagászati követéshez és GOTO-hoz szükséges összes funkciót tartalmazza.</li><li><b>Ideális:</b> Egyszerűbb, régebbi hardverekhez, vagy ha a maximális stabilitás a cél.</li>",
-        "onstepxFeatures": "<li><b>Célhardver:</b> 32-bites mikrokontrollerek (pl. ESP32, STM32).</li><li><b>Teljesítmény:</b> Jelentősen gyorsabb és több memóriával rendelkezik.</li><li><b>Funkciók:</b> Fejlett pointing modellek, WiFi, Bluetooth, webes felület és sok más extra képesség.</li><li><b>Ideális:</b> Modern hardverekhez, ha a legújabb funkciókat és a legnagyobb pontosságot szeretnéd elérni.</li>",
-        "wikiButton": "Wiki / Súgó",
-        "backToHomeButton": "Vissza a főmenübe",
-        "wizardTitleStep1": "Alapbeállítások",
-        "wizardTitleStep2": "Motor és Áttétel (Kalkulátor)",
-        "wizardTitleStep3": "Meghajtó Beállítások",
-        "wizardTitleStep4": "Összegzés és Generálás",
-        "wizardPrev": "Vissza",
-        "wizardNext": "Tovább",
-        "wizardSummary": "Összegzés",
-        "summaryText": "A beállításaid alapján a generált <code>Config.h</code> fájl előnézete alább látható. Ha minden rendben, a 'Letöltés' gombbal mentheted a fájlt.",
-        "summaryWaiting": "A konfiguráció generálása...",
-        "downloadButton": "Letöltés (Config.h)",
-        "wikiTitle": "Tudásbázis",
-        "wikiNavPrerequisites": "Előfeltételek",
-        "wikiNavHardware": "Hardver választás",
-        "wikiNavGearing": "Áttételek",
-        "PINMAP_LABEL": "Vezérlőpanel",
-        "PINMAP_DESC": "Válaszd ki a használt vezérlőpanelt (pl. FYSETC E4).",
-        "MOUNT_TYPE_LABEL": "Mechanika Típusa",
-        "MOUNT_TYPE_DESC": "Válaszd ki a távcsőmechanika típusát (pl. GEM - Német Ekvatoriális).",
-        "AXIS1_SPD_LABEL": "RA/AZM Tengely Lépés/Fok",
-        "AXIS2_SPD_LABEL": "DEC/ALT Tengely Lépés/Fok",
-        "AXIS_DM_LABEL": "Meghajtó Modell",
-        "AXIS_DM_DESC": "A léptetőmotor vezérlő típusa (pl. TMC2209).",
-        "AXIS_MS_LABEL": "Mikrolépés (Követés)",
-        "AXIS_MS_DESC": "A mikrolépés beállítás követés közben.",
-        "AXIS_MSG_LABEL": "Mikrolépés (GOTO)",
-        "AXIS_MSG_DESC": "A mikrolépés beállítás gyorsmozgás (GOTO) közben.",
-        "AXIS_REV_LABEL": "Forgásirány Megfordítása",
-        "AXIS_REV_DESC": "Szoftveres irányváltás.",
-        "XLS_MOTOR_STEPS": "Motor Lépés (Step/Rev)",
-        "XLS_MICROSTEPS": "Mikrolépés (Driver)",
-        "XLS_GR1": "Áttétel 1 (GR1 Ratio)",
-        "XLS_GR2": "Áttétel 2 (GR2 Ratio)",
-        "XLS_RESOLUTION": "Követési Felbontás",
-        "XLS_RPM": "Motor Fordulat",
-        "beltCalcButton": "Szíjhossz",
-        "beltCalcApply": "Mentés & Alkalmazás",
-        "beltCalcTitle": "Szíjhossz Kalkulátor",
-        "beltCalcType": "Szíj Típus",
-        "beltCalcP1": "1. tárcsa fogszám",
-        "beltCalcP2": "2. tárcsa fogszám",
-        "beltCalcPitch": "Szíj osztás (mm)",
-        "beltCalcDist": "Tengelytáv (mm)",
-        "beltCalcResult": "Eredmény",
-        "beltCalcLength": "Szükséges szíjhossz",
-        "beltCalcTeeth": "Legközelebbi fogszám",
-        "wiki_page_prerequisites_title": "Előfeltételek",
-        "wiki_page_prerequisites_content": "Tartalom...",
-        "wiki_page_hardware_title": "Hardver",
-        "wiki_page_hardware_content": "Tartalom...",
-        "wiki_page_gearing_title": "Áttételek",
-        "wiki_page_gearing_content": "Tartalom..."
-    },
-    de: {
-        "appTitle": "OnStep Konfigurator",
-        "appDescription": "Willkommen! Dieses Tool hilft Ihnen, eine personalisierte Konfigurationsdatei für Ihre OnStep-Teleskopsteuerung zu erstellen. Bitte wählen Sie eine Firmware-Version, um zu beginnen.",
-        "classicTitle": "OnStep Classic",
-        "onstepxTitle": "OnStepX",
-        "classicTagline": "Die stabile Wahl für 8-Bit-Controller.",
-        "onstepxTagline": "Die moderne, funktionsreiche Firmware für 32-Bit-Controller.",
-        "classicFeatures": "<li><b>Zielhardware:</b> 8-Bit-Mikrocontroller (z. B. Arduino Mega 2560).</li><li><b>Leistung:</b> Zuverlässig, aber mit begrenzter Rechenleistung.</li><li><b>Funktionen:</b> Enthält alle wesentlichen Funktionen für die grundlegende astronomische Nachführung und GOTO.</li><li><b>Ideal für:</b> Einfachere, ältere Hardware oder wenn maximale Stabilität das Ziel ist.</li>",
-        "onstepxFeatures": "<li><b>Zielhardware:</b> 32-Bit-Mikrocontroller (z. B. ESP32, STM32).</li><li><b>Leistung:</b> Deutlich schneller mit mehr Speicher.</li><li><b>Funktionen:</b> Erweiterte Pointing-Modelle, WLAN, Bluetooth, Web-Interface und viele weitere Zusatzfunktionen.</li><li><b>Ideal für:</b> Moderne Hardware, wenn Sie die neuesten Funktionen und höchste Präzision wünschen.</li>",
-        "wikiButton": "Wiki / Hilfe",
-        "backToHomeButton": "Zurück zum Hauptmenü",
-        "wizardTitleStep1": "Grundeinstellungen",
-        "wizardTitleStep2": "Motor und Getriebe (Rechner)",
-        "wizardTitleStep3": "Treiber-Einstellungen",
-        "wizardTitleStep4": "Zusammenfassung und Erstellung",
-        "wizardPrev": "Zurück",
-        "wizardNext": "Weiter",
-        "wizardSummary": "Zusammenfassung",
-        "summaryText": "Basierend auf Ihren Einstellungen wird unten die Vorschau der generierten <code>Config.h</code>-Datei angezeigt. Wenn alles korrekt aussieht, können Sie die Datei mit der Schaltfläche 'Herunterladen' speichern.",
-        "summaryWaiting": "Konfiguration wird generiert...",
-        "downloadButton": "Herunterladen (Config.h)",
-        "wikiTitle": "Wissensdatenbank",
-        "wikiNavPrerequisites": "Voraussetzungen",
-        "wikiNavHardware": "Hardware-Auswahl",
-        "wikiNavGearing": "Getriebe",
-        "PINMAP_LABEL": "Controller-Board",
-        "PINMAP_DESC": "Wählen Sie Ihr Controller-Board (z. B. FYSETC E4).",
-        "MOUNT_TYPE_LABEL": "Montierungstyp",
-        "MOUNT_TYPE_DESC": "Wählen Sie Ihren Montierungstyp (z. B. GEM - Deutsche Äquatoriale).",
-        "AXIS1_SPD_LABEL": "RA/AZM-Achse Schritte/Grad",
-        "AXIS2_SPD_LABEL": "DEC/ALT-Achse Schritte/Grad",
-        "AXIS_DM_LABEL": "Treibermodell",
-        "AXIS_DM_DESC": "Der Typ des Schrittmotortreibers (z. B. TMC2209).",
-        "AXIS_MS_LABEL": "Mikroschritte (Nachführung)",
-        "AXIS_MS_DESC": "Mikroschritt-Einstellung während der Nachführung.",
-        "AXIS_MSG_LABEL": "Mikroschritte (GOTO)",
-        "AXIS_MSG_DESC": "Mikroschritt-Einstellung während des Schwenkens.",
-        "AXIS_REV_LABEL": "Richtung umkehren",
-        "AXIS_REV_DESC": "Kehrt die Motorrichtung per Software um.",
-        "XLS_MOTOR_STEPS": "Motorschritte (Step/Rev)",
-        "XLS_MICROSTEPS": "Mikroschritte (Treiber)",
-        "XLS_GR1": "Übersetzungsverhältnis 1 (GR1)",
-        "XLS_GR2": "Übersetzungsverhältnis 2 (GR2)",
-        "XLS_RESOLUTION": "Nachführungsauflösung",
-        "XLS_RPM": "Motordrehzahl",
-        "beltCalcButton": "Riemenlänge berechnen",
-        "beltCalcApply": "Übernehmen",
-        "beltCalcTitle": "Riemenlängen-Rechner",
-        "beltCalcType": "Riemen-Typ",
-        "beltCalcP1": "Zähne Riemenscheibe 1",
-        "beltCalcP2": "Zähne Riemenscheibe 2",
-        "beltCalcPitch": "Riemen-Teilung (mm)",
-        "beltCalcDist": "Achsabstand (mm)",
-        "beltCalcResult": "Ergebnis",
-        "beltCalcLength": "Benötigte Riemenlänge",
-        "beltCalcTeeth": "Nächste Zähnezahl",
-        "wiki_page_prerequisites_title": "Voraussetzungen",
-        "wiki_page_prerequisites_content": "Inhalt...",
-        "wiki_page_hardware_title": "Hardware-Auswahl",
-        "wiki_page_hardware_content": "Inhalt...",
-        "wiki_page_gearing_title": "Getriebe",
-        "wiki_page_gearing_content": "Inhalt..."
-    },
-    es: {
-        "appTitle": "Configurador OnStep",
-        "appDescription": "¡Bienvenido! Esta herramienta le ayuda a crear un archivo de configuración personalizado para su controlador de telescopio OnStep. Por favor, seleccione una versión de firmware para comenzar.",
-        "classicTitle": "OnStep Classic",
-        "onstepxTitle": "OnStepX",
-        "classicTagline": "La opción estable para controladores de 8 bits.",
-        "onstepxTagline": "El firmware moderno y rico en funciones para controladores de 32 bits.",
-        "classicFeatures": "<li><b>Hardware de destino:</b> Microcontroladores de 8 bits (p. ej., Arduino Mega 2560).</li><li><b>Rendimiento:</b> Fiable pero con potencia de procesamiento limitada.</li><li><b>Funciones:</b> Incluye todas las funciones esenciales para el seguimiento astronómico básico y GOTO.</li><li><b>Ideal para:</b> Hardware más simple y antiguo, o cuando la máxima estabilidad es el objetivo.</li>",
-        "onstepxFeatures": "<li><b>Hardware de destino:</b> Microcontroladores de 32 bits (p. ej., ESP32, STM32).</li><li><b>Rendimiento:</b> Significativamente más rápido y con más memoria.</li><li><b>Funciones:</b> Modelos de apuntado avanzados, WiFi, Bluetooth, interfaz web y muchas otras capacidades adicionales.</li><li><b>Ideal para:</b> Hardware moderno, si desea las últimas funciones y la máxima precisión.</li>",
-        "wikiButton": "Wiki / Ayuda",
-        "backToHomeButton": "Volver al Menú Principal",
-        "wizardTitleStep1": "Ajustes Básicos",
-        "wizardTitleStep2": "Motor y Engranajes (Calculadora)",
-        "wizardTitleStep3": "Ajustes del Driver",
-        "wizardTitleStep4": "Resumen y Generación",
-        "wizardPrev": "Atrás",
-        "wizardNext": "Siguiente",
-        "wizardSummary": "Resumen",
-        "summaryText": "Basado en sus ajustes, a continuación se muestra la vista previa del archivo <code>Config.h</code> generado. Si todo parece correcto, puede guardar el archivo con el botón 'Descargar'.",
-        "summaryWaiting": "Generando configuración...",
-        "downloadButton": "Descargar (Config.h)",
-        "wikiTitle": "Base de Conocimientos",
-        "wikiNavPrerequisites": "Prerrequisitos",
-        "wikiNavHardware": "Selección de Hardware",
-        "wikiNavGearing": "Engranajes",
-        "PINMAP_LABEL": "Placa Controladora",
-        "PINMAP_DESC": "Seleccione su placa controladora (p. ej., FYSETC E4).",
-        "MOUNT_TYPE_LABEL": "Tipo de Montura",
-        "MOUNT_TYPE_DESC": "Seleccione su tipo de montura (p. ej., GEM - Ecuatorial Alemana).",
-        "AXIS1_SPD_LABEL": "Pasos/Grado Eje AR/AZM",
-        "AXIS2_SPD_LABEL": "Pasos/Grado Eje DEC/ALT",
-        "AXIS_DM_LABEL": "Modelo del Driver",
-        "AXIS_DM_DESC": "El tipo de driver del motor paso a paso (p. ej., TMC2209).",
-        "AXIS_MS_LABEL": "Micropasos (Seguimiento)",
-        "AXIS_MS_DESC": "Configuración de micropasos durante el seguimiento.",
-        "AXIS_MSG_LABEL": "Micropasos (GOTO)",
-        "AXIS_MSG_DESC": "Configuración de micropasos durante el GOTO.",
-        "AXIS_REV_LABEL": "Invertir Dirección",
-        "AXIS_REV_DESC": "Invierte la dirección del motor por software.",
-        "XLS_MOTOR_STEPS": "Pasos del Motor (Paso/Rev)",
-        "XLS_MICROSTEPS": "Micropasos (Driver)",
-        "XLS_GR1": "Relación de Engranajes 1 (GR1)",
-        "XLS_GR2": "Relación de Engranajes 2 (GR2)",
-        "XLS_RESOLUTION": "Resolución de Seguimiento",
-        "XLS_RPM": "Velocidad del Motor",
-        "beltCalcButton": "Calcular Longitud de Correa",
-        "beltCalcApply": "Aplicar",
-        "beltCalcTitle": "Calculadora de Longitud de Correa",
-        "beltCalcType": "Tipo de Correa",
-        "beltCalcP1": "Dientes Polea 1",
-        "beltCalcP2": "Dientes Polea 2",
-        "beltCalcPitch": "Paso de la Correa (mm)",
-        "beltCalcDist": "Distancia entre Ejes (mm)",
-        "beltCalcResult": "Resultado",
-        "beltCalcLength": "Longitud de Correa Requerida",
-        "beltCalcTeeth": "Número de Dientes más Cercano",
-        "wiki_page_prerequisites_title": "Prerrequisitos",
-        "wiki_page_prerequisites_content": "Contenido...",
-        "wiki_page_hardware_title": "Selección de Hardware",
-        "wiki_page_hardware_content": "Contenido...",
-        "wiki_page_gearing_title": "Engranajes",
-        "wiki_page_gearing_content": "Contenido..."
-    }
-};
-
-// ===================================================================================
-// CONSTANTS & CONFIGURATION
-// ===================================================================================
-const APP_VERSION = "0.0.5.6-beta";
-
-const schemas = {
-    onstepx: [
-        { // Step 1: Alapbeállítások
-            PINMAP: { type: 'select', labelKey: 'PINMAP_LABEL', descriptionKey: 'PINMAP_DESC', options: ['FYSETC_E4', 'MiniPCB', 'MiniPCB2', 'MaxPCB2', 'MaxESP3', 'CNC3', 'STM32Blue', 'MaxSTM3', 'FYSETC_S6_2'], defaultValue: 'FYSETC_E4' },
-            MOUNT_TYPE: { type: 'select', labelKey: 'MOUNT_TYPE_LABEL', descriptionKey: 'MOUNT_TYPE_DESC', options: ['GEM', 'GEM_TA', 'GEM_TAC', 'FORK', 'FORK_TA', 'FORK_TAC', 'ALTAZM', 'ALTAZM_UNL'], defaultValue: 'GEM' }
-        },
-        { // Step 2: Motor és Áttétel (XLS Style)
-            AXIS_GEARING: { type: 'axis_calculator_table' }
-        },
-        { // Step 3: Meghajtó Beállítások
-            AXIS1_DRIVER_MODEL: { type: 'select', labelKey: 'AXIS_DM_LABEL', descriptionKey: 'AXIS_DM_DESC', options: ['A4988', 'DRV8825', 'TMC2130', 'TMC2209', 'TMC5160'], defaultValue: 'TMC2209' },
-            AXIS1_DRIVER_MICROSTEPS: { type: 'select', labelKey: 'AXIS_MS_LABEL', descriptionKey: 'AXIS_MS_DESC', options: [8, 16, 32, 64, 128], defaultValue: 32 },
-            AXIS1_DRIVER_MICROSTEPS_GOTO: { type: 'select', labelKey: 'AXIS_MSG_LABEL', descriptionKey: 'AXIS_MSG_DESC', options: [1, 2, 4, 8, 16], defaultValue: 4 },
-            AXIS1_REVERSE: { type: 'select', labelKey: 'AXIS_REV_LABEL', descriptionKey: 'AXIS_REV_DESC', options: ['OFF', 'ON'], defaultValue: 'OFF' },
-            AXIS2_DRIVER_MODEL: { type: 'select', labelKey: 'AXIS_DM_LABEL', descriptionKey: 'AXIS_DM_DESC', options: ['A4988', 'DRV8825', 'TMC2130', 'TMC2209', 'TMC5160'], defaultValue: 'TMC2209' },
-            AXIS2_DRIVER_MICROSTEPS: { type: 'select', labelKey: 'AXIS_MS_LABEL', descriptionKey: 'AXIS_MS_DESC', options: [8, 16, 32, 64, 128], defaultValue: 32 },
-            AXIS2_DRIVER_MICROSTEPS_GOTO: { type: 'select', labelKey: 'AXIS_MSG_LABEL', descriptionKey: 'AXIS_MSG_DESC', options: [1, 2, 4, 8, 16], defaultValue: 4 },
-            AXIS2_REVERSE: { type: 'select', labelKey: 'AXIS_REV_LABEL', descriptionKey: 'AXIS_REV_DESC', options: ['OFF', 'ON'], defaultValue: 'OFF' },
-        },
-        { // Step 4: Összegzés és Generálás
-            _summary: true
-        } 
-    ],
-    classic: [
-        { // Step 1
-            PINMAP: { type: 'select', labelKey: 'PINMAP_LABEL', descriptionKey: 'PINMAP_DESC', options: ['MksGenL2', 'MiniPCB2', 'MaxPCB2', 'MaxESP3', 'CNC3', 'STM32Blue', 'MaxSTM3', 'FYSETC_S6_2'], defaultValue: 'OFF' },
-            MOUNT_TYPE: { type: 'select', labelKey: 'MOUNT_TYPE_LABEL', descriptionKey: 'MOUNT_TYPE_DESC', options: ['GEM', 'FORK', 'ALTAZM'], defaultValue: 'GEM' }
-        },
-            { // Step 2: Motor és Áttétel (XLS Style)
-            AXIS_GEARING: { type: 'axis_calculator_table' }
-        },
-        { // Step 3
-            AXIS1_DRIVER_MODEL: { type: 'select', labelKey: 'AXIS_DM_LABEL', descriptionKey: 'AXIS_DM_DESC', options: ['A4988', 'DRV8825', 'LV8729', 'TMC2209'], defaultValue: 'A4988' },
-            AXIS1_DRIVER_MICROSTEPS: { type: 'select', labelKey: 'AXIS_MS_LABEL', descriptionKey: 'AXIS_MS_DESC', options: [8, 16, 32], defaultValue: 16 },
-            AXIS1_DRIVER_MICROSTEPS_GOTO: { type: 'select', labelKey: 'AXIS_MSG_LABEL', descriptionKey: 'AXIS_MSG_DESC', options: [1, 2, 4, 8], defaultValue: 4 },
-            AXIS1_DRIVER_REVERSE: { type: 'select', labelKey: 'AXIS_REV_LABEL', descriptionKey: 'AXIS_REV_DESC', options: ['OFF', 'ON'], defaultValue: 'OFF' },
-            AXIS2_DRIVER_MODEL: { type: 'select', labelKey: 'AXIS_DM_LABEL', descriptionKey: 'AXIS_DM_DESC', options: ['A4988', 'DRV8825', 'LV8729', 'TMC2209'], defaultValue: 'A4988' },
-            AXIS2_DRIVER_MICROSTEPS: { type: 'select', labelKey: 'AXIS_MS_LABEL', descriptionKey: 'AXIS_MS_DESC', options: [8, 16, 32], defaultValue: 16 },
-            AXIS2_DRIVER_MICROSTEPS_GOTO: { type: 'select', labelKey: 'AXIS_MSG_LABEL', descriptionKey: 'AXIS_MSG_DESC', options: [1, 2, 4, 8], defaultValue: 4 },
-            AXIS2_DRIVER_REVERSE: { type: 'select', labelKey: 'AXIS_REV_LABEL', descriptionKey: 'AXIS_REV_DESC', options: ['OFF', 'ON'], defaultValue: 'OFF' },
-        },
-        { // Step 4
-            _summary: true
-        }
-    ]
-};
-
-// ===================================================================================
-// APPLICATION STATE
-// ===================================================================================
 const appState = { 
     version: null, 
     language: 'en', 
@@ -365,12 +13,12 @@ const appState = {
         AXIS2: { motor: 200, micro: 32, gr1: 4, gr2: 144 },
         SLEW_RATE: 2.5
     },
-    // New: Track input modes per field (std/custom/belt/worm)
+    // Default modes for calculator inputs
     calcModes: {
         AXIS1: { motor: 'std', micro: 'std', gr1: 'free', gr2: 'free' },
         AXIS2: { motor: 'std', micro: 'std', gr1: 'free', gr2: 'free' }
     },
-    activeCalcField: null, // Tracks which field opened the belt calculator
+    activeCalcField: null,
     i18n: {}, 
     wizardStep: 0, 
     constellations: [],
@@ -399,6 +47,8 @@ const dom = {
     
     beltCalcModal: document.getElementById('belt-calc-modal'),
     beltResultText: document.getElementById('belt-result-text'),
+    
+    loadingOverlay: document.getElementById('loading-overlay')
 };
 
 // ===================================================================================
@@ -416,7 +66,7 @@ function applyLocalization() {
 
 function renderWizard() {
     dom.configWizard.innerHTML = '';
-    const schema = schemas[appState.version];
+    const schema = SCHEMAS[appState.version];
     if (!schema) return;
 
     const maxSteps = schema.length;
@@ -436,6 +86,7 @@ function renderWizard() {
     const stepContainer = document.createElement('div');
     stepContainer.className = 'step-container';
     
+    // Check type of step
     if (currentStepSchema._summary) {
         stepContainer.style.display = 'flex';
         stepContainer.style.flexDirection = 'column';
@@ -446,12 +97,11 @@ function renderWizard() {
         const previewArea = document.createElement('textarea');
         previewArea.id = 'config-preview';
         previewArea.readOnly = true;
-        previewArea.value = appState.i18n.summaryWaiting; // Use .value for textarea
+        previewArea.value = appState.i18n.summaryWaiting; 
         stepContainer.appendChild(previewArea);
         
-        generateConfigFile();
     } else if (currentStepSchema.AXIS_GEARING) {
-        stepContainer.appendChild(renderAxisCalculatorTable());
+        stepContainer.appendChild(renderAxisCalculatorTable()); // From calc.js
     } else {
         const formContent = buildFormForStep(currentStepSchema);
         stepContainer.appendChild(formContent);
@@ -477,213 +127,58 @@ function renderWizard() {
             downloadButton.id = 'download-btn';
             downloadButton.textContent = appState.i18n.downloadButton;
             downloadButton.className = 'button primary';
-            downloadButton.disabled = true;
-            downloadButton.onclick = downloadConfigFile;
+            // Trigger generation when clicked
+            downloadButton.onclick = () => {
+                showLoading();
+                // Allow UI to update before heavy sync work (though string replacement is fast, it's good UX)
+                setTimeout(() => {
+                    generateConfigFile();
+                    downloadConfigFile();
+                    hideLoading();
+                }, 500);
+            };
             nextButtonContainer.appendChild(downloadButton);
     }
     
     nav.append(prevButton, nextButtonContainer);
     dom.configWizard.append(wizardHeader, stepContainer, nav);
     bindWizardEvents();
-}
 
-// --- Enhanced Calculator Table (Radio/Buttons support) ---
-function renderAxisCalculatorTable() {
-    const container = document.createElement('div');
-    
-    // Slew Rate Global Input
-    const slewDiv = document.createElement('div');
-    slewDiv.style.marginBottom = '1.5rem';
-    slewDiv.innerHTML = `
-        <div class="form-group" style="max-width: 300px; margin: 0 auto;">
-            <label>SLEW_RATE_BASE_DESIRED (°/s) <code>(SLEW_RATE_BASE_DESIRED)</code></label>
-            <input type="number" id="SLEW_RATE_BASE_DESIRED" class="xls-input" value="${appState.calcParams.SLEW_RATE}" step="0.1">
-        </div>
-    `;
-    container.appendChild(slewDiv);
-
-    const table = document.createElement('div');
-    table.className = 'xls-table';
-
-    // Header
-    table.innerHTML += `
-        <div class="xls-header">Parameter</div>
-        <div class="xls-header">Axis 1 (RA/AZM)</div>
-        <div class="xls-header">Axis 2 (DEC/ALT)</div>
-    `;
-
-    // Definition of rows with "modes"
-    const rows = [
-        { id: 'motor', label: 'XLS_MOTOR_STEPS', modes: [{k:'std', l:'Std'}, {k:'custom', l:'Custom'}], stdOpts: [200, 400] },
-        { id: 'micro', label: 'XLS_MICROSTEPS', modes: [{k:'std', l:'Std'}, {k:'custom', l:'Custom'}], stdOpts: [16, 32, 64, 128] },
-        { id: 'gr1', label: 'XLS_GR1', modes: [{k:'free', l:'Free'}, {k:'belt', l:'Belt'}, {k:'worm', l:'Worm'}] },
-        { id: 'gr2', label: 'XLS_GR2', modes: [{k:'free', l:'Free'}, {k:'belt', l:'Belt'}, {k:'worm', l:'Worm'}] }
-    ];
-
-    rows.forEach(p => {
-        // Render Label
-        table.innerHTML += `<div class="xls-cell"><div class="xls-label">${appState.i18n[p.label] || p.label}</div></div>`;
-        
-        // Render Axis 1 & 2 Inputs
-        ['AXIS1', 'AXIS2'].forEach(axis => {
-            const cell = document.createElement('div');
-            cell.className = 'xls-cell';
-            
-            // Mode Selector Buttons
-            const modeContainer = document.createElement('div');
-            modeContainer.className = 'mode-selector';
-            const currentMode = appState.calcModes[axis][p.id];
-
-            p.modes.forEach(m => {
-                const btn = document.createElement('button');
-                btn.className = `mode-btn ${currentMode === m.k ? 'active' : ''}`;
-                btn.textContent = m.l;
-                btn.onclick = () => {
-                    appState.calcModes[axis][p.id] = m.k;
-                    // Reset value if switching to Belt to force calc? No, keep value.
-                    // Re-render table to reflect mode change
-                    const newContent = renderAxisCalculatorTable();
-                    dom.configWizard.querySelector('.step-container').innerHTML = '';
-                    dom.configWizard.querySelector('.step-container').appendChild(newContent);
-                };
-                modeContainer.appendChild(btn);
-            });
-            cell.appendChild(modeContainer);
-
-            // Input Logic
-            const val = appState.calcParams[axis][p.id];
-            let inputHTML = '';
-            let extraHTML = '';
-
-            // Handle "Belt" Mode special case
-            if ((p.id === 'gr1' || p.id === 'gr2') && currentMode === 'belt') {
-                inputHTML = `<input type="number" class="xls-input locked-input" id="${axis}_${p.id}_input" value="${val}" readonly>`;
-                extraHTML = `<button class="xls-calc-btn btn-glow" onclick="openBeltCalc('${axis}', '${p.id}')">${appState.i18n.beltCalcButton || 'Calc'}</button>`;
-            } 
-            // Handle "Standard" Dropdown
-            else if (currentMode === 'std' && p.stdOpts) {
-                 let opts = p.stdOpts.map(o => `<option value="${o}" ${o==val?'selected':''}>${o}</option>`).join('');
-                 inputHTML = `<select class="xls-input calc-trigger" data-axis="${axis}" data-param="${p.id}">${opts}</select>`;
-            }
-            // Handle "Custom" or "Free" or "Worm" (Just input)
-            else {
-                // If Worm, maybe add a label but standard input? Treat as free input for now.
-                inputHTML = `<input type="number" class="xls-input calc-trigger" id="${axis}_${p.id}_input" data-axis="${axis}" data-param="${p.id}" value="${val}">`;
-                if(p.id.startsWith('gr')) {
-                     // Still show Calc button but without glow/force
-                     extraHTML = `<button class="xls-calc-btn" onclick="openBeltCalc('${axis}', '${p.id}')">Calc</button>`;
-                }
-            }
-
-            cell.innerHTML += inputHTML + extraHTML + `<div id="${axis}_${p.id}_err" class="xls-warning"></div>`;
-            table.appendChild(cell);
-        });
-    });
-
-    // Results Section (Same as before)
-    table.innerHTML += `<div class="xls-section-title">Calculated Results</div>`;
-    table.innerHTML += `<div class="xls-label">STEPS_PER_DEGREE</div>`;
-    ['AXIS1', 'AXIS2'].forEach(axis => {
-        table.innerHTML += `<div><div id="${axis}_RES_SPD" class="xls-result">-</div><span id="${axis}_WARN_SPD" class="xls-warning"></span></div>`;
-    });
-    table.innerHTML += `<div class="xls-label">${appState.i18n.XLS_RESOLUTION} (arc-sec)</div>`;
-    ['AXIS1', 'AXIS2'].forEach(axis => {
-        table.innerHTML += `<div id="${axis}_RES_TR" class="xls-readout">-</div>`;
-    });
-    table.innerHTML += `<div class="xls-label">${appState.i18n.XLS_RPM} (@SlewMax)</div>`;
-    ['AXIS1', 'AXIS2'].forEach(axis => {
-        table.innerHTML += `<div><div id="${axis}_RES_RPM" class="xls-readout">-</div><span id="${axis}_WARN_RPM" class="xls-warning"></span></div>`;
-    });
-
-    container.appendChild(table);
-    setTimeout(() => recalculateXLS(), 0);
-    return container;
-}
-
-function recalculateXLS() {
-    if (!document.querySelector('.xls-table')) return;
-
-    const slewRate = parseFloat(document.getElementById('SLEW_RATE_BASE_DESIRED').value) || 2.5;
-    appState.calcParams.SLEW_RATE = slewRate;
-    appState.config['SLEW_RATE_BASE_DESIRED'] = slewRate;
-
-    ['AXIS1', 'AXIS2'].forEach(axis => {
-        const p = appState.calcParams[axis];
-        
-        let isValid = true;
-        
-        // Validation logic... (Simplified for brevity, same as before)
-        // Note: For Belt mode, inputs are readonly, so assume valid logic or check value
-        if (p.motor <= 0) isValid = false;
-        if (p.gr1 <= 0) isValid = false;
-        if (p.gr2 <= 0) isValid = false;
-
-        // Visual feedback for errors is handled by checking DOM elements if they exist
-        const motorErr = document.getElementById(`${axis}_motor_err`);
-        if(motorErr) motorErr.textContent = (p.motor <= 0) ? "Invalid" : "";
-
-        if (!isValid) return;
-
-        const spd = (p.motor * p.micro * p.gr1 * p.gr2) / 360.0;
-        
-        appState.config[`${axis}_STEPS_PER_DEGREE`] = spd.toFixed(1);
-        appState.config[`${axis}_DRIVER_MICROSTEPS`] = p.micro;
-
-        const spdEl = document.getElementById(`${axis}_RES_SPD`);
-        const warnSpdEl = document.getElementById(`${axis}_WARN_SPD`);
-        const trEl = document.getElementById(`${axis}_RES_TR`);
-        const rpmEl = document.getElementById(`${axis}_RES_RPM`);
-        const warnRpmEl = document.getElementById(`${axis}_WARN_RPM`);
-
-        if (spdEl) spdEl.textContent = spd.toLocaleString(undefined, {maximumFractionDigits: 1});
-        
-        if (spd < 12800 || spd > 61200) {
-            if(warnSpdEl) warnSpdEl.textContent = "[12,800 - 61,200]";
-            if(spdEl) spdEl.style.backgroundColor = 'rgba(255,0,0,0.2)';
-        } else {
-            if(warnSpdEl) warnSpdEl.textContent = "";
-            if(spdEl) spdEl.style.backgroundColor = '';
-        }
-
-        const res = 3600 / spd; 
-        if (trEl) trEl.textContent = res.toFixed(3);
-
-        const totalRatio = p.gr1 * p.gr2;
-        const rpm = (slewRate * totalRatio) / 6.0;
-        
-        if (rpmEl) rpmEl.textContent = rpm.toFixed(1);
-        if (rpm > 1500) {
-            if(warnRpmEl) warnRpmEl.textContent = "[< 1500 RPM]";
-        } else {
-            if(warnRpmEl) warnRpmEl.textContent = "";
-        }
-    });
+    // If we just landed on Summary, auto-generate preview
+    if (currentStepSchema._summary) {
+         showLoading();
+         setTimeout(() => {
+             generateConfigFile();
+             hideLoading();
+         }, 500);
+    }
 }
 
 function buildFormForStep(stepSchema) {
     const fragment = document.createDocumentFragment();
+    
+    // Optional grouping logic for Driver settings
     if (stepSchema.AXIS1_DRIVER_MODEL) {
         const axis1Section = document.createElement('div');
         axis1Section.className = 'axis-section';
-        const h3_1 = document.createElement('h3');
-        h3_1.textContent = 'RA/AZM Axis';
-        axis1Section.appendChild(h3_1);
+        axis1Section.innerHTML = `<h3>RA/AZM Axis</h3>`;
         
         const axis2Section = document.createElement('div');
         axis2Section.className = 'axis-section';
-        const h3_2 = document.createElement('h3');
-        h3_2.textContent = 'DEC/ALT Axis';
-        axis2Section.appendChild(h3_2);
+        axis2Section.innerHTML = `<h3>DEC/ALT Axis</h3>`;
         
         for (const key in stepSchema) {
+            if (key === '_separator') continue;
             const def = stepSchema[key];
             const formControl = createFormControl(key, def);
             if(key.startsWith('AXIS1')) axis1Section.appendChild(formControl);
             else if (key.startsWith('AXIS2')) axis2Section.appendChild(formControl);
+            else fragment.appendChild(formControl);
         }
         fragment.append(axis1Section, axis2Section);
     } else {
             for (const key in stepSchema) {
+            if (key === '_separator') continue;
             const def = stepSchema[key];
             fragment.appendChild(createFormControl(key, def));
         }
@@ -700,6 +195,7 @@ function createFormControl(key, def) {
     label.htmlFor = key;
     label.textContent = appState.i18n[def.labelKey] || key;
     
+    // Add define code name
     const codeTag = document.createElement('code');
     codeTag.textContent = `(${key})`;
     label.appendChild(codeTag);
@@ -721,6 +217,12 @@ function createFormControl(key, def) {
             select.appendChild(option);
         });
         group.appendChild(select);
+    } else if (def.type === 'number') {
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.id = key; input.name = key;
+        input.value = appState.config[key];
+        group.appendChild(input);
     }
     return group;
 }
@@ -734,7 +236,7 @@ function renderWikiPage(pageKey) {
 }
 
 // ===================================================================================
-// EVENT HANDLERS & ACTIONS
+// EVENT HANDLERS
 // ===================================================================================
 function loadLanguage(lang) {
     appState.language = lang;
@@ -780,19 +282,12 @@ function changeWizardStep(direction) {
 }
 
 function generateConfigFile() {
-    // Select template based on version
-    if (!appState.version) {
-        document.getElementById('config-preview').value = "Error: No configuration loaded. Please restart.";
-        return;
-    }
+    if (!appState.version) return;
     const template = appState.version === 'classic' ? TEMPLATE_ONSTEP_CLASSIC : TEMPLATE_ONSTEPX;
     
     const previewArea = document.getElementById('config-preview');
-    const downloadBtn = document.getElementById('download-btn');
-    if (!previewArea || !downloadBtn) return;
+    if (!previewArea) return;
     
-    downloadBtn.disabled = true;
-
     let content = template;
     // Inject user values
     for (const key in appState.config) {
@@ -811,7 +306,6 @@ function generateConfigFile() {
     content += comments;
 
     previewArea.value = content;
-    downloadBtn.disabled = false;
 }
 
 function downloadConfigFile() {
@@ -828,90 +322,28 @@ function downloadConfigFile() {
 }
 
 function showInfoModal(key) {
-        const stepSchema = schemas[appState.version]?.[appState.wizardStep];
-        const def = stepSchema?.[key];
+        // Find schema definition across all steps (naive search)
+        const schema = SCHEMAS[appState.version];
+        let def = null;
+        for(let step of schema) {
+            if(step[key]) { def = step[key]; break; }
+        }
     
     if (def) {
         dom.infoModalTitle.innerHTML = appState.i18n[def.labelKey] || key;
-        dom.infoModalText.innerHTML = (appState.i18n[def.descriptionKey] || 'N/A');
+        dom.infoModalText.innerHTML = (appState.i18n[def.descriptionKey] || 'No description available.');
         dom.infoModal.classList.add('visible');
     }
 }
 function hideInfoModal(modal) { modal.classList.remove('visible'); }
 
-// --- New Belt Calc Logic ---
-function openBeltCalc(axis, param) {
-    appState.activeCalcField = { axis, param };
-    dom.beltCalcModal.classList.add('visible');
-    
-    // Add "Apply" button logic dynamically or ensure it exists
-    let applyBtn = document.getElementById('belt-apply-btn');
-    if(!applyBtn) {
-        applyBtn = document.createElement('button');
-        applyBtn.id = 'belt-apply-btn';
-        applyBtn.className = 'button primary';
-        applyBtn.style.marginTop = '1rem';
-        applyBtn.style.width = '100%';
-        applyBtn.textContent = appState.i18n.beltCalcApply || "Apply Ratio";
-        dom.beltResultText.parentNode.appendChild(applyBtn);
-        
-        applyBtn.onclick = applyBeltCalcResult;
-    }
-    calculateBeltLength();
-}
-
-function applyBeltCalcResult() {
-    if (!appState.activeCalcField) return;
-    
-    const p1 = parseFloat(document.getElementById('belt-p1').value);
-    const p2 = parseFloat(document.getElementById('belt-p2').value);
-    
-    if (p1 > 0 && p2 > 0) {
-        const ratio = p2 / p1;
-        const { axis, param } = appState.activeCalcField;
-        
-        // Update App State
-        appState.calcParams[axis][param] = ratio;
-        appState.calcModes[axis][param] = 'belt'; // Force mode to Belt to lock input
-        
-        // Close and Re-render
-        hideInfoModal(dom.beltCalcModal);
-        const newContent = renderAxisCalculatorTable();
-        dom.configWizard.querySelector('.step-container').innerHTML = '';
-        dom.configWizard.querySelector('.step-container').appendChild(newContent);
-    }
-}
-
-function calculateBeltLength() {
-    const p1 = parseFloat(document.getElementById('belt-p1').value);
-    const p2 = parseFloat(document.getElementById('belt-p2').value);
-    const pitch = parseFloat(document.getElementById('belt-pitch').value);
-    const dist = parseFloat(document.getElementById('belt-distance').value);
-    if ([p1, p2, pitch, dist].some(isNaN)) return;
-
-    const r1 = (p1 * pitch) / (2 * Math.PI);
-    const r2 = (p2 * pitch) / (2 * Math.PI);
-    const length = Math.sqrt(4 * dist**2 - (r1 - r2)**2) + Math.PI * (r1 + r2) + Math.asin((r1 - r2) / (2*dist)) * (r1 - r2);
-    const teeth = Math.round(length / pitch);
-    
-    // Add Ratio display
-    const ratio = (p2/p1).toFixed(4);
-    
-    dom.beltResultText.innerHTML = `
-        ${appState.i18n.beltCalcLength}: <strong>${length.toFixed(2)} mm</strong><br>
-        ${appState.i18n.beltCalcTeeth}: <strong>${teeth}</strong><br>
-        <hr style="border: 0; border-top: 1px solid #444; margin: 0.5rem 0;">
-        Ratio (P2/P1): <strong>${ratio}</strong>
-    `;
-}
+function showLoading() { dom.loadingOverlay.classList.remove('hidden'); }
+function hideLoading() { dom.loadingOverlay.classList.add('hidden'); }
 
 // ===================================================================================
-// BACKGROUND ANIMATION (Refactored for Constellation Life)
+// BACKGROUND ANIMATION
 // ===================================================================================
-function distance(p1, p2) {
-    return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
-}
-
+// (Keeping this compact)
 function initBackground() {
     const canvas = dom.constellationCanvas;
     canvas.width = window.innerWidth;
@@ -919,65 +351,32 @@ function initBackground() {
     appState.bgStars = [];
     appState.constellations = [];
 
-    // Background Stars
     for (let i = 0; i < 200; i++) {
         appState.bgStars.push({
-            x: Math.random() * canvas.width,
-            y: Math.random() * canvas.height,
-            r: Math.random() * 1.2 + 0.3, 
-            alpha: Math.random() * 0.6 + 0.2,
-            vx: (Math.random() - 0.5) * 0.05,
-            vy: (Math.random() - 0.5) * 0.05,
+            x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+            r: Math.random() * 1.2 + 0.3, alpha: Math.random() * 0.6 + 0.2,
+            vx: (Math.random() - 0.5) * 0.05, vy: (Math.random() - 0.5) * 0.05
         });
     }
-
-    // Initial Constellations
-    for (let i = 0; i < 15; i++) {
-        spawnConstellation(canvas);
-    }
+    for (let i = 0; i < 15; i++) spawnConstellation(canvas);
 }
 
 function spawnConstellation(canvas) {
-    // Start at a random point
     let startX = Math.random() * canvas.width;
     let startY = Math.random() * canvas.height;
-    
-    let chain = [];
-    let current = {
-        x: startX, y: startY,
-        r: Math.random() * 1.5 + 1.0,
-        vx: (Math.random() - 0.5) * 0.15, // Slightly faster
-        vy: (Math.random() - 0.5) * 0.15
-    };
-    chain.push(current);
-
-    // Length 3 to 13
+    let chain = [{ x: startX, y: startY, r: Math.random()*1.5+1.0, vx: (Math.random()-0.5)*0.15, vy: (Math.random()-0.5)*0.15 }];
     const chainLength = Math.floor(Math.random() * 11) + 3; 
     
     for (let k = 0; k < chainLength - 1; k++) {
-        // Next star generation: somewhat random direction but near previous
-        // To reduce backtracking, we simply generate a new point in a random cone
-        // instead of looking for existing stars which might be "behind" us.
         const angle = Math.random() * 2 * Math.PI;
-        const dist = 50 + Math.random() * 100; // 50 to 150px dist
-        
-        let nextStar = {
-            x: current.x + Math.cos(angle) * dist,
-            y: current.y + Math.sin(angle) * dist,
-            r: Math.random() * 1.5 + 0.8,
-            vx: (Math.random() - 0.5) * 0.15,
-            vy: (Math.random() - 0.5) * 0.15
-        };
-        chain.push(nextStar);
-        current = nextStar;
+        const dist = 50 + Math.random() * 100;
+        let prev = chain[chain.length-1];
+        chain.push({
+            x: prev.x + Math.cos(angle) * dist, y: prev.y + Math.sin(angle) * dist,
+            r: Math.random() * 1.5 + 0.8, vx: (Math.random()-0.5)*0.15, vy: (Math.random()-0.5)*0.15
+        });
     }
-
-    appState.constellations.push({
-        stars: chain,
-        life: 1000 + Math.random() * 2000, // Frames to live
-        maxLife: 3000,
-        opacity: 0 // Start invisible and fade in
-    });
+    appState.constellations.push({ stars: chain, life: 1000 + Math.random() * 2000, maxLife: 3000, opacity: 0 });
 }
 
 function animateBackground() {
@@ -985,62 +384,41 @@ function animateBackground() {
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Draw Background Stars
     ctx.fillStyle = 'rgba(224, 229, 240, 1)';
     appState.bgStars.forEach(star => {
         star.x += star.vx; star.y += star.vy;
-        if(star.x < 0) star.x = canvas.width; else if(star.x > canvas.width) star.x = 0;
-        if(star.y < 0) star.y = canvas.height; else if(star.y > canvas.height) star.y = 0;
-        
-        ctx.globalAlpha = star.alpha;
-        ctx.beginPath(); ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2); ctx.fill();
+        if(star.x<0) star.x=canvas.width; else if(star.x>canvas.width) star.x=0;
+        if(star.y<0) star.y=canvas.height; else if(star.y>canvas.height) star.y=0;
+        ctx.globalAlpha = star.alpha; ctx.beginPath(); ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2); ctx.fill();
     });
     ctx.globalAlpha = 1.0;
 
-    // Manage Constellations
     for (let i = appState.constellations.length - 1; i >= 0; i--) {
         let c = appState.constellations[i];
-        
-        // Life Cycle
         c.life--;
-        // Fade In
         if (c.life > c.maxLife - 100) c.opacity += 0.01;
-        // Fade Out
         else if (c.life < 100) c.opacity -= 0.01;
-        else c.opacity = Math.min(c.opacity, 1.0); // Cap
+        else c.opacity = Math.min(c.opacity, 1.0);
 
         if (c.life <= 0 || c.opacity <= 0) {
-            appState.constellations.splice(i, 1);
-            spawnConstellation(canvas); // Respawn
-            continue;
+            appState.constellations.splice(i, 1); spawnConstellation(canvas); continue;
         }
 
         ctx.strokeStyle = `rgba(224, 229, 240, ${c.opacity * 0.3})`;
         ctx.fillStyle = `rgba(255, 255, 255, ${c.opacity})`;
         ctx.lineWidth = 1;
 
-        // Update & Draw
         if(c.stars.length > 0) {
-            ctx.beginPath();
-            ctx.moveTo(c.stars[0].x, c.stars[0].y);
-            
+            ctx.beginPath(); ctx.moveTo(c.stars[0].x, c.stars[0].y);
             c.stars.forEach(star => {
                 star.x += star.vx; star.y += star.vy;
-                // Boundary bounce
-                if (star.x < 0 || star.x > canvas.width) star.vx *= -1;
-                if (star.y < 0 || star.y > canvas.height) star.vy *= -1;
-                
+                if(star.x<0||star.x>canvas.width) star.vx*=-1; if(star.y<0||star.y>canvas.height) star.vy*=-1;
                 ctx.lineTo(star.x, star.y);
             });
             ctx.stroke();
-
-            // Draw Dots
-            c.stars.forEach(star => {
-                ctx.beginPath(); ctx.arc(star.x, star.y, star.r, 0, Math.PI*2); ctx.fill();
-            });
+            c.stars.forEach(star => { ctx.beginPath(); ctx.arc(star.x, star.y, star.r, 0, Math.PI*2); ctx.fill(); });
         }
     }
-
     requestAnimationFrame(animateBackground);
 }
 
@@ -1065,10 +443,10 @@ function bindEventListeners() {
     const beltPitchInput = document.getElementById('belt-pitch');
     beltTypeSelector.addEventListener('change', (e) => {
         beltPitchInput.value = e.target.value;
-        calculateBeltLength();
+        if(typeof calculateBeltLength === 'function') calculateBeltLength(); // Check existence in case calc.js fails
     });
     dom.beltCalcModal.addEventListener('input', e => {
-        if (e.target.id !== 'belt-type') calculateBeltLength();
+        if (e.target.id !== 'belt-type' && typeof calculateBeltLength === 'function') calculateBeltLength();
     });
 }
 
@@ -1083,10 +461,10 @@ function bindWizardEvents() {
             const axis = target.dataset.axis;
             const param = target.dataset.param;
             appState.calcParams[axis][param] = parseFloat(target.value);
-            recalculateXLS();
+            if(typeof recalculateXLS === 'function') recalculateXLS();
             } else if (target.id === 'SLEW_RATE_BASE_DESIRED') {
-            recalculateXLS();
-            } else if (target.tagName === 'SELECT') {
+            if(typeof recalculateXLS === 'function') recalculateXLS();
+            } else if (target.tagName === 'SELECT' || target.tagName === 'INPUT') {
             if (target.id) appState.config[target.id] = target.value;
             }
     });
@@ -1118,7 +496,7 @@ async function init() {
         window.addEventListener('resize', initBackground);
     } catch (e) {
         console.error("Critical Initialization Error:", e);
-        alert("Critical Error: Application failed to start. Check console for details.\n\n" + e.message);
+        alert("Critical Error: Application failed to start.\n" + e.message);
     }
 }
 
