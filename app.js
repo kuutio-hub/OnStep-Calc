@@ -300,7 +300,7 @@ const LOCALES = {
 // ===================================================================================
 // CONSTANTS & CONFIGURATION
 // ===================================================================================
-const APP_VERSION = "0.0.5.4-beta";
+const APP_VERSION = "0.0.5.5-beta";
 
 const schemas = {
     onstepx: [
@@ -427,7 +427,8 @@ function renderWizard() {
     stepContainer.className = 'step-container';
     
     if (currentStepSchema._summary) {
-        stepContainer.style.display = 'flex'; flex-direction: 'column';
+        stepContainer.style.display = 'flex';
+        stepContainer.style.flexDirection = 'column';
         const summaryText = document.createElement('p');
         summaryText.innerHTML = appState.i18n.summaryText;
         stepContainer.appendChild(summaryText);
