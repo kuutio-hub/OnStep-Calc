@@ -6,6 +6,12 @@ All notable changes to this project will be documented in this file.
 The format is based on on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.5.4-beta] - 2024-06-07
+
+### Fixed
+- **Offline Compatibility (CORS):** Completely removed ES6 Module dependencies (`import`/`export`) which caused "Loading..." freeze when opening the application directly from the hard drive via `file://` protocol.
+- **Refactor:** Merged `templates.js` and `locales.js` directly into `app.js`.
+
 ## [0.0.5.3-beta] - 2024-06-07
 
 ### Fixed
