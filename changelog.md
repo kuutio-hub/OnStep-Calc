@@ -6,6 +6,17 @@ All notable changes to this project will be documented in this file.
 The format is based on on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.5.6-beta] - 2024-06-07
+
+### Added
+- **UI Improvements:** Added "Mode Selectors" to the Motor/Gearing Calculator. Users can now choose between Standard lists or Custom inputs for motors, and Free input or Belt calculations for gears.
+- **Belt Calculator Integration:** Added an "Apply Ratio" button to the belt calculator modal. This writes the calculated P2/P1 ratio back to the main form, locks the input field, and adds a visual glow effect to indicate the data source.
+- **Background Animation:** Completely rewrote constellation logic. Constellations now have a "lifespan", fade in/out, and regenerate to prevent visual degradation over time. Chain lengths increased to 3-13 stars.
+
+### Fixed
+- **Generation Bug:** Fixed an issue where the `Config.h` preview window remained stuck on "Generating..." due to incorrect property access (`textContent` vs `value`).
+- **Contrast:** Improved text contrast in dropdown menus for better readability.
+
 ## [0.0.5.5-beta] - 2024-06-07
 
 ### Fixed
